@@ -1,0 +1,291 @@
+
+body {
+  font-family: "Satoshi" !important;
+  background-color: #fff !important;
+  background-color: #f6f7ff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; 
+}
+
+body::-webkit-scrollbar{
+ width: 0.3em;;
+ height: 0.3em;
+}
+body::-webkit-scrollbar-thumb{
+ background-color: rgba(0,0,0,.1);
+ }
+body::-webkit-scrollbar-track{
+ box-shadow: inset 0 0 6px rgba(0,0,0,0.00);
+}
+
+::-webkit-scrollbar{
+ width: 0.3em;
+ height: 0.3em;
+}
+::-webkit-scrollbar-thumb{
+ background-color: rgba(0,0,0,.1); 
+}
+::-webkit-scrollbar-track{
+ box-shadow: inset 0 0 6px rgba(0,0,0,0.00);
+}
+
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.refo-name {
+ font-family: 'arialRounded', sans-serif;
+ font-weight: 600 ;
+ font-size:2.3rem;
+ color:#064be2;
+ letter-spacing: 3px;
+ margin: 0px;
+}
+
+@font-face {
+ font-family: "arialRounded";
+ src: local("arialRounded"),
+  url("../../fonts/arialRounded.ttf") format("truetype");
+}
+
+.refo-font {
+ font-family: 'arialRounded', sans-serif;
+ font-weight: 600 ;
+ letter-spacing: 2px;
+}
+
+nav ul {
+ list-style-type: none;
+ display: flex;
+ align-items: center;
+ height: 50px;
+ padding: 0;
+ flex-direction: row;
+}
+
+nav .unOrder {
+ list-style-type: none;
+ display: flex;
+ align-items: flex-start;
+ padding: 0;
+ flex-direction: column;
+ height: max-content;
+ gap: 30px;
+ margin-top:30px;
+}
+
+nav li {
+ margin: 0 10px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 10px;
+}
+
+nav li img {
+ width: 22px;
+ filter: invert();
+}
+
+
+nav .list {
+ margin: 0 10px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap:8px;
+}
+
+nav .list img {
+ width: 22px;
+ filter: invert();
+}
+
+nav .list-item{
+ text-align: center;
+ color: #fff;
+}
+
+nav .list-item:hover{
+ cursor: pointer;
+}
+
+nav .list-item a{
+ color: #ffffff;
+ text-decoration: none;
+ padding: 5px 15px;
+ transition: all 0.3s ease;
+ text-align: start;
+}
+
+nav .list:hover{
+ cursor: pointer;
+}
+nav .list a {
+ color: #ffffff;
+ text-decoration: none;
+ padding: 5px 10px;
+ transition: all 0.3s ease;
+ align-items: flex-end;
+ display: flex;
+ gap: 10px;
+}
+
+nav .list a.active {
+ border-bottom: 3px solid #ffffff8a;
+ /* color: rgb(36, 55, 99);
+ background-color: #ffffff8a;
+ border-radius: 10px;
+ width: max-content;
+ font-weight: 600; */
+}
+
+.unOrder{
+ list-style: none;
+ display: flex;
+ flex-direction: column;
+}
+
+ul{
+ list-style: none;
+ display: flex;
+ flex-direction: column;
+ gap:12px
+}
+
+.registration_firm{
+  border:2px solid #fff;
+  border-radius:10px;
+  padding:4px 15px;
+
+}
+
+.iconBlink{
+ -webkit-animation: blink-1 3s steps(2, end) 3s infinite both;
+  animation: blink-1 3s steps(2, end) 3s infinite both;
+  width:80px !important;
+  text-align:center;
+  text-decoration:none;
+  color:#ffec1d !important;
+}
+
+@-webkit-keyframes blink-1 {
+ 0%,
+ 50%,
+ 100% {
+   opacity: 1;
+ }
+ 25%,
+ 75% {
+   opacity: 0.5;
+ }
+}
+@keyframes blink-1 {
+ 0%,
+ 50%,
+ 100% {
+   opacity: 1;
+ }
+ 25%,
+ 75% {
+   opacity: 0.5;
+ }
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+  
+@-webkit-keyframes rotation {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+
+  to {
+    -webkit-transform: rotate(359deg);
+  }
+}
+
+@-moz-keyframes rotation {
+  from {
+    -moz-transform: rotate(0deg);
+  }
+
+  to {
+    -moz-transform: rotate(359deg);
+  }
+}
+
+@-o-keyframes rotation {
+  from {
+    -o-transform: rotate(0deg);
+  }
+
+  to {
+    -o-transform: rotate(359deg);
+  }
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+.Toastify__toast-body{
+ gap: 15px !important;
+}
+
+.Toastify__toast--error{
+ background-color: #f44336 !important;
+ color: #fff !important;
+}
+
+.Toastify__toast--success{
+ background-color: #4caf50 !important;
+ color: #fff !important;
+}
+
+.Toastify__toast-icon {
+ display: none;
+}
+
+.tag_input{
+  border: 1px solid #ced4da;
+    width: 100% !important;
+    border-radius: 0px;  
+  }
+
+.rti--input{
+ width: 100% !important;
+}
+
+.tooltip-container {
+ position: relative;
+ height: 100%;
+ width: 100%;
+} 
+
+.recharts-responsive-container{ 
+ display: flex;
+}
+
+/* .recharts-wrapper{
+ box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px !important
+} */
+
+.activeness {
+ background-color: #f0f0f0;
+ color: #000;
+}
+
+
+ 

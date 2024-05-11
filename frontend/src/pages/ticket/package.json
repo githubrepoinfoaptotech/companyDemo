@@ -1,0 +1,7 @@
+{
+    "name": "ticket",
+    "version": "0.0.0",
+    "main": "Ticket.js",
+    "private": true
+  }
+  

@@ -1,0 +1,1004 @@
+import React from "react";
+import { useState } from "react";
+import {
+  Grid,
+  Typography,
+  Box,
+  useTheme,
+  useMediaQuery, 
+  Button,
+  Backdrop,
+  CircularProgress,
+} from "@material-ui/core";
+import { createTheme, MuiThemeProvider } from "@material-ui/core/styles";
+import {
+  Toolbar,
+  AppBar,
+  TextField,
+  InputLabel,
+  FormControl,
+  Select,
+  MenuItem,
+} from "@material-ui/core";
+import { ToastContainer } from "react-toastify";
+
+import axios from "axios";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import Notification from "../../components/Notification";
+import useStyles from "../../themes/style";
+import DrawerComp from "./DrawerComp";
+  
+import icon1 from "../../images/dashboard/home.png";
+ import moment from "moment";
+import CloseIcon from "@material-ui/icons/Close";
+
+import red from "@material-ui/core/colors/red";
+import "react-toastify/dist/ReactToastify.css";
+import "./register.css"
+const positions = [toast.POSITION.TOP_RIGHT];
+
+function CompanyRegister() {
+  const getMuiTheme = () =>
+    createTheme({
+      overrides: {
+        MuiAvatar: {
+          root: {
+            fontFamily: '"Satoshi"',
+          },
+        },
+        MuiMenuItem: {
+          root: {
+            fontFamily: '"Satoshi"',
+          },
+        },
+        MUIDataTableToolbar: {
+          actions: {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+          },
+          icon: {
+            color: "#064be2",
+            "& svg": {
+              color: "white",
+              width: "25px",
+              cursor: "pointer",
+              height: "25px",
+              padding: "5px",
+              boxShadow: "0 3px 9px 0 rgba(0,0,0,0.3)",
+              borderRadius: "100%",
+              backgroundColor: "#064be2",
+            },
+          },
+
+          iconActive: {
+            color: "#064be2",
+            "& svg": {
+              color: "white",
+              width: "25px",
+              cursor: "pointer",
+              height: "25px",
+              padding: "5px",
+              boxShadow: "0 3px 9px 0 rgba(0,0,0,0.3)",
+              borderRadius: "100%",
+              backgroundColor: "#064be2",
+            },
+          },
+        },
+        MUIDataTableBody: {
+          emptyTitle: {
+            "@media (max-width: 425px)": {
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+            },
+            "@media (max-width: 959.95px)": {
+              marginLeft: "-100px",
+            },
+          },
+        },
+
+        MUIDataTableBodyCell: {
+          stackedCommon: {
+            "@media (max-width:959.95px)": {
+              fontSize: "13px !important",
+              "&:nth-last-child(2)": { fontWeight: 700 },
+              "&:last-child": { lineBreak: "anywhere" },
+            },
+          },
+          responsiveStackedSmallParent: {
+            "@media (max-width:425px)": { width: "93%" },
+          },
+        },
+        MuiTable: {
+          root: {
+            "& caption": { fontFamily: '"Satoshi" !important' },
+          },
+        },
+        MuiBadge: {
+          badge: {
+            height: "30px!important",
+            fontFamily: '"Satoshi" !important',
+          },
+          colorSecondary: {
+            backgroundColor: red[500] + "!important",
+          },
+          anchorOriginTopLeftCircular: {
+            top: "14%",
+            left: "-21px",
+            inlineSize: "max-content",
+          },
+        },
+        MuiTableCell: {
+          head: {
+            color: "#121224",
+            backgroundColor: "#f0f5f9 !important",
+            fontSize: "15px !important",
+            fontWeight: "bold",
+            letterSpacing: "0.02em",
+          },
+          body: {
+            color: "#121224",
+            fontFamily: '"Satoshi" !important',
+            fontSize: "13.5px !important",
+            "&:last-child": { whiteSpace: "nowrap" },
+          },
+
+          root: {
+            padding: "14px",
+            fontFamily: '"Satoshi" !important',
+          },
+          paddingCheckbox: {
+            "@media (max-width:959.95px)": { width: "10px" },
+          },
+        },
+        MuiList: {
+          padding: {
+            paddingBottom: "0px !important",
+          },
+        },
+        MuiListItem: {
+          secondaryAction: {
+            paddingRight: "45px !important",
+          },
+        },
+        MuiSelect: {
+          select: {
+            "&:focus": { backgroundColor: "none !important" },
+          },
+        },
+
+        MuiTableRow: {
+          root: {
+            "&:nth-of-type(odd)": { backgroundColor: "white" },
+            "&:nth-of-type(even)": { backgroundColor: "#f0f5f9" },
+          },
+        },
+
+        MuiIconButton: {
+          root: {
+            padding: "9px",
+          },
+        },
+
+        MuiTypography: {
+          subtitle1: {
+            fontSize: "1rem",
+            fontWeight: "500",
+            fontFamily: '"Satoshi" !important',
+            "@media (max-width:959.95px)": { fontSize: "0.9rem !important" },
+          },
+          subtitle2: {
+            fontWeight: "500",
+            fontFamily: '"Satoshi" !important',
+            textAlign: "center",
+            padding: "10px",
+            fontSize: "21px",
+            "@media (max-width:959.95px)": {
+              fontSize: "calc(1.1rem) !important",
+            },
+          },
+          body1: {
+            fontFamily: '"Satoshi" !important',
+            fontSize: "14px",
+            "@media (max-width:959.95px)": { fontSize: "13px !important" },
+          },
+          body2: {
+            color: "#121224",
+            fontFamily: '"Satoshi" !important',
+            fontSize: "14px",
+            "@media (max-width:959.95px)": { fontSize: "13px !important" },
+          },
+          h5: {
+            color: "#121224",
+            fontFamily: '"Satoshi" !important',
+            fontSize: "14px",
+            "@media (max-width:959.95px)": {
+              fontSize: "calc(1.1rem) !important",
+            },
+          },
+          h6: {
+            color: "#121224",
+            fontFamily: '"Satoshi" !important',
+            fontSize: "14px",
+            "@media (max-width:959.95px)": {
+              fontSize: "calc(1.1rem) !important",
+            },
+          },
+        },
+        MuiPaper: {
+          elevation4: {
+            boxShadow: "none",
+          },
+        },
+
+        MuiDialog: {
+          paper: {
+            margin: "15px !important",
+            border: "1px solid #000 !important",
+          },
+        },
+
+        MuiFab: {
+          root: {
+            "&:hover": {
+              backgroundColor: "064be2 !important",
+            },
+          },
+        },
+        MuiButton: {
+          root: {
+            fontFamily: '"Satoshi !important"',
+            fontSize: "14px",
+            fontWeight: 500,
+            boxShadow: "0 3px 9px 0 rgba(0,0,0,0.3) !important",
+            "@media (max-width:959.95px)": { fontSize: "10px !important" },
+          },
+          label: {
+            fontFamily: '"Satoshi" !important',
+            fontSize: "14px",
+            "@media (max-width:959.95px)": { fontSize: "10px !important" },
+          },
+          containedPrimary: {
+            backgroundColor: "#064be2 !important",
+            textTransform: "initial !important",
+            "&:active": {
+              backgroundColor: "#064be2 !important",
+              color: "#fff !important",
+            },
+            "&:hover": {
+              backgroundColor: "#064be2 !important",
+              color: "#fff !important",
+            },
+            "&:disabled": {
+              backgroundColor: "#064be2c7 !important",
+              color: "#fff !important",
+            },
+          },
+          containedSizeSmall: {
+            textTransform: "initial !important",
+            padding: "4px 10px !important",
+            fontWeight: "300 !important",
+            height: "fit-content !important",
+          },
+          containedSecondary: {
+            backgroundColor: red[500] + "!important",
+            "&:active": {
+              backgroundColor: red[500] + "!important",
+              color: "#fff !important",
+            },
+            "&:hover": {
+              backgroundColor: red[500] + "!important",
+              color: "#fff !important",
+            },
+          },
+        },
+        MuiFormLabel: {
+          root: {
+            fontFamily: '"Satoshi" !important',
+            fontSize: "20px",
+            "@media (max-width:959.95px)": { fontSize: "15px !important" },
+            color: "rgba(0, 0, 0, 0.87)",
+          },
+        },
+        MuiCheckbox: {
+          root: {
+            color: "#bcbdbf",
+          },
+        },
+        MuiFormControl: {
+          root: {
+            width: "100%",
+          },
+        },
+        MuiTooltip: {
+          tooltip: {
+            fontFamily: '"Satoshi" !important',
+          },
+          // popper:{
+          //   top: "-34px !important",
+          //   left: '-45px !important'
+          // }
+        },
+        MuiInputBase: {
+          root: {
+            width: "100%",
+          },
+          input: {
+            width: "100%",
+            border: "none",
+            fontSize: "13px",
+            display: "block",
+            padding: "10px 12px !important",
+
+            borderRadius: "4px",
+          },
+        },
+
+        MuiAutocomplete: {
+          input: {
+            width: "100% !important",
+          },
+        },
+
+        MuiFilledInput: {
+          root: {
+            width: "100%",
+            display: "block",
+            padding: "0px 25px 0px 0px !important",
+            position: "relative",
+            fontSize: "13px",
+            marginTop: "24px",
+
+            backgroundColor: "white",
+            "&:hover": { backgroundColor: "unset !important" },
+            "&.Mui-focused": { backgroundColor: "unset !important" },
+          },
+
+          underline: {
+            "&&&:before": { borderBottom: "none" },
+            "&&:after": { borderBottom: "none" },
+          },
+          inputAdornedEnd: {
+            border: "1px solid #ced4da",
+          },
+        },
+
+        MuiOutlined: {
+          MuiChip: {
+            avatar: { margin: "0px" },
+          },
+        },
+
+        MuiCardContent: {
+          root: {
+            marginBottom: "10px !important",
+            "&:last-child": { paddingBottom: "0px" },
+          },
+        },
+        MuiCardActions: {
+          root: {
+            marginBottom: "1px !important",
+            // padding: "0px",
+            // marginBottom: "20px",
+            // "@media (max-width:959.95px)": {
+            //   marginBottom: "1px !important",
+            // },
+          },
+        },
+
+        MuiDrawer: {
+          paperAnchorBottom: {
+            width: "50%",
+            left: "30%",
+            bottom: "10%",
+          },
+          paper: {
+            overflowY: "auto",
+            overflowX: "hidden",
+          },
+        },
+        MuiDialogTitle: {
+          root: {
+            padding: "0px 10px !important",
+          },
+        },
+
+        MuiChip: {
+          avatar: {
+            width: "50px !important",
+            height: "50px !important",
+            fontSize: "1.5rem !important",
+            margin: "0px",
+          },
+        },
+        MuiInputLabel: {
+          shrink: {
+            width: "max-content",
+            display: "initial !important",
+            transformOrigin: "top left !important",
+            fontSize: "16px",
+          },
+        },
+      },
+
+      MuiFormGroup: {
+        row: {
+          marginTop: "10px !important",
+        },
+      },
+    });
+
+ 
+  var [errorToastId, setErrorToastId] = useState(null);
+  var [notificationsPosition] = useState(2);
+
+  const theme = useTheme();
+  const classes = useStyles();
+  const isMatch = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const years = Array.from(
+    { length: 60 },
+    (_, i) => moment(new Date()).format("YYYY") - i,
+  );
+
+  function sendNotification(componentProps, options) {
+    return toast(
+      <Notification
+        {...componentProps}
+        className={classes.notificationComponent}
+      />,
+      options,
+    );
+  }
+  function handleNotificationCall(notificationType, message) {
+    var componentProps;
+
+    if (errorToastId && notificationType === "error") return;
+
+    switch (notificationType) {
+      case "info":
+        componentProps = {
+          type: "feedback",
+          message: message,
+          variant: "contained",
+          color: "primary",
+        };
+        break;
+      case "error":
+        componentProps = {
+          type: "message",
+          message: message,
+          variant: "contained",
+          color: "secondary",
+        };
+        break;
+      default:
+        componentProps = {
+          type: "shipped",
+          message: message,
+          variant: "contained",
+          color: "success",
+        };
+    }
+
+    var toastId = sendNotification(componentProps, {
+      type: notificationType,
+      position: positions[notificationsPosition],
+      progressClassName: classes.progress,
+      onClose: notificationType === "error" && (() => setErrorToastId(null)),
+      className: classes.notification,
+    });
+
+    if (notificationType === "error") setErrorToastId(toastId);
+  }
+
+  const [state, setState] = React.useState({
+    JobPortal: false,
+    SocialMedia: false,
+    Reference: false,
+    OthersMention: false,
+    OthersMentionValue: "",
+    contractStaffing: "",
+    minimumCadidatePlacementFee: "",
+    foundedIn: "",
+    hiringSupport: "",
+  });
+
+
+
+  const handleChange = (event) => {
+    setState({ ...state, [event.target.name]: event.target.value });
+  };
+
+  const validationSchema = Yup.object().shape({
+    companyName: Yup.string()
+      .max(255)
+      .required("Name of your Company is required"),
+    foundedIn: Yup.string().required("Founded In is required"),
+    firstName: Yup.string()
+      .max(255)
+      .required("First Name is required")
+      .matches(/^[^!@#$%^&*+=<>:;|~]*$/, {
+        message: "First Name be Alphanumeric",
+      }),
+    lastName: Yup.string()
+      .max(255)
+      .required("Last Name is required")
+      .matches(/^[^!@#$%^&*+=<>:;|~]*$/, {
+        message: "Last Name be Alphanumeric",
+      }),
+    mobile: Yup.string()
+      .required("Mobile is required")
+      .min(10, "Must be exactly 10 digits")
+      .max(10, "Must be exactly 10 digits"),
+    email: Yup.string()
+      .required("Email is required")
+      .email("Email must be a Valid Email Address"),
+    using_ATS: Yup.string().required("Mention ATS Details is required"),
+    hiringSupport: Yup.string().required(
+      "What kind of Hiring Support?",
+    ),
+    gst: Yup.string(),
+
+  });
+
+
+  const {
+    register,
+    reset,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
+
+
+  const [loader, setLoader] = useState(false);
+
+
+  function handleAdd(values) {
+    return new Promise((resolve) => {
+      setLoader(true);
+      
+      axios({
+        method: "post",
+        url: `${process.env.REACT_APP_SERVER}auth/MSMECompanyRegisteration`,
+        data: {
+          companyName: values.companyName,
+          foundedIn: values.foundedIn,
+          firstName: values.firstName,
+          lastName: values.lastName,
+          mobile: values.mobile,
+          email: values.email,
+          recruiterStrength: values.recruiterStrength,
+          using_ATS: values.using_ATS,
+          hiringSupport: state.hiringSupport,
+          gst: values.gst,
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then(function (response) {
+           if (response.data.status === true) {
+            handleNotificationCall("success", response.data.message);
+
+            reset();
+            setTimeout(() => { 
+              window.location.href = `${process.env.REACT_APP_SITE}v1/msme/#/login`;
+            }, 2000);
+          } else {
+            handleNotificationCall("error", response.data.message);
+          }
+          setLoader(false);
+          resolve();
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    });
+  }
+
+  return (
+    <div className={classes.backgroundColor}>
+      <MuiThemeProvider theme={getMuiTheme()}>
+        <>
+          <AppBar className={classes.appBarBg}>
+            <Toolbar className={classes.toolbarLP}>
+              {isMatch ? (
+                <>
+                  <div className={classes.refoTitleMobile}>
+                    <p className="refo-name">refo</p>
+                  </div>
+                  <DrawerComp />
+                </>
+              ) : (
+                <Grid className={classes.gridCenter} container spacing={2}>
+                  <Grid item xs={1} md={1} className={classes.refoTitle}>
+                    <p className="refo-name">refo</p>
+                  </Grid>
+                  <Grid item xs={9} md={7} className={classes.flexCenter}>
+                    <nav>
+                      <ul>
+                        <li className="list">
+                          
+                          <a href={`${process.env.REACT_APP_SITE}`}>
+                            <img src={icon1} alt="Home" /> Home
+                          </a>
+                        </li>
+                        <li className="list">
+                          <a href={`${process.env.REACT_APP_SITE}`}>
+                            Why refo
+                          </a>
+                        </li>
+                        <li className="list">
+                          <a href={`${process.env.REACT_APP_SITE}`}>
+                            Customer Experience
+                          </a>
+                        </li>
+                      </ul>
+                    </nav>
+                  </Grid>
+
+                  <Grid item xs={2} md={4} className={classes.loginContainer}>
+                    <Box className="registration_firm">
+                      <a
+                        href={`${process.env.REACT_APP_SITE}/v1/#/register`}
+                        className="iconBlink"
+                      >
+                        List your consultancy
+                      </a>
+                    </Box>
+                    <div
+                      className={classes.regLoginContainer}>
+                      <p className={classes.beta} >
+                        Beta
+                      </p>
+                      <Box>
+                        <a
+                          href={`${process.env.REACT_APP_SITE}/v1/#/login`}
+                          className={classes.btnLogin}
+                        >
+                          Login
+                        </a>
+                      </Box>
+                    </div>
+                  </Grid>
+                </Grid>
+              )}
+            </Toolbar>
+          </AppBar>
+
+          <Grid container direction="row"  justifyContent={"center"}>
+            <Grid item xs={12} sm={8} md={8} lg={8}>
+              <form
+                onSubmit={handleSubmit(handleAdd)}
+                className={classes.formFields}
+              >
+                <Grid
+                  container
+                  direction="row"
+                  spacing={4}
+                  className={classes.formBox}
+                >
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    <InputLabel shrink htmlFor="companyName">
+                      Name of your Company
+                    </InputLabel>
+                    <FormControl className={classes.margin}>
+                      <TextField
+                        size="small"
+                        classes={{ root: classes.customTextField }}
+                        InputProps={{ disableUnderline: true }}
+                        placeholder="Enter name of your Company"
+                        id="companyName"
+                        name="companyName"
+                        {...register("companyName")}
+                        error={errors.companyName ? true : false}
+                      />
+
+                      <Typography variant="inherit" color="error">
+                        {errors.companyName?.message}
+                      </Typography>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    <InputLabel shrink htmlFor="foundedIn">
+                      Founded In (Year)
+                    </InputLabel>
+                    <FormControl className={classes.margin}>
+                      <Select
+                        name="foundedIn"
+                        value={state.foundedIn}
+                        {...register("foundedIn")}
+                        error={errors.foundedIn ? true : false}
+                        classes={{
+                          root: classes.customSelectField,
+                          icon: classes.customSelectIcon,
+                        }}
+                        disableUnderline
+                        onChange={(e) => {
+                          handleChange(e);
+                        }}
+                      >
+                        {years.reverse().map((item, index) => {
+                          return [<MenuItem value={item}>{item}</MenuItem>];
+                        })}
+                      </Select>
+
+                      <Typography variant="inherit" color="error">
+                        {errors.foundedIn?.message}
+                      </Typography>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    <InputLabel shrink htmlFor="firstName">
+                      Name of the Proprietor / CEO / Head
+                    </InputLabel>
+                    <FormControl className={classes.margin}>
+                      <Grid container direction="row" spacing={2}>
+                        <Grid item xs={6}>
+                          <TextField
+                            classes={{ root: classes.customTextField }}
+                            InputProps={{ disableUnderline: true }}
+                            size="small"
+                            placeholder="Enter First Name"
+                            id="firstName"
+                            name="firstName"
+                            {...register("firstName")}
+                            error={errors.firstName ? true : false}
+                          />
+
+                          <Typography variant="inherit" color="error">
+                            {errors.firstName?.message}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={6}>
+                          <TextField
+                            classes={{ root: classes.customTextField }}
+                            InputProps={{ disableUnderline: true }}
+                            size="small"
+                            placeholder="Enter Last Name"
+                            id="lastName"
+                            name="lastName"
+                            {...register("lastName")}
+                            error={errors.lastName ? true : false}
+                          />
+
+                          <Typography variant="inherit" color="error">
+                            {errors.lastName?.message}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} lg={6}>
+                    <InputLabel shrink htmlFor="mobile">
+                      Mobile Number
+                    </InputLabel>
+                    <FormControl className={classes.margin}>
+                      <TextField
+                        type="number"
+                        classes={{ root: classes.customTextField }}
+                        InputProps={{ disableUnderline: true }}
+                        size="small"
+                        placeholder="Enter Mobile Number"
+                        id="mobile"
+                        name="mobile"
+                        {...register("mobile")}
+                        error={errors.mobile ? true : false}
+                      />
+
+                      <Typography variant="inherit" color="error">
+                        {errors.mobile?.message}
+                      </Typography>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} lg={6}>
+                    <InputLabel shrink htmlFor="email">
+                      Email ID
+                    </InputLabel>
+                    <FormControl className={classes.margin}>
+                      <TextField
+                        classes={{ root: classes.customTextField }}
+                        InputProps={{ disableUnderline: true }}
+                        size="small"
+                        placeholder="Enter Email ID"
+                        id="email"
+                        name="email"
+                        {...register("email")}
+                        error={errors.email ? true : false}
+                      />
+
+                      <Typography variant="inherit" color="error">
+                        {errors.email?.message}
+                      </Typography>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} lg={6}>
+                    <InputLabel shrink htmlFor="recruiterStrength">
+                      Number of Employees
+                    </InputLabel>
+                    <FormControl className={classes.margin}>
+                      <TextField
+                        classes={{ root: classes.customTextField }}
+                        InputProps={{ disableUnderline: true }}
+                        size="small"
+                        placeholder="Enter Recruiter Strength"
+                        id="recruiterStrength"
+                        name="recruiterStrength"
+                        {...register("recruiterStrength")}
+                        error={errors.recruiterStrength ? true : false}
+                      />
+
+                      <Typography variant="inherit" color="error">
+                        {errors.recruiterStrength?.message}
+                      </Typography>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} lg={6}>
+                    <InputLabel shrink htmlFor="hiringSupport">
+                      What kind of Hiring Support?
+                    </InputLabel>
+
+                    <Select
+                      label="Role"
+                      name="hiringSupport"
+                      value={state.hiringSupport}
+                      {...register("hiringSupport")}
+                      error={errors.hiringSupport ? true : false}
+                      classes={{
+                        root: classes.customSelectField,
+                        icon: classes.customSelectIcon,
+                      }}
+                      onChange={(e) => {
+                        handleChange(e);
+                      }}
+                      disableUnderline
+                    >
+                      <MenuItem value="BlueCollar (Electrician, Plumber, Delivery People etc.,)">
+                        
+                        BlueCollar (Electrician, Plumber, Delivery People etc.,)
+                      </MenuItem>
+                      <MenuItem value="WhiteCollar (Tech Jobs, Functional)">
+                        
+                        WhiteCollar (Tech Jobs, Functional)
+                      </MenuItem>
+                      <MenuItem value="PinkCollar (Nurses, Secretaries, Elementary School Teachers etc.,)">
+                        
+                        PinkCollar (Nurses, Secretaries, Elementary School
+                        Teachers etc.,)
+                      </MenuItem>
+                      <MenuItem value="GreenCollar (Land Surveyor, Ecologist, Solar Installer etc.,)">
+                        
+                        GreenCollar (Land Surveyor, Ecologist, Solar Installer
+                        etc.,)
+                      </MenuItem>
+                      <MenuItem value="GoldCollar (Lawyers, Doctors, Research Scientist)">
+                        
+                        GoldCollar (Lawyers, Doctors, Research Scientist)
+                      </MenuItem>
+                      <MenuItem value="NewCollar (Cybersecurity Analysts, Application Developers, Cloud Computing Specialists etc.,)">
+                        
+                        NewCollar (Cybersecurity Analysts, Application
+                        Developers, Cloud Computing Specialists etc.,)
+                      </MenuItem>
+                      <MenuItem value="Others">Others</MenuItem>
+                    </Select>
+
+                    <Typography variant="inherit" color="error">
+                      {errors.hiringSupport?.message}
+                    </Typography>
+
+                    {state.hiringSupport === "Others" ? (
+                      <TextField
+                        required="true"
+                        classes={{ root: classes.customTextField }}
+                        InputProps={{ disableUnderline: true }}
+                        size="small"
+                        placeholder="Enter Other Hiring Support"
+                        id="otherHiringSupport"
+                        name="otherHiringSupport"
+                        {...register("otherHiringSupport")}
+                        error={errors.otherHiringSupport ? true : false}
+                      />
+                    ) : (
+                      ""
+                    )}
+
+                    <Typography variant="inherit" color="error">
+                      {errors.otherHiringSupport?.message}
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} lg={6}>
+                    <InputLabel shrink htmlFor="using_ATS">
+                      Are you using an ATS (Applicant Tracking System) already?
+                      (If Yes)
+                    </InputLabel>
+                    <FormControl className={classes.margin}>
+                      <TextField
+                        classes={{ root: classes.customTextField }}
+                        InputProps={{ disableUnderline: true }}
+                        size="small"
+                        placeholder="Mention ATS Details"
+                        id="using_ATS"
+                        name="using_ATS"
+                        {...register("using_ATS")}
+                        error={errors.using_ATS ? true : false}
+                      />
+
+                      <Typography variant="inherit" color="error">
+                        {errors.using_ATS?.message}
+                      </Typography>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} lg={6}>
+                    <InputLabel shrink htmlFor="using_ATS">
+                      Your Company GST Number (Optional)
+                    </InputLabel>
+                    <FormControl className={classes.margin}>
+                      <TextField 
+                        classes={{ root: classes.customTextField }}
+                        InputProps={{ disableUnderline: true }}
+                        size="small"
+                        placeholder="Enter Your Company GST Number"
+                        id="gst"
+                        name="gst"
+                        {...register("gst")}
+                        error={errors.gst ? true : false}
+                      />
+
+                      <Typography variant="inherit" color="error">
+                        {errors.gst?.message}
+                      </Typography>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} className={classes.regBtn}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      type="submit"
+                      disabled={isSubmitting}
+                    >
+                      Register
+                    </Button>
+                  </Grid>
+                </Grid>
+              </form>
+            </Grid>
+          </Grid>
+
+          <ToastContainer
+            closeButton={
+              <CloseButton className={classes.notificationCloseButton} />
+            }
+            closeOnClick={false}
+            hideProgressBar={true}
+          />
+          <Backdrop className={classes.backdrop} open={loader}>
+            <CircularProgress color="inherit" />
+          </Backdrop>
+        </>
+      </MuiThemeProvider>
+    </div>
+  );
+}
+
+export default CompanyRegister;
+function CloseButton({ closeToast, className }) {
+  return <CloseIcon className={className} onClick={closeToast} />;
+}

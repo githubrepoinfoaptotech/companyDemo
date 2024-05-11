@@ -1,0 +1,6 @@
+{
+  "name": "Live status as on date",
+  "version": "1.0.0",
+  "private": true,
+  "main": "Dashboard.js"
+}
