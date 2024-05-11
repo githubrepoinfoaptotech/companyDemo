@@ -811,12 +811,12 @@ server.listen(process.env.PORT || 4000, () =>
 const https = require("https");
 
   
- const options = {
-    key: fs.readFileSync("/home/ubuntu/ca.key"),
-  cert: fs.readFileSync("/home/ubuntu/ca.crt"),
- };
+//  const options = {
+//     key: fs.readFileSync("/home/ubuntu/ca.key"),
+//   cert: fs.readFileSync("/home/ubuntu/ca.crt"),
+//  };
 
- https.createServer(options, app)
+ http.createServer(app)
   .listen(8443, function (req, res) {
  console.log(req);
 console.log(res);

@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const recruiter = require("../models/recruiter");
 const orgRecruiter = require("../models/orgRecruiter");
 const recruitersSettings = require("../models/recruiterSettings");
+const client = require("../models/client");
 const moment = require("moment");
 // const client=require('../models/client');
 const { Op } = require("sequelize");
@@ -79,6 +80,7 @@ exports.addAdmin = async (req, res) => {
             companyAddress:companyAddress
           });
           await data.update({ mainId: data.id });
+          await autoAddTheClient(req.body);
           await Source.create(
             {
                 mainId: data.id,
@@ -831,3 +833,30 @@ exports.externalUserList=async(req,res)=>{
     res.status(500).json({ status: false, message: "Error" });
   });
 };
+
+async function autoAddTheClient(req)
+{
+  var myclient = {
+    clientName: req.body.clientName,
+    recruiterId: req.recruiterId,
+    statusCode: 101,
+    mainId: req.mainId,
+    clientIndustry:req.body.clientIndustry,
+    clientWebsite:req.body.clientWebsite,
+    aggStartDate:req.body.aggStartDate,
+    aggEndDate:req.body.aggEndDate
+  };
+  const cliunidata = await client.findOne({
+    where: { mainId: req.mainId },
+    order: [["clientInt", "DESC"]],
+  });
+  if (cliunidata) {
+    myclient.clientInt = Number(cliunidata.clientInt) + 1;
+    myclient.clientText = "CLI";
+  } else {
+    myclient.clientInt = 1001;
+    myclient.clientText = "CLI";
+  }
+  myclient.uniqueId = `${myclient.clientText}${myclient.clientInt}`;
+  await client.create(myclient);
+}
