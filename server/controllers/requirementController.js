@@ -15,14 +15,23 @@ const { Op, col } = require("sequelize");
 const Sequelize = require("../db/db");
 const fn = Sequelize.fn;
 const candidate=require("../models/candidate");
+const e = require("express");
 //
 
 exports.addRequirement = async (req, res) => {
   try{
-  var client_data=await client.findOne({where:{id:req.body.clientId,mainId:req.mainId}});
+    if(req.companyType=="COMPANY")
+      {
+        var client_data=await client.findOne({where:{mainId:req.mainId}});
+      }
+      else
+      {
+        var client_data=await client.findOne({where:{id:req.body.clientId,mainId:req.mainId}});
+      }
+  
   if(client_data){
     const myreq = {
-      clientId: req.body.clientId,
+      clientId: client_data.id,
       requirementName: req.body.requirementName,
       skills: req.body.skills,
       statusCode: 201,

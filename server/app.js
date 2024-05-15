@@ -5,6 +5,7 @@ const path = require("path");
 const bcrypt = require("bcrypt");
 const bodyParser = require("body-parser");
 const user = require("./models/user");
+const pricing = require("./models/pricing");
 const admin_routes = require("./routes/admin-routes");
 const super_admin_routes = require("./routes/superAdmin-routes");
 const recruiter_routes = require("./routes/recruiter-routes");
@@ -24,6 +25,8 @@ const chatUserMessage = require("./models/chatUserMessage");
 const recruiterWallets=require("./models/recruiterWallets");
 const chatMedia = require("./models/chatMedia");
 const recruiterSettings = require("./models/recruiterSettings");
+const hiringSupport = require("./models/hiringSupport");
+const statusList = require("./models/statusList");
 const axios = require("axios").default;
 const fs = require("fs");
 const AWS = require("aws-sdk");
@@ -34,6 +37,7 @@ const priceRoutes = require("./routes/pricing-routes");
 const sourceRoutes = require("./routes/source-rouetes");
 const aiRoutes=require('./routes/ai-connection-routes');
 const { Op } = require("sequelize");
+const xlsx = require('xlsx');
 // -----------------------------------
 const app = express();
 // ----------------------------
@@ -70,14 +74,18 @@ app.use("/api/source",sourceRoutes);
 app.use("/api/AI/",aiRoutes);
 //-------------------------------------
 
-app.post("/addrole", (req, res) => {
-  role
-    .create({
-      roleName: req.body.roleName,
-    })
-    .then(() => {
-      res.send("success");
-    });
+app.post("/addrole", async(req, res) => {
+  const workbook = xlsx.readFile('hiringSupports.csv', { cellText: false, cellDates: false });
+  const sheetName = workbook.SheetNames[0];
+  const sheet = workbook.Sheets[sheetName];
+// Convert the CSV data to JSON
+    const data = xlsx.utils.sheet_to_json(sheet);
+      console.log(data);
+  for(i=0;i<data.length;i++)
+    {
+      await hiringSupport.create(data[i]);
+    }
+    res.send("done");
 });
 
 app.post("/testUser", async (req, res) => {
@@ -837,7 +845,7 @@ console.log(res);
 //   });
 //   console.log("listening")
 // }
- /*
+
 sequelize
   .sync({ alter: true })
   .then(() => {
@@ -846,7 +854,7 @@ sequelize
   .catch((err) => {
     console.log(err);
 });  
-   */
+ 
 
 // -----------------------------------------------------------------------------------------------------------------------------
 function downloadMedia(  

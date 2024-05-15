@@ -1048,6 +1048,7 @@ exports.viewAllCanditates = async (req, res) => {
             },
             {
               model: statusCode,
+              
               attributes: ["statusName","statusCode"],
             },
             {
@@ -2300,9 +2301,18 @@ exports.updateStcStatus = async (req, res) => {
             updatedBy: req.userId,
           }),
         ]).then(() => {
-          res
-            .status(200)
-            .json({ message: "Candidate is Submitted To Client", status: true });
+          if(req.companyType=="COMPANY")
+            {
+              res
+              .status(200)
+              .json({ message: "Candidate is Submitted To Hiring Manager", status: true });
+            }
+            else
+            {
+              res
+              .status(200)
+              .json({ message: "Candidate is Submitted To Client", status: true });
+            }
         });
       } else {
         res.status(200).json({ message: "Candidate Not Found", status: false });
@@ -3007,13 +3017,13 @@ async function candidateHistory(req, candidateId, mobile, requirementId) {
         recruiterId: req.recruiterId,
       })
       .then(async () => {
-        Wallet = await recruiterWallet.findOne({
-          where: { mainId: req.mainId },
-        });
-        messagesLeft = Wallet.remainingMessages - 1;
-        await Wallet.update({
-          remainingMessages: messagesLeft,
-        });
+        // Wallet = await recruiterWallet.findOne({
+        //   where: { mainId: req.mainId },
+        // });
+        // messagesLeft = Wallet.remainingMessages - 1;
+        // await Wallet.update({
+        //   remainingMessages: messagesLeft,
+        // });
       });
   }
 }

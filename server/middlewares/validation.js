@@ -153,30 +153,56 @@ exports.addClientValidation=async(req,res,next)=>{
     }
 }
 exports.addRequirementValidation=async(req,res,next)=>{
-    const requirementSchema= Joi.object({
-        clientName:Joi.string().required(),
-        organisationRecruiter:Joi.string().required(),
-        requirementName:Joi.string().required(),
-        jobLocation:Joi.string().required(),
-        skill:Joi.string().required(),
-        experience:Joi.string().required()   
-    });
-    var compObj={
-        clientName:req.body.clientId,
-        organisationRecruiter:req.body.orgRecruiterId,
-        requirementName:req.body.requirementName,
-        skill:req.body.skills,
-        jobLocation:req.body.jobLocation,
-        experience:req.body.experience
-    };
-    const  {error,value}= requirementSchema.validate(compObj);
-    if(error){
-        console.log(error);
-     res.status(200).json({status:false,message:error.details[0].message});
-    }
-    else{
-     next();
-    }
+    if(req.companyType=="COMPANY")
+        {
+            const requirementSchema= Joi.object({
+                requirementName:Joi.string().required(),
+                jobLocation:Joi.string().required(),
+                skill:Joi.string().required(),
+                experience:Joi.string().required()   
+            });
+            var compObj={
+                requirementName:req.body.requirementName,
+                skill:req.body.skills,
+                jobLocation:req.body.jobLocation,
+                experience:req.body.experience
+            };
+            const  {error,value}= requirementSchema.validate(compObj);
+            if(error){
+                console.log(error);
+             res.status(200).json({status:false,message:error.details[0].message});
+            }
+            else{
+             next();
+            }
+        }
+        else{
+            const requirementSchema= Joi.object({
+                clientName:Joi.string().required(),
+                organisationRecruiter:Joi.string().required(),
+                requirementName:Joi.string().required(),
+                jobLocation:Joi.string().required(),
+                skill:Joi.string().required(),
+                experience:Joi.string().required()   
+            });
+            var compObj={
+                clientName:req.body.clientId,
+                organisationRecruiter:req.body.orgRecruiterId,
+                requirementName:req.body.requirementName,
+                skill:req.body.skills,
+                jobLocation:req.body.jobLocation,
+                experience:req.body.experience
+            };
+            const  {error,value}= requirementSchema.validate(compObj);
+            if(error){
+                console.log(error);
+             res.status(200).json({status:false,message:error.details[0].message});
+            }
+            else{
+             next();
+            }
+        }
+    
 };
 
 exports.addCandidateValidation=(req,res,next)=>{

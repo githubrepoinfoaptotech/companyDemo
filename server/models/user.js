@@ -14,10 +14,13 @@ const user = sequelize.define("user", {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  companyType:{
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
   roleName: {
     type: Sequelize.STRING,
     allowNull: false,
-    unique: true,
     references: {
       model: role,
       key: 'roleName',

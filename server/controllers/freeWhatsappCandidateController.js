@@ -806,7 +806,7 @@ async function candidateHistory(req, candidateId, mobile, requirementId) {
         });
       });
   }
-}
+};
 
 
 ////open page api's
@@ -1268,9 +1268,19 @@ exports.updateStcStatusOpen = async (req, res) => {
             updatedBy: data.recruiterId,
           }),
         ]).then(() => {
-          res
-            .status(200)
-            .json({ message: "Candidate is Submitted To Client", status: true });
+          if(req.companyType=="COMPANY")
+            {
+              res
+              .status(200)
+              .json({ message: "Candidate is Submitted To Hiring Manager", status: true });
+            }
+            else
+            {
+              res
+              .status(200)
+              .json({ message: "Candidate is Submitted To Client", status: true });
+            }
+          
         });
       } else {
         res.status(200).json({ message: "Candidate Not Found", status: false });

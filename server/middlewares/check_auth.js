@@ -28,6 +28,7 @@ module.exports = async (req,res,next) => {
                 req.mainId=myuser.mainId;
                 req.recruiterId=myuser.id;
                 req.roleName=myuser.user.roleName;
+                req.companyType=decodedToken.companyType;
                 next();
             }
             else{

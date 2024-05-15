@@ -66,10 +66,11 @@ exports.addAdmin = async (req, res) => {
           email: email,
           roleName: "ADMIN",
           password: Hash,
-          isMsme:false
+          isMsme:false,
+          companyType:req.body.company_type
         })
         .then(async (data) => {
-          await recruiter.create({
+          var rec_data=await recruiter.create({
             userId: data.id,
             mainId: data.id,
             firstName: firstName,
@@ -80,7 +81,10 @@ exports.addAdmin = async (req, res) => {
             companyAddress:companyAddress
           });
           await data.update({ mainId: data.id });
-          await autoAddTheClient(req.body);
+          if(company_type=="COMPANY")
+            {
+              await autoAddTheClient(req.body,rec_data,data.id);
+            }
           await Source.create(
             {
                 mainId: data.id,
@@ -834,24 +838,20 @@ exports.externalUserList=async(req,res)=>{
   });
 };
 
-async function autoAddTheClient(req)
+async function autoAddTheClient(bodyData,rec_data,mainId)
 {
   var myclient = {
-    clientName: req.body.clientName,
-    recruiterId: req.recruiterId,
+    clientName: bodyData.companyName,
+    recruiterId: rec_data.id,
     statusCode: 101,
-    mainId: req.mainId,
-    clientIndustry:req.body.clientIndustry,
-    clientWebsite:req.body.clientWebsite,
-    aggStartDate:req.body.aggStartDate,
-    aggEndDate:req.body.aggEndDate
+    mainId: mainId
   };
-  const cliunidata = await client.findOne({
-    where: { mainId: req.mainId },
+  const clientData = await client.findOne({
+    where: { mainId: mainId },
     order: [["clientInt", "DESC"]],
   });
-  if (cliunidata) {
-    myclient.clientInt = Number(cliunidata.clientInt) + 1;
+  if (clientData) {
+    myclient.clientInt = Number(clientData.clientInt) + 1;
     myclient.clientText = "CLI";
   } else {
     myclient.clientInt = 1001;

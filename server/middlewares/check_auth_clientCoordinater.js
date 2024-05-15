@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const recruiter=require("../models/recruiter");
 const user = require("../models/user");
+const { where } = require("sequelize");
 require("dotenv").config();
 
 
@@ -19,6 +20,7 @@ module.exports = async (req,res,next) => {
  
             const decodedToken =  jwt.verify(token, process.env.jwtKey);
             var myuser=await recruiter.findOne({where:{userId:decodedToken.user_id},include:[user]});
+            
             if(myuser&&myuser.user.isActive==true){
             // var useraccess=await recruiterAccess.findOne({where:{page:req.url,recruiterId:decodedToken.user_id}});
             if(myuser&&(myuser.user.roleName=="CLIENTCOORDINATOR"||myuser.user.roleName=="ADMIN")){
@@ -26,6 +28,7 @@ module.exports = async (req,res,next) => {
                 req.mainId=myuser.mainId;
                 req.recruiterId=myuser.id;
                 req.roleName=myuser.user.roleName;
+                req.companyType=decodedToken.companyType;
                 next();
             }
             // else if (myuser&&useraccess){

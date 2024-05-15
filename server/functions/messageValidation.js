@@ -4,6 +4,9 @@ const recruiterSettings=require("../models/recruiterSettings");
 const { QueryTypes, Op } = require("sequelize");
 const Sequelize = require("../db/db");
 exports.checkMessageAvailable=async (req,res,next)=>{
+    var mySettings=recruiterSettings.findOne({Where:{mainId:req.mainId}});
+    if(mySettings.isEnablePaid)
+        {
     recruiteWallet.findOne({where:{mainId:req.mainId}}).then(data=>{
         
         if(data){
@@ -18,10 +21,16 @@ exports.checkMessageAvailable=async (req,res,next)=>{
         res.status(200).json({status:false,message:"No More Credit Left !"});
     }
     });
+}
+else{
+    next();
+}
 };
 exports.checkCredsAvailable=async(req,res,next)=>{
-    recruiteWallet.findOne({where:{mainId:req.mainId}}).then(data=>{
-        
+    var mySettings=recruiterSettings.findOne({Where:{mainId:req.mainId}});
+    if(mySettings.isEnablePaid)
+        {
+    recruiteWallet.findOne({where:{mainId:req.mainId}}).then(data=>{ 
         if(data){
         if(data.remainingMessages==0){
             res.status(200).json({status:false,message:"No More Credit Left !"});
@@ -34,6 +43,10 @@ exports.checkCredsAvailable=async(req,res,next)=>{
         res.status(200).json({status:false,message:"No More Credit Left !"});
     }
     });
+    }
+    else{
+        next();
+    }
 };
 exports.checkInimessage=async (req,res,next)=>{
     console.log(req.body);

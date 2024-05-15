@@ -25,7 +25,7 @@ const requirement=sequelize.define("requirement",{
     },
     orgRecruiterId:{
         type:Sequelize.UUID,      
-        allowNull:false,
+        allowNull:true,
         references:{
             model:orgRecruiter,
             key:'id'
