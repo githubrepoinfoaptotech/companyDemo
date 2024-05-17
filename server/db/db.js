@@ -13,9 +13,21 @@ const Sequelize= require("sequelize");
 //     } catch (error) {
 //     console.error('Unable to connect to the database:', error);
 //     }
-    const sequelize=new Sequelize("refo_production","refo_production","AHXjRk!hbs6m9RAHXjRk!hbs6m9R$789",{
+    // const sequelize=new Sequelize("refo_production","refo_production","AHXjRk!hbs6m9RAHXjRk!hbs6m9R$789",{
+    //     dialect:"postgres",
+    //     host:"refo-production-v1.ckzrrpsjwx6b.us-east-1.rds.amazonaws.com",
+    //     logging:false,
+    // });
+    // try {
+    //     sequelize.authenticate();
+    //     console.log('Connection has been established successfully.');
+    //     } catch (error) {
+    //     console.error('Unable to connect to the database:', error);
+    //     }
+
+        const sequelize=new Sequelize("refo_production","postgres","123456789",{
         dialect:"postgres",
-        host:"refo-production-v1.ckzrrpsjwx6b.us-east-1.rds.amazonaws.com",
+        host:"localhost",
         logging:false,
     });
     try {

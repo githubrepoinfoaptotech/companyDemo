@@ -129,29 +129,46 @@ exports.companySettingsValidation=async(req,res,next)=>{
 };
 
 exports.addClientValidation=async(req,res,next)=>{
-    const clientSchema= Joi.object({
-        clientName:Joi.string().required(),
-        clientIndustry:Joi.string().required(),
-        clientWebsite:Joi.string().required(), 
-        aggStartDate:Joi.required(), 
-        aggEndDate:Joi.required()
-    });
-    var compObj={
-        clientName:req.body.clientName,
-        clientIndustry:req.body.clientIndustry,
-        clientWebsite:req.body.clientWebsite,
-        aggStartDate:req.body.aggStartDate,
-        aggEndDate:req.body.aggEndDate
-    };
-    const  {error,value}= clientSchema.validate(compObj);
-    if(error){
-        console.log(error);
-     res.status(200).json({status:false,message:error.details[0].message});
-    }
-    else{
-     next();
-    }
-}
+    if(req.companyType=="COMPANY")
+           {
+       const clientSchema= Joi.object({
+           clientName:Joi.string().required(),
+           clientIndustry:Joi.string().required(),
+           aggStartDate:Joi.required(), 
+           aggEndDate:Joi.required()
+       });
+       var compObj={
+           clientName:req.body.clientName,
+           clientIndustry:req.body.clientIndustry,
+           aggStartDate:req.body.aggStartDate,
+           aggEndDate:req.body.aggEndDate
+       };
+       }
+       else{
+       const clientSchema= Joi.object({
+           clientName:Joi.string().required(),
+           clientIndustry:Joi.string().required(),
+           clientWebsite:Joi.string().required(), 
+           aggStartDate:Joi.required(), 
+           aggEndDate:Joi.required()
+       });
+       var compObj={
+           clientName:req.body.clientName,
+           clientIndustry:req.body.clientIndustry,
+           clientWebsite:req.body.clientWebsite,
+           aggStartDate:req.body.aggStartDate,
+           aggEndDate:req.body.aggEndDate
+       };
+       }
+       const  {error,value}= clientSchema.validate(compObj);
+       if(error){
+           console.log(error);
+        res.status(200).json({status:false,message:error.details[0].message});
+       }
+       else{
+        next();
+       }
+   }
 exports.addRequirementValidation=async(req,res,next)=>{
     if(req.companyType=="COMPANY")
         {
