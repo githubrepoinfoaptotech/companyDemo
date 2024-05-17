@@ -16,6 +16,30 @@ const clients=sequelize.define("clients",{
         type:Sequelize.STRING,
         allowNull:false
     },
+    reasonForHiring:{
+        type:Sequelize.STRING,
+        allowNull:true
+    },
+    projectRegion:{
+        type:Sequelize.STRING,
+        allowNull:true
+    },
+    projectLocation:{
+        type:Sequelize.STRING,
+        allowNull:true
+    },
+    hrbpCode:{
+        type:Sequelize.STRING,
+        allowNull:true
+    },
+    approved:{
+        type:Sequelize.BOOLEAN,
+        allowNull:true
+    },
+    billable:{
+        type:Sequelize.BOOLEAN,
+        allowNull:true
+    },
     handlerId:{
         type:Sequelize.UUID,
         allowNull:true,
@@ -72,6 +96,7 @@ const clients=sequelize.define("clients",{
             key: 'statusCode',
          }
     },
+    
     createdBy:{
         type: Sequelize.UUID,
     },
@@ -92,7 +117,8 @@ const clients=sequelize.define("clients",{
 );
 clients.belongsTo(Recruiter);
 Recruiter.hasMany(clients);
-
+clients.belongsTo(Recruiter, { foreignKey: 'handlerId', targetKey: 'id' });
+Recruiter.hasMany(clients, { foreignKey: 'handlerId', sourceKey: 'id' });
 statusList.hasMany(clients, { foreignKey: 'statusCode' });
 clients.belongsTo(statusList, { foreignKey: 'statusCode', targetKey:'statusCode' });
 

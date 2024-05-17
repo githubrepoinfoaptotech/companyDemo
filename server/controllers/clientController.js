@@ -2,6 +2,7 @@ const client = require("../models/client");
 const orgRecruiter = require("../models/orgRecruiter");
 const recruiter = require("../models/recruiter");
 const statusCode=require("../models/statusList");
+const levelOfHiring=require("../models/levelOfHiring");
 const moment=require('moment');
 // client control---------------------------------------------------------------------------------------------------------
 //
@@ -17,13 +18,19 @@ exports.addClient = async (req, res) => {
             .status(200)
             .json({ status: false, message: "Client Already Exist!!" });
         } else {
+          var message;
           if(req.companyType=="COMPANY")
             {
+              var message="Project Added Successfully!";
               var myclient = {
                 clientName: req.body.clientName,
                 recruiterId: req.recruiterId,
                 statusCode: 101,
                 mainId: req.mainId,
+                reasonForHiring:req.body.reasonForHiring,
+                projectRegion:req.body.projectRegion,
+                hrbpCode:req.body.hrbpCode,
+                billable:req.body.billable,
                 clientIndustry:req.body.clientIndustry,
                 clientWebsite:req.body.clientWebsite,
                 aggStartDate:req.body.aggStartDate,
@@ -33,6 +40,7 @@ exports.addClient = async (req, res) => {
             }
             else
             {
+              var message="Client Added Successfully!";
               var myclient = {
                 clientName: req.body.clientName,
                 recruiterId: req.recruiterId,
@@ -58,6 +66,25 @@ exports.addClient = async (req, res) => {
           }
           myclient.uniqueId = `${myclient.clientText}${myclient.clientInt}`;
           await client.create(myclient).then(async (client_data) => {
+            if(req.body.levelOfHiring.length>0)
+              {
+                var levelOfHirings=req.body.levelOfHiring;
+                for(i=0;i<levelOfHirings.length;i++)
+                  {
+                    const newdata = await levelOfHiring.findOne({ where: { name: levelOfHirings[i].name ,clientId:client_data.id} });
+                    if(!newdata){
+                      if(levelOfHirings[i].name!=''&& levelOfHirings[i].noOfHires!=''){
+                      await levelOfHiring
+                        .create({
+                          name:  levelOfHirings[i].name,
+                          noOfHires:  levelOfHirings[i].noOfHires,
+                          mainId: req.mainId,
+                          clientId:  client_data.id,
+                        });  
+                      }
+                    }
+                }
+              }
             if(req.body.orgRec.length>0){
               var orgRec=req.body.orgRec;
               for(i=0;i<orgRec.length;i++){
@@ -79,7 +106,7 @@ exports.addClient = async (req, res) => {
             }
             res
               .status(200)
-              .json({ status: true, message: "Client Added Successfully!" });
+              .json({ status: true, message: message });
           });
         }
       });

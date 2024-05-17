@@ -129,23 +129,34 @@ exports.companySettingsValidation=async(req,res,next)=>{
 };
 
 exports.addClientValidation=async(req,res,next)=>{
+    var clientSchema;
     if(req.companyType=="COMPANY")
            {
-       const clientSchema= Joi.object({
+        clientSchema= Joi.object({
            clientName:Joi.string().required(),
+           handlerId:Joi.string().required(),
            clientIndustry:Joi.string().required(),
+           reasonForHiring:Joi.string().required(),
+           projectRegion:Joi.string().required(),
+           projectLocation:Joi.string().required(),
+           hrbpCode:Joi.string().required(),
            aggStartDate:Joi.required(), 
            aggEndDate:Joi.required()
        });
        var compObj={
            clientName:req.body.clientName,
+           hrbpCode:req.body.hrbpCode,
+           handlerId:req.body.handlerId,
+           projectLocation:req.body.projectLocation,
+           reasonForHiring:req.body.reasonForHiring,
+           projectRegion:req.body.projectRegion,
            clientIndustry:req.body.clientIndustry,
            aggStartDate:req.body.aggStartDate,
            aggEndDate:req.body.aggEndDate
        };
        }
        else{
-       const clientSchema= Joi.object({
+        clientSchema= Joi.object({
            clientName:Joi.string().required(),
            clientIndustry:Joi.string().required(),
            clientWebsite:Joi.string().required(), 
@@ -168,7 +179,7 @@ exports.addClientValidation=async(req,res,next)=>{
        else{
         next();
        }
-   }
+   };
 exports.addRequirementValidation=async(req,res,next)=>{
     if(req.companyType=="COMPANY")
         {
