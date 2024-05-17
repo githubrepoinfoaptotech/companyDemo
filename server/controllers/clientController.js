@@ -17,16 +17,34 @@ exports.addClient = async (req, res) => {
             .status(200)
             .json({ status: false, message: "Client Already Exist!!" });
         } else {
-          var myclient = {
-            clientName: req.body.clientName,
-            recruiterId: req.recruiterId,
-            statusCode: 101,
-            mainId: req.mainId,
-            clientIndustry:req.body.clientIndustry,
-            clientWebsite:req.body.clientWebsite,
-            aggStartDate:req.body.aggStartDate,
-            aggEndDate:req.body.aggEndDate
-          };
+          if(req.companyType=="COMPANY")
+            {
+              var myclient = {
+                clientName: req.body.clientName,
+                recruiterId: req.recruiterId,
+                statusCode: 101,
+                mainId: req.mainId,
+                clientIndustry:req.body.clientIndustry,
+                clientWebsite:req.body.clientWebsite,
+                aggStartDate:req.body.aggStartDate,
+                aggEndDate:req.body.aggEndDate,
+                handlerId:req.body.handlerId
+              };
+            }
+            else
+            {
+              var myclient = {
+                clientName: req.body.clientName,
+                recruiterId: req.recruiterId,
+                statusCode: 101,
+                mainId: req.mainId,
+                clientIndustry:req.body.clientIndustry,
+                clientWebsite:req.body.clientWebsite,
+                aggStartDate:req.body.aggStartDate,
+                aggEndDate:req.body.aggEndDate
+              };
+            }
+          
           const cliunidata = await client.findOne({
             where: { mainId: req.mainId },
             order: [["clientInt", "DESC"]],

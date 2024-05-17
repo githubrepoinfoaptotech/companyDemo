@@ -16,6 +16,14 @@ const clients=sequelize.define("clients",{
         type:Sequelize.STRING,
         allowNull:false
     },
+    handlerId:{
+        type:Sequelize.UUID,
+        allowNull:true,
+        references: {
+            model: Recruiter, 
+            key: 'id',
+         }
+    },
     clientIndustry:{
         type:Sequelize.STRING,
         allowNull:true
