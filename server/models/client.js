@@ -102,6 +102,10 @@ const clients=sequelize.define("clients",{
     },
     updatedBy:{
         type: Sequelize.UUID,
+    },
+    token:{
+        type:Sequelize.STRING,
+        allowNull:true
     }
 },{
     indexes: [

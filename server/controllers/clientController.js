@@ -3,6 +3,7 @@ const orgRecruiter = require("../models/orgRecruiter");
 const recruiter = require("../models/recruiter");
 const statusCode=require("../models/statusList");
 const levelOfHiring=require("../models/levelOfHiring");
+const mailFunction=require("../functions/sendReplyMail");
 const moment=require('moment');
 // client control---------------------------------------------------------------------------------------------------------
 //
@@ -14,9 +15,18 @@ exports.addClient = async (req, res) => {
       .findOne({ where: { clientName: req.body.clientName,mainId:req.mainId } })
       .then(async (data) => {
         if (data) {
+          if(req.companyType=="COMPANY")
+            {
           res
             .status(200)
+            .json({ status: false, message: "Project Already Exist!!" });
+            }
+            else
+            {
+              res
+            .status(200)
             .json({ status: false, message: "Client Already Exist!!" });
+            }
         } else {
           var message;
           if(req.companyType=="COMPANY")
@@ -29,6 +39,7 @@ exports.addClient = async (req, res) => {
                 mainId: req.mainId,
                 reasonForHiring:req.body.reasonForHiring,
                 projectRegion:req.body.projectRegion,
+                projectLocation:req.body.projectLocation,
                 hrbpCode:req.body.hrbpCode,
                 billable:req.body.billable,
                 clientIndustry:req.body.clientIndustry,
@@ -115,11 +126,83 @@ exports.addClient = async (req, res) => {
     res.status(500).json({ status: false, message: "Error" });
   }
 };
+
+exports.sendApprovalMail=async(req,res)=>{
+  try
+  {
+    var c_data=client.findOne({where:{id:req.body.id}});
+    await c_data.update({
+      token:c_data.id
+    });
+    var data={name:req.body.name,email:req.body.email,content:req.body.content,token:req.body.id};
+    mailFunction.sendProjectApproval(data);
+    res.status(200).json({status:true,message:"Mail Has been sent for Approval"});
+  }
+  catch(e)
+  {
+    res.status(500).json({status:false,message:"Error"});
+  }
+};
+
+exports.approveClient=async(req,res)=>{
+  try
+  {
+    await client.update({approved:req.body.approved,token:""},{where:{id:req.body.clientId}});
+    res.status(200).json({status:true,message:"Successfully Updated"});
+  }
+  catch(e)
+  {
+    res.status(500).json({status:false,message:"Error"});
+  }
+};
+exports.checkApprovalValidity=async(req,res)=>{
+  try
+  {
+    c_data=await client.findOne({ where: { id: req.body.clientId } });
+    if((c_data&&c_data.token!=""))
+      {
+        var ordrec_data= await orgRecruiter.findAll({ where: {clientId:req.body.clientId},order:[['createdAt','DESC']]});
+        var levelOfHiring_data= await levelOfHiring.findAll({ where: {clientId:req.body.clientId},order:[['createdAt','DESC']]});
+        res.status(200).json({status:true,c_data:c_data,ordrec_data:ordrec_data,levelOfHiring_data:levelOfHiring_data});
+      }
+      else
+      {
+        var ordrec_data= await orgRecruiter.findAll({ where: {clientId:req.body.clientId},order:[['createdAt','DESC']]});
+        var levelOfHiring_data= await levelOfHiring.findAll({ where: {clientId:req.body.clientId},order:[['createdAt','DESC']]});
+        res.status(200).json({status:false,c_data:c_data,ordrec_data:ordrec_data,levelOfHiring_data:levelOfHiring_data});
+      }
+    
+  }
+  catch(e)
+  {
+    res.status(500).json({status:false,message:"Error"});
+  }
+};
+
 exports.editClient = async (req, res) => {
 
   client
     .findOne({ where: { id: req.body.id } })
     .then(async (data) => {
+      if(req.companyType="COMPANY")
+        {
+      await data.update({
+        clientName: req.body.clientName,
+        clientIndustry:req.body.clientIndustry,
+        clientWebsite:req.body.clientWebsite,
+        aggStartDate:req.body.aggStartDate,
+        aggEndDate:req.body.aggEndDate,
+        updatedBy:req.userId,
+        reasonForHiring:req.body.reasonForHiring,
+        projectRegion:req.body.projectRegion,
+        projectLocation:req.body.projectLocation,
+        hrbpCode:req.body.hrbpCode,
+        billable:req.body.billable,
+        handlerId:req.body.handlerId
+      });
+    }
+    else
+    {
       await data.update({
         clientName: req.body.clientName,
         clientIndustry:req.body.clientIndustry,
@@ -128,9 +211,20 @@ exports.editClient = async (req, res) => {
         aggEndDate:req.body.aggEndDate,
         updatedBy:req.userId
       });
-      res
+    }
+      
+      if(req.companyType="COMPANY")
+        {
+          res
+          .status(200)
+          .json({ status: true, message: "Project Edited Successfully" });
+        }
+      else
+      {
+        res
         .status(200)
         .json({ status: true, message: "Client Edited Successfully" });
+      }
     })
     .catch((e) => {
       res.status(500).json({ status: false, message: "Error" });
@@ -212,7 +306,8 @@ exports.viewClient = async (req, res) => {
     .then(async (data) => {
       if (data) {
        var ordrec_data= await orgRecruiter.findAll({ where: {clientId:req.body.id},order:[['createdAt','DESC']]});
-        res.status(200).json({ status: true, data: data,orgRecruiter:ordrec_data});
+       var levelOfHiring_data= await levelOfHiring.findAll({ where: {clientId:req.body.id},order:[['createdAt','DESC']]});
+        res.status(200).json({ status: true, data: data,orgRecruiter:ordrec_data,levelOfHiring:levelOfHiring_data});
       } else {
         res.status(200).json({ status: false ,message:"Not found"});
       }
@@ -222,6 +317,44 @@ exports.viewClient = async (req, res) => {
       res.status(500).json({ status: false, message: "Error" });
     });
 };
+
+
+exports.addHiringLevel = async(req,res)=>{
+  try {
+    const { name,noOfHires,clientId } = req.body;
+    const newdata = await levelOfHiring.findOne({ where: { name: name ,clientId:clientId} });
+    if (newdata) {
+      res
+        .status(200)
+        .json({ message: "Level Already Exits", status: false });
+    } else {
+      await levelOfHiring
+        .create({
+          name:name,
+          clientId:clientId,
+          noOfHires:noOfHires
+        });  
+        res.status(200).json({ message: "Successfully Created A Hiring Level",status:true});
+     }   
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error", status: false });
+  }
+};
+
+exports.editHiringLevel=async(req,res)=>{
+
+  const { name,noOfHires,clientId } = req.body;
+  await orgRecruiter.findOne({ where: { id: req.body.id,mainId: req.mainId } }).then(async (data) => {
+    data.name=name;
+    data.noOfHires=noOfHires;
+    await data.update();
+  }).catch(e=>{
+    console.log(e);
+    res.status(500).json({ status: false, message: "Error" });
+  });
+};
+
 exports.addOrgRecruiter = async (req, res) => {
   try {
     const { name,email,mobile,clientId } = req.body;
@@ -276,7 +409,14 @@ exports.editOrgRecruiter=async(req,res)=>{
         name: name,
         mobile: mobile, 
       });
-      res.status(200).json({status:true,message:"Organization POC Details Edited Successfully"});
+      if(req.companyType=="COMPANY")
+        {
+          res.status(200).json({status:true,message:"Organization POC Details Edited Successfully"});
+        }
+        else
+        {
+          res.status(200).json({status:true,message:"Organization Recruiter Details Edited Successfully"});
+        }
     }
     else{
       var orgRec_data=await orgRecruiter.findOne({where:{email:email,mainId:req.mainId,clientId:data.clientId}});
@@ -286,7 +426,15 @@ exports.editOrgRecruiter=async(req,res)=>{
           email: email,
           mobile: mobile,
         });
-        res.status(200).json({status:true,message:"Organization POC Details Edited Successfully"});
+        if(req.companyType=="COMPANY")
+          {
+            res.status(200).json({status:true,message:"Organization POC Details Edited Successfully"});
+          }
+          else
+          {
+            res.status(200).json({status:true,message:"Organization Recruiter Details Edited Successfully"});
+          }
+        
       }
       else{
         res.status(200).json({status:false,message:"Email Already Exist Please Try Another One!!"});
@@ -348,14 +496,29 @@ exports.changeClientStatus=async(req,res)=>{
         statusCode:102,
         updatedBy:req.userId
       });
-      res.status(200).json({status:true,message:"Client Is Now Inactive"});
+      if(req.companyType=="COMPANY")
+        {
+          res.status(200).json({status:true,message:"Project Is Now Inactive"});
+        }
+        else
+        {
+          res.status(200).json({status:true,message:"Client Is Now Inactive"});
+        }
+      
     }
     else{
       await data.update({
         statusCode:101,
         updatedBy:req.userId
       }); 
-      res.status(200).json({status:true,message:"Client Is Now Active"});
+      if(req.companyType=="COMPANY")
+        {
+          res.status(200).json({status:true,message:"Project Is Now Active"});
+        }
+        else
+        {
+          res.status(200).json({status:true,message:"Client Is Now Active"});
+        }
     }
   }).catch(e=>{
     console.log(e);

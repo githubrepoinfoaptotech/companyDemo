@@ -838,6 +838,17 @@ exports.externalUserList=async(req,res)=>{
   });
 };
 
+exports.orgPocForCompany=async(req,res)=>{
+  recruiter.findAll({where:{mainId:req.mainId},include:[{model:user,where:{[Op.or]: [
+    { roleName: 'RECRUITER' }, // Users with roleName 'admin' // Users with roleName 'superadmin'
+  ]}}]}).then(data=>{
+    res.status(200).json({ status: true, data: data });
+  }).catch(e => {
+    console.log(e);
+    res.status(500).json({ status: false, message: "Error" });
+  });
+};
+
 async function autoAddTheClient(bodyData,rec_data,mainId)
 {
   var myclient = {

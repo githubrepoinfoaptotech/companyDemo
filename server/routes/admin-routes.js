@@ -142,5 +142,7 @@ route.post("/msmeSearchCompany",check_auth_admin,authController.msmeSearchCompan
 
 route.post("/getAssignedCompanies",check_auth_admin,requirementController.getAssignedCompanies);
 route.post("/viewRequirementCandidates",check_auth_admin,requirementController.viewRequirementCandidates);
-route.post("/candidateCvLink",check_auth_admin,candidateController.candidateCvLink)
+route.post("/candidateCvLink",check_auth_admin,candidateController.candidateCvLink);
+route.post("/orgPocForCompany",check_auth_admin,userController.orgPocForCompany);
+
 module.exports = route;     

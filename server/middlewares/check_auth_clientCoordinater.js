@@ -23,7 +23,8 @@ module.exports = async (req,res,next) => {
             
             if(myuser&&myuser.user.isActive==true){
             // var useraccess=await recruiterAccess.findOne({where:{page:req.url,recruiterId:decodedToken.user_id}});
-            if(myuser&&(myuser.user.roleName=="CLIENTCOORDINATOR"||myuser.user.roleName=="ADMIN")){
+            if(myuser&&(myuser.user.roleName=="CLIENTCOORDINATOR"||myuser.user.roleName=="ADMIN"))
+            {
                 req.userId=decodedToken.user_id;
                 req.mainId=myuser.mainId;
                 req.recruiterId=myuser.id;
@@ -38,7 +39,7 @@ module.exports = async (req,res,next) => {
             else{
                 res.status(401).json({status:false,message:"Invalid user"});
             }
-        }
+            }
         else{
             res.status(401).json({ status: false, message: "User Inactive" });
         }

@@ -530,3 +530,25 @@ email.transporter.sendMail(clientMailOptions, async function (error, info) {
   }
 });
 }
+
+exports.sendProjectApproval=async(data)=>{
+  var clientMailOptions = {
+    from: '<no-reply@refo.app>',
+    to: data.email,
+    // to: "vishallegend7775@gmail.com",
+    template: "projectApproval",
+    subject: "",
+    context: {
+       name:data.name,
+       content:data.content,
+       token:data.token
+    },
+};
+email.transporter.sendMail(clientMailOptions, async function (error, info) {
+  if (error) {
+      console.log(error);
+  } else {
+      console.log("Success");
+  }
+});
+}
