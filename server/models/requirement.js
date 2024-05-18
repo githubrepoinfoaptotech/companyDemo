@@ -6,7 +6,7 @@ const user=require("./user");
 const orgRecruiter = require("./orgRecruiter");
 const uniqueid=require("uniqid");
 const recruiter = require("./recruiter");
-
+const levelOfHiring=require("../models/levelOfHiring");
 
 const requirement=sequelize.define("requirement",{
     id: {
@@ -108,6 +108,14 @@ const requirement=sequelize.define("requirement",{
     specialHiring:{
         type:Sequelize.STRING,
         allowNull:true
+    },
+    levelOfHiringId:{
+        type:Sequelize.UUID,
+        allowNull:true,
+        references: {
+            model: levelOfHiring, 
+            key: 'id',
+         }
     }
 },
 {
@@ -117,13 +125,16 @@ const requirement=sequelize.define("requirement",{
             fields: ['id']
         },
         {
-            fields: ["mainId","uniqueId"]
+            fields: ["mainId","uniqueId","levelOfHiringId"]
         }
     ]
   }
 );
 requirement.belongsTo(client);
 client.hasMany(requirement);
+
+requirement.belongsTo(levelOfHiring);
+levelOfHiring.hasMany(requirement);
 
 requirement.belongsTo(recruiter);
 recruiter.hasMany(requirement);

@@ -10,7 +10,7 @@ const assignedRequirements=require("../models/assignedRequirement");
 const candidateDetails=require("../models/candidateDetail");
 const Source=require("../models/source");
 const candidateStatus=require("../models/myCandidateStatus");
-
+const levelOfHiring=require("../models/levelOfHiring");
 const { Op, col } = require("sequelize");
 const Sequelize = require("../db/db");
 const fn = Sequelize.fn;
@@ -30,22 +30,46 @@ exports.addRequirement = async (req, res) => {
       }
   
   if(client_data){
-    const myreq = {
-      clientId: client_data.id,
-      requirementName: req.body.requirementName,
-      skills: req.body.skills,
-      statusCode: 201,
-      mainId: req.mainId,
-      recruiterId: req.recruiterId,
-      orgRecruiterId: req.body.orgRecruiterId,
-      experience:req.body.experience,
-      jobLocation:req.body.jobLocation,
-      hideFromInternal:req.body.hideFromInternal,
-      gist:req.body.gist,
-      modeOfWork:req.body.modeOfWork,
-      specialHiring:req.body.specialHiring,
-      createdBy:req.userId
-    };
+    var myreq;
+    if(req.companyType="COMPANY")
+      {
+         myreq = {
+          clientId: client_data.id,
+          requirementName: req.body.requirementName,
+          skills: req.body.skills,
+          statusCode: 201,
+          mainId: req.mainId,
+          recruiterId: req.recruiterId,
+          orgRecruiterId: req.body.orgRecruiterId,
+          experience:req.body.experience,
+          jobLocation:req.body.jobLocation,
+          hideFromInternal:req.body.hideFromInternal,
+          gist:req.body.gist,
+          modeOfWork:req.body.modeOfWork,
+          specialHiring:req.body.specialHiring,
+          createdBy:req.userId
+        };
+      }
+    else
+    {
+      myreq = {
+        clientId: client_data.id,
+        requirementName: req.body.requirementName,
+        skills: req.body.skills,
+        statusCode: 201,
+        mainId: req.mainId,
+        recruiterId: req.recruiterId,
+        orgRecruiterId: req.body.orgRecruiterId,
+        experience:req.body.experience,
+        jobLocation:req.body.jobLocation,
+        hideFromInternal:req.body.hideFromInternal,
+        gist:req.body.gist,
+        modeOfWork:req.body.modeOfWork,
+        specialHiring:req.body.specialHiring,
+        levelOfHiringId:req.body.levelOfHiringId,
+        createdBy:req.userId
+      };
+    }
     const requnidata = await requirements.findOne({
       where: { mainId: req.mainId },
       order: [["requirementInt", "DESC"]],

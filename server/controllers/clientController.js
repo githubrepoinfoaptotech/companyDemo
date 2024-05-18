@@ -468,8 +468,9 @@ exports.getAllClientList=async(req,res)=>{
   });
 };
 exports.getOrganisationReciruterList=async(req,res)=>{
-  orgRecruiter.findAll({where:{clientId:req.body.id,mainId:req.mainId,isActive:true},attributes:['id','name']}).then(data=>{
-    res.status(200).json({status:true,data:data});
+  await orgRecruiter.findAll({where:{clientId:req.body.id,mainId:req.mainId,isActive:true},attributes:['id','name']}).then(async data=>{
+    lvlHrData=await levelOfHiring.findAll({where:{clientId:req.body.id,mainId:req.mainId},attributes:['id','name']});
+    res.status(200).json({status:true,data:data,lvlHrData:lvlHrData});
   }).catch(e=>{
     res.status(500).json({ status: false, message: "Error" });
   });
