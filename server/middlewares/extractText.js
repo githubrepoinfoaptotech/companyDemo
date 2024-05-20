@@ -133,14 +133,14 @@ exports.textExtract = async function (req, res, next) {
                 req.body.candidate_email=candidate_email;
                 req.body.candidate_mobile=candidate_mobilel;
                 fs.unlinkSync(req.file.path);
-                next();
+                res.status(200).json({data:req.body,status:true});
             } catch (extractionError) {
                 console.error('Text Extraction Error:', extractionError);
                 res.status(500).json({ status: false, message: 'Error extracting text from the document' });
             }
         }
     });
-}
+};
 
 
 exports.extractFromLink=async function(req,res,next){
