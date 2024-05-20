@@ -359,6 +359,21 @@ exports.addHiringLevel = async(req,res)=>{
 };
 
 exports.editHiringLevel=async(req,res)=>{
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+
+  const { name,noOfHires,clientId } = req.body;
+  await orgRecruiter.findOne({ where: { id:clientId,mainId: req.mainId } }).then(async (data) => {
+    data.name=name;
+    data.noOfHires=noOfHires;
+    await data.update();
+  }).catch(e=>{
+    console.log(e);
+    res.status(500).json({ status: false, message: "Error" });
+  });
+=======
+>>>>>>> Stashed changes
   const { name,noOfHires,id } = req.body;
   var isName=await levelOfHiring.findOne({ where: { name:req.body.name } });
   if(!isName)
@@ -387,6 +402,10 @@ exports.editHiringLevel=async(req,res)=>{
       res.status(200).json({message:"Name Already Exist","status":false});
     }
  
+<<<<<<< Updated upstream
+=======
+>>>>>>> 3650383015481e5953f5475381112d0109d55214
+>>>>>>> Stashed changes
 };
 
 exports.addOrgRecruiter = async (req, res) => {
