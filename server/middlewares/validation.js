@@ -57,7 +57,7 @@ exports.editAdminValidation=async(req,res)=>{
 exports.addOrgRecValidation=async(req,res,next)=>{
     const addOrgSchema= Joi.object({
         email:Joi.string().email().required(),
-        name:Joi.string().alphanum().required(),
+        name:Joi.string().required(),
         mobile:Joi.number().required(),
         clientId:Joi.string().required(),
     });
@@ -76,11 +76,14 @@ exports.addOrgRecValidation=async(req,res,next)=>{
      next();
     }
 };
+
+
+
 exports.editOrgRecValidation=async(req,res,next)=>{
 
     const addOrgSchema= Joi.object({
         email:Joi.string().email().required(),
-        name:Joi.string().alphanum().required(),
+        name:Joi.string().required(),
         mobile:Joi.number().required(),
         id:Joi.string().required(),
     });
@@ -88,6 +91,47 @@ exports.editOrgRecValidation=async(req,res,next)=>{
         email:req.body.email,
         name:req.body.name,
         mobile:req.body.mobile,
+        id:req.body.id,
+    };
+    const  {error,value}= addOrgSchema.validate(compObj);
+    if(error){
+        console.log(error);
+     res.status(200).json({status:false,message:error.details[0].message});
+    }
+    else{
+     next();
+    }
+};
+exports.addHiringLevelValidation=async(req,res,next)=>{
+    const addOrgSchema= Joi.object({
+        name:Joi.string().required(),
+        noOfHires:Joi.number().required(),
+        clientId:Joi.string().required(),
+    });
+    compObj={
+        name:req.body.name,
+        noOfHires:req.body.noOfHires,
+        clientId:req.body.clientId,
+    };
+    const  {error,value}= addOrgSchema.validate(compObj);
+    if(error){
+        console.log(error);
+     res.status(200).json({status:false,message:error.details[0].message});
+    }
+    else{
+     next();
+    }
+};
+exports.editHiringLevelValidation=async(req,res,next)=>{
+
+    const addOrgSchema= Joi.object({
+        name:Joi.string().required(),
+        noOfHires:Joi.number().required(),
+        id:Joi.string().required(),
+    });
+    compObj={
+        name:req.body.name,
+        noOfHires:req.body.noOfHires,
         id:req.body.id,
     };
     const  {error,value}= addOrgSchema.validate(compObj);

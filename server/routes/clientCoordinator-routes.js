@@ -29,6 +29,6 @@ route.post("/updateRequirementJd",check_auth_CC,filefunctions.jdUpload,requireme
 route.post("/sendApprovalMail",check_auth_CC,ClientController.sendApprovalMail);
 route.post("/checkIsApproved",check_auth_mail,ClientController.approveClient);
 route.post("/checkApprovalValidity",check_auth_mail,ClientController.checkApprovalValidity);
-route.post("/addHiringLevel",check_auth_CC,ClientController.addHiringLevel);
-route.post("/editHiringLevel",check_auth_CC,ClientController.editHiringLevel);
+route.post("/addHiringLevel",check_auth_CC,validation.addHiringLevelValidation,ClientController.addHiringLevel);
+route.post("/editHiringLevel",check_auth_CC,validation.editHiringLevelValidation,ClientController.editHiringLevel);
 module.exports=route;

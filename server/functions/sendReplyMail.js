@@ -537,7 +537,7 @@ exports.sendProjectApproval=async(data)=>{
     to: data.email,
     // to: "vishallegend7775@gmail.com",
     template: "projectApproval",
-    subject: "",
+    subject: "Project Approval",
     context: {
        name:data.name,
        content:data.content,
@@ -551,4 +551,4 @@ email.transporter.sendMail(clientMailOptions, async function (error, info) {
       console.log("Success");
   }
 });
-}
+};
