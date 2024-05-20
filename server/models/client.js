@@ -106,6 +106,14 @@ const clients=sequelize.define("clients",{
     token:{
         type:Sequelize.STRING,
         allowNull:true
+    },
+    otp: {
+        type: Sequelize.JSON,
+        allowNull: true,
+        defaultValue: {
+            value: null,
+            validity: null
+        }
     }
 },{
     indexes: [

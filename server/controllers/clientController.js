@@ -164,15 +164,31 @@ exports.addClient = async (req, res) => {
   }
 };
 
+async function generateOTP() {
+  const otpValue = Math.floor(1000 + Math.random() * 9000); // Generate a 4-digit OTP
+  const currentTime = new Date();
+  const validityTime = new Date(currentTime.getTime() + 24 * 60 * 60 * 1000); // 24 hours from now
+
+  return {
+      value: otpValue,
+      validity: validityTime
+  };
+}
+
 exports.sendApprovalMail=async(req,res)=>{
   try
   {
     var c_data=await client.findOne({where:{id:req.body.id}});
+    var otpData=await generateOTP();
     await c_data.update({
-      token:c_data.id
+      token:c_data.id,
+      otp:otpData
     });
     var data={name:req.body.name,email:req.body.email,content:req.body.content,url:`https://refo.app/v1/#/approvalMail?approval_id=${req.body.id}`};
-    mailFunction.sendProjectApproval(data);
+    await mailFunction.sendProjectApproval(data);
+    var content=`To complete the verification process for the project${c_data.clientName}(${c_data.uniqueId}), please use the OTP below:`;
+    var otp_data={name:req.body.name,email:req.body.email,content:content,otp:otpData.value};
+    await mailFunction.sendOtpForProjectApproval(otp_data);
     res.status(200).json({status:true,message:"Mail Has been sent for Approval"});
   }
   catch(e)
@@ -181,6 +197,8 @@ exports.sendApprovalMail=async(req,res)=>{
     res.status(500).json({status:false,message:"Error"});
   }
 };
+
+exports.resendOtp=async()
 
 exports.approveClient=async(req,res)=>{
   try
