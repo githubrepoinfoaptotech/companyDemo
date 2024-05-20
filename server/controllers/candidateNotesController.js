@@ -26,6 +26,24 @@ exports.addCandidateNotes=async(req,res)=>{
     });
 };
 
+exports.approveNotes=async(req,res)=>{
+    await candidateNotes.findOne({where:{id:req.body.id,recruiterId:req.recruiterId}}).then(async data=>{
+        if(data){
+            data.update({
+                approve:req.body.approve,
+                approvedBy:req.recruiterId
+            });
+            res.status(200).json({status:true,message:"Note Approved"});
+        }
+        else{
+            res.status(200).json({status:false,message:"Invalid Action"});
+        }
+    }).catch(e=>{
+        console.log(e);
+        res.status(500).json({status:false,message:"ERROR"});
+    });
+};
+
 exports.deleteCandidateNotes=async(req,res)=>{
     candidateNotes.findOne({where:{id:req.body.id,recruiterId:req.recruiterId}}).then(async data=>{
         if(data){

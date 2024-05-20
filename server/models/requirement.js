@@ -23,14 +23,14 @@ const requirement=sequelize.define("requirement",{
          },
         allowNull:false
     },
-    // orgRecruiterId:{
-    //     type:Sequelize.UUID,      
-    //     allowNull:true,
-    //     references:{
-    //         model:orgRecruiter,
-    //         key:'id'
-    //     }
-    // },
+    orgRecruiterId:{
+        type:Sequelize.UUID,      
+        allowNull:true,
+        references:{
+            model:orgRecruiter,
+            key:'id'
+        }
+    },
     skills:{
         type:Sequelize.STRING,
         allowNull:true
@@ -139,8 +139,8 @@ levelOfHiring.hasMany(requirement);
 requirement.belongsTo(recruiter);
 recruiter.hasMany(requirement);
 
-// requirement.belongsTo(orgRecruiter);
-// orgRecruiter.hasMany(requirement);
+requirement.belongsTo(orgRecruiter);
+orgRecruiter.hasMany(requirement);
 
 
 statusList.hasMany(requirement, { foreignKey: 'statusCode' });

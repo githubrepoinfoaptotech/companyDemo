@@ -25,7 +25,6 @@ exports.addRequirement = async (req, res) => {
     var myreq;
     if(req.companyType="COMPANY")
       {
-         
         myreq = {
         clientId: client_data.id,
         requirementName: req.body.requirementName,

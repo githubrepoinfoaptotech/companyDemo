@@ -282,7 +282,9 @@ exports.addCandidate = async (req, res) => {
           gender: req.body.gender,
           createdBy:req.recruiterId,
           isExternal:"YES",
-          currentCompanyName:req.body.currentCompanyName
+          currentCompanyName:req.body.currentCompanyName,
+          panNumber:req.body.panNumber,
+          linkedInProfile:req.body.linkedInProfile
         };
         if (req.body.candidateProcessed == "NO") {
           myCandidate.reason = req.body.reason;
@@ -309,7 +311,8 @@ exports.addCandidate = async (req, res) => {
                   candidateSkillExplanationRecording:req.body.candidateSkillExplanationRecording,
                   candidateMindsetAssessmentLink:req.body.candidateMindsetAssessmentLink,
                   candidateAndTechPannelDiscussionRecording:req.body.candidateAndTechPannelDiscussionRecording,
-                  hideContactDetails:req.body.hideContactDetails
+                  hideContactDetails:req.body.hideContactDetails,
+                 
                 })
                 .then(async (my_can) => {
                   await candidateStatus.create({
@@ -355,7 +358,8 @@ exports.addCandidate = async (req, res) => {
                   candidateRecruiterDiscussionRecording:req.body.candidateRecruiterDiscussionRecording,
                   candidateSkillExplanationRecording:req.body.candidateSkillExplanationRecording,
                   candidateMindsetAssessmentLink:req.body.candidateMindsetAssessmentLink,
-                  candidateAndTechPannelDiscussionRecording:req.body.candidateAndTechPannelDiscussionRecording
+                  candidateAndTechPannelDiscussionRecording:req.body.candidateAndTechPannelDiscussionRecording,
+                  
                 })
                 .then(async (my_can) => {
                   await candidateStatus.create({
@@ -448,6 +452,8 @@ exports.addCandidate = async (req, res) => {
             educationalQualification: req.body.educationalQualification,
             gender: req.body.gender,
             createdBy:req.recruiterId,
+            panNumber:req.body.panNumber,
+            linkedInProfile:req.body.linkedInProfile,
             isExternal:"NO"
           };
           if (req.body.candidateProcessed == "NO") {
@@ -474,7 +480,8 @@ exports.addCandidate = async (req, res) => {
                     candidateRecruiterDiscussionRecording:req.body.candidateRecruiterDiscussionRecording,
                     candidateSkillExplanationRecording:req.body.candidateSkillExplanationRecording,
                     candidateMindsetAssessmentLink:req.body.candidateMindsetAssessmentLink,
-                    candidateAndTechPannelDiscussionRecording:req.body.candidateAndTechPannelDiscussionRecording
+                    candidateAndTechPannelDiscussionRecording:req.body.candidateAndTechPannelDiscussionRecording,
+                    
                   })
                   .then(async (my_can) => {
                     await candidateStatus.create({
@@ -520,7 +527,8 @@ exports.addCandidate = async (req, res) => {
                     candidateRecruiterDiscussionRecording:req.body.candidateRecruiterDiscussionRecording,
                     candidateSkillExplanationRecording:req.body.candidateSkillExplanationRecording,
                     candidateMindsetAssessmentLink:req.body.candidateMindsetAssessmentLink,
-                    candidateAndTechPannelDiscussionRecording:req.body.candidateAndTechPannelDiscussionRecording
+                    candidateAndTechPannelDiscussionRecording:req.body.candidateAndTechPannelDiscussionRecording,
+                    
                   })
                   .then(async (my_can) => {
                     await candidateStatus.create({
@@ -611,7 +619,9 @@ exports.editCandidate = async (req, res) => {
         differentlyAbled: req.body.differentlyAbled,
         educationalQualification: req.body.educationalQualification,
         gender: req.body.gender,
-        currentCompanyName:req.body.currentCompanyName
+        currentCompanyName:req.body.currentCompanyName,
+        panNumber:req.body.panNumber,
+        linkedInProfile:req.body.linkedInProfile
       };
       if (req.body.candidateProcessed == "NO") {
         mycan.reason = req.body.reason;
@@ -708,7 +718,9 @@ exports.adminEditCandidate = async (req, res) => {
           differentlyAbled: req.body.differentlyAbled,
           educationalQualification: req.body.educationalQualification,
           gender: req.body.gender,
-          currentCompanyName:req.body.currentCompanyName
+          currentCompanyName:req.body.currentCompanyName,
+          panNumber:req.body.panNumber,
+          linkedInProfile:req.body.linkedInProfile
         };
         if (req.body.candidateProcessed == "NO") {
           mycan.reason = req.body.reason;

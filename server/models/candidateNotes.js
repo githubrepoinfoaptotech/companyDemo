@@ -16,6 +16,19 @@ const candidateNote=sequelize.define("candidateNote",{
     message:{
         type:Sequelize.TEXT,
         allowNull:false
+    },
+    approve:{
+        type:Sequelize.BOOLEAN,
+        allowNull:true
+    },
+    approvedBy:{
+        type:Sequelize.UUID, 
+        allowNull:true,
+        references: {
+            model: recruiter, 
+            key: 'id',
+         }
+
     }
     // statusCode:{
     //     type:Sequelize.INTEGER,
@@ -48,5 +61,8 @@ recruiter.hasMany(candidateNote);
 
 candidateNote.belongsTo(candidate);
 candidate.hasMany(candidateNote);
+
+candidateNote.belongsTo(recruiter, { foreignKey: 'approvedBy', targetKey: 'id' });
+recruiter.hasMany(candidateNote, { foreignKey: 'approvedBy', sourceKey: 'id' });
 
 module.exports=candidateNote;

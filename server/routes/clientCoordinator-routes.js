@@ -8,6 +8,7 @@ const check_auth_mail=require('../middlewares/check_auth_mail');
 const dashboardController=require('../controllers/dashboardController');
 const validation=require("../middlewares/validation");
 const filefunctions=require("../middlewares/fileUploadMulter");
+const candidateNotes=require('../controllers/candidateNotesController');
 const route=Router();
 
 route.post('/addRequirement',check_auth_CC,validation.addRequirementValidation,requirementController.addRequirement);
@@ -31,4 +32,6 @@ route.post("/checkIsApproved",check_auth_mail,ClientController.approveClient);
 route.post("/checkApprovalValidity",check_auth_mail,ClientController.checkApprovalValidity);
 route.post("/addHiringLevel",check_auth_CC,validation.addHiringLevelValidation,ClientController.addHiringLevel);
 route.post("/editHiringLevel",check_auth_CC,validation.editHiringLevelValidation,ClientController.editHiringLevel);
+route.post("/approveNotes",check_auth_CC,candidateNotes.approveNotes);
+
 module.exports=route;

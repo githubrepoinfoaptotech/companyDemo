@@ -117,6 +117,14 @@ const candidateDetail=sequelize.define("candidateDetail",{
     currentCompanyName:{
         type:Sequelize.STRING,
         allowNull:true
+    },
+    panNumber:{
+        type:Sequelize.STRING,
+        allowNull:true
+    },
+    linkedInProfile:{
+        type:Sequelize.STRING,
+        allowNull:true
     }
 },
 {

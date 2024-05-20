@@ -44,7 +44,23 @@ const recruiter=sequelize.define("recruiter",{
     companyAddress:{
         type:Sequelize.STRING,
         allowNull:true,
-    }
+    },
+    headOfficeLocation:{
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+    branchOfficeLocation:{
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+    capabilities:{
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+    recruiterCapacity:{
+        type: Sequelize.STRING,
+        allowNull: true,
+      }
 },
 {
     indexes: [

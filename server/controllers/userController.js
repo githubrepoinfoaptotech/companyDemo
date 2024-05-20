@@ -545,7 +545,7 @@ exports.changeUserState = async (req, res) => {
 
 // recruiter control ------------------------------------------------------------------------------------------------------------
 exports.addUser = async (req, res) => {
-  const { email, firstName, roleName, lastName, password, companyName, mobile, employeeId } =
+  const { email, firstName, roleName, lastName, password, companyName, mobile, employeeId,companyAddress,headOfficeLocation,branchOfficeLocation,capabilities,recruiterCapacity } =
     req.body;
     console.log(companyName);
   try {
@@ -569,15 +569,21 @@ exports.addUser = async (req, res) => {
         isMsme:false,
         isActive:true
       });
-      recruiter.create({
+      rec_data={
         userId: user_data.id,
         firstName: firstName,
         lastName: lastName,
         mainId: req.mainId,
         mobile: mobile,
         employeeId: employeeId,
-        companyName:companyName
-      });
+        companyName:companyName,
+        companyAddress:companyAddress,
+        headOfficeLocation:headOfficeLocation,
+        branchOfficeLocation:branchOfficeLocation,
+        capabilities:capabilities,
+        recruiterCapacity:recruiterCapacity
+      };
+      recruiter.create();
       res
         .status(200)
         .json({ status: true, message: "User Added Successfully" });
