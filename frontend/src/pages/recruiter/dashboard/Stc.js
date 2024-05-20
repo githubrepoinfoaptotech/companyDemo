@@ -1,7 +1,10 @@
 import React from 'react'
 import Layout from '../../../components/Recruiter/Layout'
+import jwtDecode from 'jwt-decode';
 
 function Stc() {
+  const token = localStorage.getItem("token")
+  const decode = jwtDecode(token)
   const CandidatesDataUrl = `${process.env.REACT_APP_SERVER}recruiter/getStcData`; 
   const UpdateDataUrl = `${process.env.REACT_APP_SERVER}recruiter/getAllCandidateStatus`;
   const UpdateCandidates=`${process.env.REACT_APP_SERVER}recruiter/candidate`;
@@ -27,7 +30,7 @@ function Stc() {
   return (
     <div>
       <Layout
-        title="Ongoing - Submitted to Client Report"
+        title={ decode.companyType === "COMPANY" ? "Ongoing - Submitted to Hiring Manager Report" : "Ongoing - Submitted to Client Report"  }
         CandidatesDataUrl={CandidatesDataUrl}
         UpdateDataUrl={UpdateDataUrl}
         UpdateCandidates={UpdateCandidates}

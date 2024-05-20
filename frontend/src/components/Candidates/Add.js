@@ -254,8 +254,8 @@ export default function Add(props) {
                                 requirementName: response.data.data.requirementName,
                                 clientId: response.data.data.clientId,
                                 skills: response.data.data.skills,
-                                orgRecruiterId: response.data.data.orgRecruiter.id,
-                                orgRecruiterName: response.data.data.orgRecruiter.name,
+                                orgRecruiterId: decode.companyType === "COMPANY" ? ""  :response.data.data.orgRecruiter.id,
+                                orgRecruiterName: decode.companyType === "COMPANY" ? ""  : response.data.data.orgRecruiter.name,
                                 jobLocation: response.data.data.jobLocation,
                                 experience: response.data.data.experience,
                                 clientUniqueId: response.data.data.client?.uniqueId,
@@ -655,30 +655,30 @@ export default function Add(props) {
            
                   </Grid>
                 
+                  {decode.companyType === "COMPANY" ?
+                    <></>
+                  :
+                    <Grid item xs={6} sm={5} md={2} lg={2}>
+                      <InputLabel shrink htmlFor="resume">                   
+                        Hide Contact Detail
+                      </InputLabel>
+                
+                      <FormControl className={classes.margin}>
 
-                  <Grid item xs={6} sm={5} md={2} lg={2}>
-                    <InputLabel shrink htmlFor="resume">
-                      
-                      Hide Contact Detail
-                    </InputLabel>
-               
-                    <FormControl className={classes.margin}>
+                              <Switch
+                              checked={props.hideContactDetails}
+                              onChange={(e) => {
+                            
+                                props.setHideContactDetails(e.target.checked);
 
-                            <Switch
-                            checked={props.hideContactDetails}
-                            onChange={(e) => {
-                           
-                              props.setHideContactDetails(e.target.checked);
+                              }}
+                              color="primary"
+                              inputProps={{ "aria-label": "primary checkbox" }}
+                              />
 
-                            }}
-                            color="primary"
-                            inputProps={{ "aria-label": "primary checkbox" }}
-                            />
-
-                    </FormControl>
-
-           
-                  </Grid>
+                      </FormControl>
+                    </Grid>
+                  }
 
                  { decode.role !== "SUBVENDOR" && decode.role !==  "FREELANCER"? <>
                   <Grid item xs={12} sm={7} md={4} lg={4}>
@@ -1513,7 +1513,7 @@ export default function Add(props) {
 
                           <Grid item xs={6} lg={6}>
                             <Typography>
-                              <b>Clients Name:</b>
+                              <b> {decode.companyType === "COMPANY" ? "Project Name:" :"Client Name:"}</b>
                             </Typography>
                           </Grid>
                           <Grid item xs={6} lg={6}>

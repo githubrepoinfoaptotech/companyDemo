@@ -648,7 +648,7 @@ export default function Tables() {
   return (
     <>
       <Grid container direction="row" spacing={2} className={classes.heading}>
-        <Grid item xs={7}> <PageTitle title="Invoiced Candidates" />  </Grid>
+        <Grid item xs={7}> <PageTitle title={decode.companyType === "COMPANY" ? "On-boarded Candidates" :"Invoiced Candidates"} />  </Grid>
 
         <Grid item xs={5} className={classes.drawerClose}>
           <Select
@@ -857,7 +857,7 @@ className={classes.flexCenter}
                 name: "Recruiter Name",
               },
               {
-                name: "Client Coordinator",
+                name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
               },
               {
                 name: "Invoice Date",

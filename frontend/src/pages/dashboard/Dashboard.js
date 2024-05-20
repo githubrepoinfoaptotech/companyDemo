@@ -19,7 +19,8 @@ import InterviewScheduled from '../../images/icon/InterviewScheduled.png';
 import SalaryBreakup from '../../images/icon/SalaryBreakup.png';
 import ScheduleInterview from '../../images/icon/ScheduleInterview.png';
 import YetToJoin from '../../images/icon/YetToJoin.png';
-import WorkFlow from '../../images/RefoWorkFlow.jpg'
+import WorkFlow from '../../images/RefoWorkFlow.png'
+import WorkFlowRC from '../../images/RefoWorkFlowRc.jpg'
  
 
 export default function Dashboard(props) {
@@ -84,7 +85,7 @@ export default function Dashboard(props) {
        {decode.role === "ADMIN" ?
        <Grid container direction="row" spacing={2} >
         <Grid item xs={12} className={classes.flexCenter}> 
-          <img src={WorkFlow} alt="workflow" width="82%"/>
+          <img src={decode.companyType==="COMPANY" ? WorkFlow: WorkFlowRC} alt="workflow" width="82%"/>
         </Grid>  
         {/* <Grid item xs={12}  className={classes.flexCenter}>
           <Button
@@ -173,7 +174,7 @@ export default function Dashboard(props) {
 
               <Grid item lg={2} xl={2} md={3} sm={4} xs={12}  onClick={() => { history.push("/app/admin_candidates_stc") }} >
                 <div className={classes.purple}>
-                  <p className={classes.grid_title}>Submitted to Client</p>
+                  <p className={classes.grid_title}>{ decode.companyType === "COMPANY" ? "Submitted to Hiring Manager" : "Submitted to Client"  }</p>
                   <div className={classes.visitsNumberContainer}>
                     <Grid container item  >
                       <Grid item xs={7} className={classes.M10}>
@@ -441,7 +442,7 @@ export default function Dashboard(props) {
 
                 <Grid item lg={2} xl={2} md={3} sm={4} xs={12} onClick={() => { history.push("/app/cc_candidates_stc") }} >
                   <div className={classes.purple}>
-                    <p className={classes.grid_title}>Submitted to Client</p>
+                    <p className={classes.grid_title}>{ decode.companyType === "COMPANY" ? "Submitted to Hiring Manager" : "Submitted to Client"}</p>
                     <div className={classes.visitsNumberContainer}>
                       <Grid container item  >
                         <Grid item xs={7} className={classes.M10}>
@@ -717,7 +718,7 @@ export default function Dashboard(props) {
 
                   <Grid item lg={2} xl={2} md={3} sm={4} xs={12} onClick={() => { history.push("/app/recruiter_candidates_stc") }} >
                     <div className={classes.purple}>
-                      <p className={classes.grid_title}>Submitted to Client</p>
+                      <p className={classes.grid_title}>{ decode.companyType === "COMPANY" ? "Submitted to Hiring Manager" : "Submitted to Client"  }</p>
                       <div className={classes.visitsNumberContainer}>
                         <Grid container item  >
                           <Grid item xs={7} className={classes.M10}>
@@ -992,7 +993,7 @@ export default function Dashboard(props) {
 
              <Grid item lg={2} xl={2} md={3} sm={4} xs={12} onClick={() => { history.push("/app/others_candidates_stc") }} >
                <div className={classes.purple}>
-                 <p className={classes.grid_title}>Submitted to Client</p>
+                 <p className={classes.grid_title}>{ decode.companyType === "COMPANY" ? "Submitted to Hiring Manager" : "Submitted to Client"  }</p>
                  <div className={classes.visitsNumberContainer}>
                    <Grid container item  >
                      <Grid item xs={7} className={classes.M10}>

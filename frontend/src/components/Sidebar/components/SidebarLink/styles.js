@@ -16,8 +16,11 @@ export default makeStyles(theme => ({
     textDecoration: 'none'
   },
   linkActive: {
-    backgroundColor: theme.palette.background.light,
-      
+    // backgroundColor: theme.palette.background.light,
+    backgroundColor:"#d1e0f5",
+    "&:hover, &:focus": {
+      backgroundColor: '#d1e0f5',
+    }
   },
   linkNested: {
     paddingLeft: 0,

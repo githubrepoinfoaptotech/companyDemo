@@ -586,7 +586,7 @@ export default function Tables(props) {
       },
     }).then(function (response) {
       if (response.data.status === true) {
-        aiResumeUpload(data)
+        // aiResumeUpload(data)
       } else {
         handleNotificationCall("error", response.data.message);
       }
@@ -964,7 +964,7 @@ export default function Tables(props) {
                 name: "Recruiter Name",
               },
               {
-                name: "Client Coordinator",
+                name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
               },
               {
                 name: "Posted Date",

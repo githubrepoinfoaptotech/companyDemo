@@ -1437,7 +1437,7 @@ function uploadResume(File, Id) {
   }).then(function (response) {
  
     if (response.data.status === true) {
-      aiResumeUpload(data)
+      // aiResumeUpload(data)
     } else {
       handleNotificationCall("error", response.data.message);
     }
@@ -2488,7 +2488,7 @@ function uploadResume(File, Id) {
                 name: "Recruiter Name",
               },
               {
-                name: "Client Coordinator",
+                name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
               },
 
               {
@@ -2496,12 +2496,6 @@ function uploadResume(File, Id) {
               },
               {
                 name: "View Candidate",
-              },
-              {
-                name: "Match JD",
-              },
-              {
-                name: "Resume Info ",
               },
               {
                 name: "Posted Date",
@@ -2581,32 +2575,32 @@ function uploadResume(File, Id) {
                     
                     />
                 </Tooltip>,
-                <Tooltip
-                  title="Match JD"
-                  placement="bottom"
-                  aria-label="view"
-                >
-                  <div className={classes.toolIcon+" "+classes.resumeUploadParent} 
-                    onClick={(e) => {
-                      handleJDOpen();
-                      cvMatchingPercentage(item.id);
-                      setCandidMatchId(item.id);
-                    }}>
-                    %
-                  </div>
-                </Tooltip>,
-                <Tooltip
-                  title="Get Resume Info"
-                  placement="bottom"
-                  aria-label="view"
-                >
-                  <div className={classes.toolIcon+" "+classes.resumeUploadParent} 
-                    onClick={(e) => {
-                      getCanididateResumeInfo(item.candidateDetailId,item.candidateDetail);
-                    }}>
-                    i
-                  </div>
-                </Tooltip>,
+                // <Tooltip
+                //   title="Match JD"
+                //   placement="bottom"
+                //   aria-label="view"
+                // >
+                //   <div className={classes.toolIcon+" "+classes.resumeUploadParent} 
+                //     onClick={(e) => {
+                //       handleJDOpen();
+                //       cvMatchingPercentage(item.id);
+                //       setCandidMatchId(item.id);
+                //     }}>
+                //     %
+                //   </div>
+                // </Tooltip>,
+                // <Tooltip
+                //   title="Get Resume Info"
+                //   placement="bottom"
+                //   aria-label="view"
+                // >
+                //   <div className={classes.toolIcon+" "+classes.resumeUploadParent} 
+                //     onClick={(e) => {
+                //       getCanididateResumeInfo(item.candidateDetailId,item.candidateDetail);
+                //     }}>
+                //     i
+                //   </div>
+                // </Tooltip>,
                 moment(item.createdAt).format("DD-MM-YYYY"),
               ];
             })}
@@ -2692,7 +2686,7 @@ function uploadResume(File, Id) {
        handleResumeClose={handleResumeClose}
       />
 
-      <MatchJDDialog
+      {/* <MatchJDDialog
         resumePercentage={resumePercentage}
         requirementName={requirementName}
         matchLoading={matchLoading}
@@ -2701,7 +2695,7 @@ function uploadResume(File, Id) {
         candidMatchId={candidMatchId}
         cvMatchingPercentage={cvMatchingPercentage}
         removePercentage={removePercentage}
-      />
+      /> */}
 
       <Backdrop className={classes.backdrop} open={loader}>
         <CircularProgress color="inherit" />

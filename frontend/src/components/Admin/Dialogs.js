@@ -435,10 +435,8 @@ const Dialogs = (props) => {
                   color="primary"
                   onClick={ props.handleChangeMessageOpen }
                 >
-                  Submitted to Client
+                  { decode.companyType === "COMPANY" ? "Submitted to Hiring Manager" : "Submitted to Client"  }
                 </Button>
-
-               
               </>
             
              :props.shortList.statusCode === 3081 ? 

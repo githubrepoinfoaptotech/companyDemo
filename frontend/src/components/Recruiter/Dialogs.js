@@ -416,7 +416,7 @@ const Dialogs = (props) => {
     color="primary"
     onClick={ props.handleChangeMessageOpen }
   >
-     Submitted to Client
+   {decode.companyType === "COMPANY" ? "Submitted to HM" :"Submitted to Client"}
   </Button>
 
 

@@ -24,7 +24,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import CloseIcon from '@material-ui/icons/Close';
 import Notification from "../../components/Notification/Notification";
 import 'react-toastify/dist/ReactToastify.css';
-
+import jwt_decode from "jwt-decode"; 
 
 
 function Layouts(props) {
@@ -32,6 +32,8 @@ function Layouts(props) {
    const mobileQuery = useMediaQuery('(max-width:600px)'); 
 
   const positions = [toast.POSITION.TOP_RIGHT];
+  const token = localStorage.getItem("token");
+  const decode = jwt_decode(token);
 
   const invoiceRef = useRef();
 
@@ -1072,7 +1074,7 @@ function Layouts(props) {
               },
              
               {
-                name: "Client Coordinator",
+                name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
               }, 
               {
                 name: "View Candidate",

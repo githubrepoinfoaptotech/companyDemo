@@ -42,6 +42,7 @@ import AssignAdd from "../../components/Admin/AssignAdd.js";
 
 import useStyles from "../../themes/style.js";
 import AddUser from "../../components/Admin/AddUser";
+import jwt_decode from "jwt-decode"; 
 
 const positions = [toast.POSITION.TOP_RIGHT];
 
@@ -51,6 +52,7 @@ export default function Tables() {
   const mobileQuery = useMediaQuery('(max-width:600px)'); 
 
   const token = localStorage.getItem("token");
+  const decode = jwt_decode(token);
   const [userData, setUserData] = useState([]);
   const [userEdit, setUserEdit] = useState({
     id: "",
@@ -704,9 +706,13 @@ export default function Tables() {
                           }}
                         >
                             <MenuItem value="RECRUITER">Recruiter</MenuItem>
-                          <MenuItem value="CLIENTCOORDINATOR">Client Coordinator</MenuItem>
-                          <MenuItem value="SUBVENDOR">   Sub Vendor </MenuItem>
+                          <MenuItem value="CLIENTCOORDINATOR">{decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator"}</MenuItem>
+                          <MenuItem value="SUBVENDOR"> {decode.companyType === "COMPANY" ? "Vendor" :"Sub Vendor"}</MenuItem>
+                          {decode.companyType === "COMPANY" ? 
+                          <></> 
+                          : 
                           <MenuItem value="FREELANCER">  Freelancer </MenuItem>
+                          }
                         </Select>
                       </FormControl>
                     </Grid>
@@ -1413,8 +1419,8 @@ recruiter={"false"}
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>     <Typography className={classes.boldtext}>  User Category:  </Typography> </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>   {userEdit.roleName === "RECRUITER"? "Recruiter": 
-                                                               userEdit.roleName === "CLIENTCOORDINATOR"?  "Client Coordinator" :
-                                                               userEdit.roleName === "SUBVENDOR"?  "Sub Vendor":
+                                                               userEdit.roleName === "CLIENTCOORDINATOR"?  "Hiring Manager" :
+                                                               userEdit.roleName === "SUBVENDOR"?  (decode.companyType === "COMPANY" ? "Vendor" :"Sub Vendor"):
                                                                userEdit.roleName === "FREELANCER"?  "Freelancer":
                                                                "" }   </Grid>
                   
@@ -1601,20 +1607,35 @@ recruiter={"false"}
                            select>
                           
                           <MenuItem value="RECRUITER">Recruiter</MenuItem>
-                          <MenuItem value="CLIENTCOORDINATOR"> Client Coordinator </MenuItem>
+                          <MenuItem value="CLIENTCOORDINATOR"> {decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator"} </MenuItem>
                           <MenuItem value="SUBVENDOR"> Subvendor </MenuItem>
-                          <MenuItem value="FREELANCER"> Freelancer </MenuItem>
+                          {decode.companyType === "COMPANY" ? 
+                          <></> 
+                          : 
+                          <MenuItem value="FREELANCER">  Freelancer </MenuItem>
+                          }
                         </TextField>
                         </div>
           <Autocomplete
             className={classes.filterFullWidth}
             options={userName}
-            
-            getOptionLabel={(option) =>
-            option.firstName + " " + option.lastName + " (" +   option.user?.role?.title +   ")" 
-            }
+            getOptionLabel={(option) => {
+              const roleName = option.user?.role?.roleName;
+              const firstName = option.firstName;
+              const lastName = option.lastName;
+              let label = `${firstName} ${lastName}`;
+              if (roleName) {
+                label += ` (${roleName})`;
 
-           
+                if (roleName === 'SUBVENDOR') {
+                  label = label.replace('(SUBVENDOR)', '(Vendor)');
+                } else if (roleName === 'CLIENTCOORDINATOR') {
+                  label = label.replace('(CLIENTCOORDINATOR)', '(Hiring Manager)');
+                }
+              }
+
+              return label;
+            }}         
             onChange={(event, value) => setRecruiterId(value)}
             size="small"
             renderInput={(params) => (
@@ -1622,7 +1643,7 @@ recruiter={"false"}
                 {...params}
                 name="recruiterId"
                 variant="standard"
-                label="Recruiter"
+                label={decode.companyType ==="COMPANY"? "User" :"Recruiter"}
                 InputLabelProps={{ shrink: true }}
                 type="text"
               />
@@ -1772,8 +1793,8 @@ recruiter={"false"}
                 item.employeeId,
                 item.mobile,
                 item.user?.roleName === "RECRUITER"? "Recruiter": 
-                item.user?.roleName === "CLIENTCOORDINATOR"?  "Client Coordinator" :
-                item.user?.roleName === "SUBVENDOR"?  "Sub Vendor":
+                item.user?.roleName === "CLIENTCOORDINATOR"?  "Hiring Manager" :
+                item.user?.roleName === "SUBVENDOR"?  (decode.companyType === "COMPANY" ? "Vendor" :"Sub Vendor"):
                 item.user?.roleName === "FREELANCER"?  "Freelancer":
                 "" ,
                 <Switch
