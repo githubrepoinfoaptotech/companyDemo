@@ -6,7 +6,7 @@ const requirement = require("./requirement");
 
 
 
-const assignedRequirements = sequelize.define("assignedRequirements", {
+const requirementRecruiters = sequelize.define("requirementRecruiters", {
     id: {
         type: Sequelize.UUID,
         unique: true,
@@ -25,7 +25,8 @@ const assignedRequirements = sequelize.define("assignedRequirements", {
         type: Sequelize.BOOLEAN,
         allowNull: true,
         defaultValue:true
-    }
+    },
+    
 },
     {
         indexes: [
@@ -43,14 +44,14 @@ const assignedRequirements = sequelize.define("assignedRequirements", {
 );
 
 
-assignedRequirements.belongsTo(recruiter);
-recruiter.hasMany(assignedRequirements);
+requirementRecruiters.belongsTo(recruiter);
+recruiter.hasMany(requirementRecruiters);
 
-assignedRequirements.belongsTo(requirement);
-requirement.hasMany(assignedRequirements);
+requirementRecruiters.belongsTo(requirement);
+requirement.hasMany(requirementRecruiters);
 
 
 
 
 // candidate.sync();
-module.exports = assignedRequirements;
+module.exports = requirementRecruiters;

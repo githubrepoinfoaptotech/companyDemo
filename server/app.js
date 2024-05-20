@@ -75,7 +75,7 @@ app.use("/api/AI/",aiRoutes);
 //-------------------------------------
 
 app.post("/addrole", async(req, res) => {
-  const workbook = xlsx.readFile('statusLists.csv', { cellText: false, cellDates: false });
+  const workbook = xlsx.readFile('hiringSupports.csv', { cellText: false, cellDates: false });
   const sheetName = workbook.SheetNames[0];
   const sheet = workbook.Sheets[sheetName];
 // Convert the CSV data to JSON
@@ -83,7 +83,7 @@ app.post("/addrole", async(req, res) => {
       console.log(data);
   for(i=0;i<data.length;i++)
     {
-      await statusList.create(data[i]);
+      await hiringSupport.create(data[i]);
     }
     res.send("done");
 });

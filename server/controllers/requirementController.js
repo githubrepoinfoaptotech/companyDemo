@@ -20,35 +20,29 @@ const e = require("express");
 
 exports.addRequirement = async (req, res) => {
   try{
-    if(req.companyType=="COMPANY")
-      {
-        var client_data=await client.findOne({where:{mainId:req.mainId}});
-      }
-      else
-      {
-        var client_data=await client.findOne({where:{id:req.body.clientId,mainId:req.mainId}});
-      }
-  
+  var client_data=await client.findOne({where:{id:req.body.clientId,mainId:req.mainId}});
   if(client_data){
     var myreq;
     if(req.companyType="COMPANY")
       {
-         myreq = {
-          clientId: client_data.id,
-          requirementName: req.body.requirementName,
-          skills: req.body.skills,
-          statusCode: 201,
-          mainId: req.mainId,
-          recruiterId: req.recruiterId,
-          orgRecruiterId: req.body.orgRecruiterId,
-          experience:req.body.experience,
-          jobLocation:req.body.jobLocation,
-          hideFromInternal:req.body.hideFromInternal,
-          gist:req.body.gist,
-          modeOfWork:req.body.modeOfWork,
-          specialHiring:req.body.specialHiring,
-          createdBy:req.userId
-        };
+         
+        myreq = {
+        clientId: client_data.id,
+        requirementName: req.body.requirementName,
+        skills: req.body.skills,
+        statusCode: 201,
+        mainId: req.mainId,
+        recruiterId: req.recruiterId,
+        orgRecruiterId: req.body.orgRecruiterId,
+        experience:req.body.experience,
+        jobLocation:req.body.jobLocation,
+        hideFromInternal:req.body.hideFromInternal,
+        gist:req.body.gist,
+        modeOfWork:req.body.modeOfWork,
+        specialHiring:req.body.specialHiring,
+        levelOfHiringId:req.body.levelOfHiringId,
+        createdBy:req.userId
+      };
       }
     else
     {
@@ -66,7 +60,6 @@ exports.addRequirement = async (req, res) => {
         gist:req.body.gist,
         modeOfWork:req.body.modeOfWork,
         specialHiring:req.body.specialHiring,
-        levelOfHiringId:req.body.levelOfHiringId,
         createdBy:req.userId
       };
     }
@@ -287,8 +280,11 @@ exports.viewRequirement = async (req, res) => {
       {
         model:statusList,
         attributes:["statusName"]
+      },
+      {
+        model:levelOfHiring,
+        attributes:["name","id"]
       }
-      
     ],attributes:[
       'requirementName',
       'skills',
@@ -303,6 +299,7 @@ exports.viewRequirement = async (req, res) => {
       'requirementJd',
       'modeOfWork',
       'specialHiring',
+      'levelOfHiringId',
       [
         fn(
           "concat",
@@ -524,7 +521,7 @@ exports.myAssignedRequirements=async(req,res)=>{
   var page=req.body.page;
   console.log(req.recruiterId);
   if(req.roleName=="ADMIN"){
-    var mywhere={recruiterId:req.recruiterId,isActive:true};
+    var mywhere={mainId:req.mainId,isActive:true};
   }
   else{
     var mywhere={mainId:req.mainId,recruiterId:req.recruiterId,isActive:true};

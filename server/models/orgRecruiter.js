@@ -2,6 +2,7 @@ const Sequelize = require("sequelize");
 const sequelize = require("../db/db");
 const clients = require("./client");
 const user = require("./user");
+const recruiter=require("./recruiter");
 const uniqueid=require("uniqid");
 
 
@@ -39,6 +40,14 @@ const orgRecruiter=sequelize.define("orgRecruiter",{
     isActive:{
         type:Sequelize.BOOLEAN,
         defaultValue:true
+    },
+    recruiterId:{
+        type:Sequelize.UUID,
+        allowNull:true,
+        references: {
+            model: recruiter, 
+            key: 'id',
+         }
     }
 },
 {
@@ -57,5 +66,7 @@ const orgRecruiter=sequelize.define("orgRecruiter",{
 orgRecruiter.belongsTo(clients);
 clients.hasMany(orgRecruiter);
 
+recruiter.belongsTo(orgRecruiter);
+orgRecruiter.hasMany(recruiter);
 
 module.exports=orgRecruiter;

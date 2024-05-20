@@ -108,24 +108,49 @@ exports.addClient = async (req, res) => {
                     }
                 }
               }
+              
             if(req.body.orgRec.length>0){
-              var orgRec=req.body.orgRec;
-              for(i=0;i<orgRec.length;i++){
-              const newdata = await orgRecruiter.findOne({ where: { email: orgRec[i].email ,clientId:client_data.id} });
-                
-              if(!newdata){
-                if(orgRec[i].name!=''&& orgRec[i].email!=''&&orgRec[i].mobile!=''){
-                await orgRecruiter
-                  .create({
-                    name:  orgRec[i].name,
-                    email:  orgRec[i].email,
-                    mobile:  orgRec[i].mobile,
-                    mainId: req.mainId,
-                    clientId:  client_data.id,
-                  });  
+              if(req.companyType=="COMPANY")
+                {
+                  var orgRec=req.body.orgRec;
+                    for(i=0;i<orgRec.length;i++){
+                    const newdata = await orgRecruiter.findOne({ where: { recruiterId:orgRec[i].recruiterId,email: orgRec[i].email ,clientId:client_data.id} });
+                      
+                    if(!newdata){
+                      if(orgRec[i].name!=''&& orgRec[i].email!=''&&orgRec[i].mobile!=''){
+                      await orgRecruiter
+                        .create({
+                          name:  orgRec[i].name,
+                          email:  orgRec[i].email,
+                          mobile:  orgRec[i].mobile,
+                          mainId: req.mainId,
+                          clientId:  client_data.id,
+                        });  
+                      }
+                    }
+                    }
                 }
-              }
-              }
+                else
+                {
+                  var orgRec=req.body.orgRec;
+                    for(i=0;i<orgRec.length;i++){
+                    const newdata = await orgRecruiter.findOne({ where: { email: orgRec[i].email ,clientId:client_data.id} });
+                      
+                    if(!newdata){
+                      if(orgRec[i].name!=''&& orgRec[i].email!=''&&orgRec[i].mobile!=''){
+                      await orgRecruiter
+                        .create({
+                          name:  orgRec[i].name,
+                          email:  orgRec[i].email,
+                          mobile:  orgRec[i].mobile,
+                          mainId: req.mainId,
+                          clientId:  client_data.id,
+                        });  
+                      }
+                    }
+                    }
+                }
+              
             }
             res
               .status(200)
