@@ -124,6 +124,14 @@ exports.textExtract = async function (req, res, next) {
                 //console.log(req.file)
                 req.body.extractedText = text;
                 req.body.fileName=req.file.originalname;
+                var candidate_email =  text.match(
+                    /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi
+                  ); //For 
+                var candidate_mobile = text.match(
+                    /(\+?\d{10})\b/
+                  );
+                req.body.candidate_email=candidate_email;
+                req.body.candidate_mobile=candidate_mobilel;
                 fs.unlinkSync(req.file.path);
                 next();
             } catch (extractionError) {

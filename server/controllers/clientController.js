@@ -186,8 +186,9 @@ exports.sendApprovalMail=async(req,res)=>{
     });
     var data={name:req.body.name,email:req.body.email,content:req.body.content,url:`https://refo.app/v1/#/approvalMail?approval_id=${req.body.id}`};
     await mailFunction.sendProjectApproval(data);
-    var content=`To complete the verification process for the project${c_data.clientName}(${c_data.uniqueId}), please use the OTP below:`;
+    var content=`To complete the verification process for the project ${c_data.clientName}(${c_data.uniqueId}), please use the OTP below:`;
     var otp_data={name:req.body.name,email:req.body.email,content:content,otp:otpData.value};
+    console.log(otp_data);
     await mailFunction.sendOtpForProjectApproval(otp_data);
     res.status(200).json({status:true,message:"Mail Has been sent for Approval"});
   }
@@ -198,7 +199,17 @@ exports.sendApprovalMail=async(req,res)=>{
   }
 };
 
-exports.resendOtp=async()
+exports.resendOtp=async(req,res)=>{
+  try
+  {
+    var c_data=await client.findOne({where:{id:req.body.id}});
+      var otpData=await generateOTP();
+      await c_data.update({
+        token:c_data.id,
+        otp:otpData
+      });
+  }
+};
 
 exports.approveClient=async(req,res)=>{
   try

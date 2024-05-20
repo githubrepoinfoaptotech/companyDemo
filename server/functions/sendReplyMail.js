@@ -554,16 +554,17 @@ email.transporter.sendMail(clientMailOptions, async function (error, info) {
 };
 
 exports.sendOtpForProjectApproval=async(data)=>{
+  console.log(data);
   var clientMailOptions = {
     from: '<no-reply@refo.app>',
     to: data.email,
     // to: "vishallegend7775@gmail.com",
-    template: "projectApproval",
+    template: "sendOtpForProjectApproval",
     subject: "Otp For Project Approval",
     context: {
        name:data.name,
        content:data.content,
-       otp:data.otp
+       otp:otp
     },
 };
 email.transporter.sendMail(clientMailOptions, async function (error, info) {
