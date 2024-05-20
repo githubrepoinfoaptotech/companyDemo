@@ -479,114 +479,29 @@
               <p>
                 {{content}}
               </p>
-              <div style="overflow-x: scroll;">
-                <h4 style="margin-bottom:5px;font-weight: 800;">Project Details</h4>
-                <table style="border:1px solid black;overflow: scroll;">
-                  <thead>
-                    <tr>
-                      <th style="border: 1px solid black;padding: 5px 10px;white-space: nowrap;"><b>S.No</b></th>
-                      <th style="border: 1px solid black;padding: 5px 10px;white-space: nowrap;"><b>Project Name</b></th>
-                      <th style="border: 1px solid black;padding: 5px 10px;white-space: nowrap;"><b>Project Division</b>
-                      </th>
-                      <th style="border: 1px solid black;padding: 5px 10px;white-space: nowrap;"><b>Hiring Manager</b></th>
-                      <th style="border: 1px solid black;padding: 5px 10px;white-space: nowrap;"><b>Hr Business Uint
-                          Code</b></th>
-                      <th style="border: 1px solid black;padding: 5px 10px;white-space: nowrap;"><b>Project Region</b></th>
-                      <th style="border: 1px solid black;padding: 5px 10px;white-space: nowrap;"><b>Project Location</b>
-                      </th>
-                      <th style="border: 1px solid black;padding: 5px 10px;white-space: nowrap;"><b>Reason Hiring</b></th>
-                      <th style="border: 1px solid black;padding: 5px 10px;white-space: nowrap;"><b>Billable</b></th>
-                      <th style="border: 1px solid black;padding: 5px 10px;white-space: nowrap;"><b>Hiring Start Date</b>
-                      </th>
-                      <th style="border: 1px solid black;padding: 5px 10px;white-space: nowrap;"><b>Hiring End Date</b>
-                      </th>
-                  </thead>
-                  <tbody style="height: 30px;" style="position: relative;">
-                    <tr id="project_Details_939223" >
-                      
-                    </tr>
-                     <tr class="no_data_234234"><td style="position: absolute; text-align: center; width: 100%;border: none;">No Data</td></tr>
-                  </tbody>
-
-                </table>
+            
 
 
 
-
-              </div>
-
-              <div style="margin: 30px 0;">
-                <h4 style="margin-bottom:5px;font-weight: 800;">Level Of Hiring</h4>
-                <table style="border:1px solid black;overflow: scroll;width: 100%;">
-                  <thead>
-                    <tr>
-                      <th style="border: 1px solid black;padding: 5px 10px;white-space: nowrap;"><b>S.No</b></th>
-                      <th style="border: 1px solid black;padding: 5px 10px;white-space: nowrap;"><b>Level Name</b></th>
-                      <th style="border: 1px solid black;padding: 5px 10px;white-space: nowrap;"><b>Number of Hiring</b>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody id="level_of_hiring_342344" style="position: relative;">
-                    <tr class="no_data_234234"><td style="position: absolute; text-align: center; width: 100%;border: none;border: none;">No Data</td></tr>
-                  </tbody>
-
-                </table>
-              </div>
-
-              <div style="margin: 30px 0;">
-                <h4 style="margin-bottom:5px;font-weight: 800;">Point Of Contact</h4>
-                <table style="border:1px solid black;overflow: scroll;width: 100%;">
-                  <thead>
-                    <tr>
-                      <th style="border: 1px solid black;padding: 5px 10px;"><b>S.No</b></th>
-                      <th style="border: 1px solid black;padding: 5px 10px;"><b>Org Point of Contact(POC) Name</b></th>
-                      <th style="border: 1px solid black;padding: 5px 10px;"><b></b>Org Point of Contact(POC) Email</th>
-                      <th style="border: 1px solid black;padding: 5px 10px;"><b>Org Point of Contact(POC) Mobile No</b>
-                      </th>
-
-                    </tr>
-                  </thead>
-
-                  <tbody id="point_of_contact_3243" style="position: relative;">
-                    <tr class="no_data_234234"><td style="position: absolute; text-align: center; border: none; width: 100%;border: none;">No Data</td></tr>
-                  </tbody>
-
-                </table>
-              </div>
-
-
-
-              <form action="" id="approve_Clinet_form" style="text-align:center;">
-                <label for="approval">Lorem ipsum dolor sit amet consectetur adipisicing elit ?</label>
-                <div style="padding: 20px 0;    display: flex;
+              <div id="approve_Clinet_form" style="text-align:center;">
+                <label for="approval">Please click here to view and verify the details of the project</label>
+                <div style="padding: 10px 0 5px;    display: flex;
                 justify-content: center;" class="options-0232312">
-                  <label class="item1">
-                    <input type="radio" name="approval" value="true" id="approval" />
-
-                    <img />
-                    Approved
-                  </label>
-                  <label class="item2">
-                    <input type="radio" name="approval" value="false" />
-
-                    <img />
-                    Notapproved
-                  </label>
-
+                 
                 </div>
-                <button type="submit"
-                  style="padding:10px 20px;border: none;border-radius:10px;background: #064be2;color:#fff;cursor: pointer;">Confirm</button>
+                <a href={{url}}
+                  style="padding:10px 20px;border: none;border-radius:10px;background: #064be2;color:#fff;cursor: pointer;">Click Here</a>
 
 
-                <p class="no_data_234234"></p>
+                <p class="no_data_234234" id="error-message"></p>
 
-              </form>
+              </div>
 
               <div style="text-align: center;color: green !important; display: none;">
                 <h2>Already Approved</h2>
               </div>
 
-              <div style="margin-top: 5px;text-align: center;">
+              <div style="margin-top: 30px;text-align: center;">
                 <b> <span>Thank You</span> </b><br />
                 <span><a href="https://refo.app/" target="_blank">https://refo.app/</a></span>
               </div>
@@ -635,236 +550,7 @@
       </table>
     </div>
   </main>
-  <script>
-
-    var token={{token}};
-
-    let approval = document.querySelector('input[value="true"]');
-
-    let disapproval = document.querySelector('input[value="false"]');
-
-    let projectDetails = document.getElementById('project_Details_939223');
-
-
-
-
-
-
-    fetch('https://refo.app:8443/api/cc/checkApprovalValidity', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      //  'token': token
-      },
-      body: JSON.stringify()
-    })
-      .then(response =>{
-        if (!response.ok) {
-      return response.text().then(text => { throw new Error(text) });
-    }
-    return response.json();
-      })
-      .then(data => {
-
-        let noDatas=document.querySelectorAll(".no_data_234234");
-        
-        if(data.status){
-
-         
-          noDatas.forEach(element=>{
-            element.style.display="none";
-          });
-
-          
-
-        let newRow = document.createElement('tr');
-
-
-        // Project Details
-
-        function formattingDate(a) {
-          const isoDateString = a;
-          const date = new Date(isoDateString);
-
-          const day = String(date.getDate()).padStart(2, '0');
-          const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-          const year = date.getFullYear();
-
-          const formattedDate = `${day}-${month}-${year}`;
-
-          return formattedDate;
-        }
-
-
-        
-
-        console.log('Success', data);
-
-       
-
-                const serialName = document.createElement('td');
-                serialName.innerText = "1";
-        projectDetails.appendChild(serialName);
-
-        const name = document.createElement('td');
-        name.innerText = data.c_data.clientName;
-        projectDetails.appendChild(name);
-
-
-        const division = document.createElement('td');
-        division.innerText = data.c_data.clientIndustry;
-        projectDetails.appendChild(division);
-
-
-        const hiringManager = document.createElement('td');
-        hiringManager.innerText = data.c_data.recruiter.firstName + " " + data.c_data.recruiter.lastName;
-        projectDetails.appendChild(hiringManager);
-
-        const hrUintCod = document.createElement('td');
-        hrUintCod.innerText = data.c_data.hrbpCode;
-        projectDetails.appendChild(hrUintCod);
-
-        const projectRegion = document.createElement('td');
-        projectRegion.innerText = data.c_data.projectRegion;
-        projectDetails.appendChild(projectRegion);
-
-
-        const projectLocation = document.createElement('td');
-        projectLocation.innerText = data.c_data.projectLocation;
-        projectDetails.appendChild(projectLocation);
-
-
-        const reasonHiring = document.createElement('td');
-        reasonHiring.innerText = data.c_data.reasonForHiring;
-        projectDetails.appendChild(reasonHiring);
-
-        const billable = document.createElement('td');
-        billable.innerText = data.c_data.billable ? "Active" : "InActive";
-        projectDetails.appendChild(billable);
-
-        const startDate = document.createElement('td');
-
-
-
-        startDate.innerText = formattingDate(data.c_data.aggStartDate);
-        projectDetails.appendChild(startDate);
-
-        const endDate = document.createElement('td');
-        endDate.innerText = formattingDate(data.c_data.aggEndDate);
-        projectDetails.appendChild(endDate);
-
-
-        // Project End
-
-
-
-        //Level Of Hiring
-
-        let levelOfHiring=document.getElementById('level_of_hiring_342344');
-
-        let levelOfHiringData=data.levelOfHiring_data;
-
-        for(let i=0;i<levelOfHiringData.length;i++){
-          let hiringList=levelOfHiringData[i];
-          let sNo=i+1;
-          let name=levelOfHiringData[i]?.name;
-          let noOfHire=levelOfHiringData[i]?.noOfHires;
-
-          let creatRow=document.createElement('tr');
-          creatRow.innerHTML=`<td>${sNo}</td><td>${name}</td><td>${noOfHire}</td>`;
-          levelOfHiring.appendChild(creatRow);
-          
-        }
-
-          //end Level Of Hiring
-
-
-          // Point of Contact
-          let pointOfContact=document.getElementById('point_of_contact_3243');
-
-          let pointOfContactData=data.ordrec_data;
-
-
-          console.log(pointOfContactData);
-
-          for(let i=0;i<pointOfContactData.length;i++){
-          let hiringList=pointOfContactData[i];
-          let sNo=i+1;
-          let name=pointOfContactData[i]?.name;
-          let mail=pointOfContactData[i]?.email;
-          let number=pointOfContactData[i]?.mobile
-
-          let creatRow=document.createElement('tr');
-          creatRow.innerHTML=`<td>${sNo}</td><td>${name}</td><td>${mail}</td><td>${number}</td>`;
-          pointOfContact.appendChild(creatRow);
-          
-        }
-        
-          // End Point of Contact
-
-      }
-
-      else{
-        noDatas.forEach(element=>{
-          element.style.display="block";
-          })
-      }
-
-
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-
-
-
-    let form = document.getElementById("approve_Clinet_form");
-
-
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-
-      const selectedOption = document.querySelector('input[name="approval"]:checked');
-
-      // Clear any previous error messages
-      const errorMessage = document.getElementById('error-message');
-      errorMessage.textContent = '';
-
-      if (selectedOption) {
-        let booleanValue ={approved:(selectedOption.value === "true")};
-
-        fetch('https://refo.app:8443/api/cc/approveClient', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-           // 'token':token
-          },
-          body: JSON.stringify()
-        })
-          .then(response =>{
-            if (!response.ok) {
-      return response.text().then(text => { throw new Error(text) });
-    }
-    return response.json(booleanValue);
-          })
-          .then(data => {
-            console.log('Success', data);
-          
-          })
-          .catch((error) => {
-            
-          });
-      } else {
-        errorMessage.textContent = 'Please select an option before submitting.';
-      }
-
-
-    })
-
-
-
-  </script>
+  
 </body>
 
 </html>

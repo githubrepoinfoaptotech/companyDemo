@@ -541,7 +541,7 @@ exports.sendProjectApproval=async(data)=>{
     context: {
        name:data.name,
        content:data.content,
-       token:data.token
+       url:data.url
     },
 };
 email.transporter.sendMail(clientMailOptions, async function (error, info) {

@@ -171,7 +171,7 @@ exports.sendApprovalMail=async(req,res)=>{
     await c_data.update({
       token:c_data.id
     });
-    var data={name:req.body.name,email:req.body.email,content:req.body.content,token:req.body.id};
+    var data={name:req.body.name,email:req.body.email,content:req.body.content,url:`https://refo.app/v1/#/approvalMail?approval_id=${req.body.id}`};
     mailFunction.sendProjectApproval(data);
     res.status(200).json({status:true,message:"Mail Has been sent for Approval"});
   }
