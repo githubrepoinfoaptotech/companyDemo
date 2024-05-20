@@ -11,9 +11,11 @@ import teal from '@material-ui/core/colors/teal';
 import cyan from '@material-ui/core/colors/cyan';
 import { alpha } from "@material-ui/core/styles/colorManipulator";
 import iFrameLogo from "../images/iFrameLogo.png"; 
+import jwtDecode from "jwt-decode";
 
 
-
+const token = localStorage.getItem("token")
+const decode = jwtDecode(token)
 export default makeStyles(theme => ({
 
   tableOverflow: {
@@ -1872,7 +1874,7 @@ barItem :{
       position: "absolute",
       content:'""',
       borderBottom: "2px solid #4bb543",
-      width: "110px",
+      width: decode.companyType ==="COMPANY"? "130px" : "110px",
       top: "20px",
       left: "60px",
       [theme.breakpoints.only("xs")]: {
@@ -1888,7 +1890,8 @@ barItem :{
     },
     "&:before":{
       backgroundColor: "#4bb543",
-      color: "white"
+      color: "white",
+      width: decode.companyType ==="COMPANY"? "130px" : "110px"
     },
    "& $barCounter":{
     backgroundColor: "#4bb543",
@@ -2501,6 +2504,9 @@ matchJdCloseIcon:{
     color: "red",
     borderRadius:'100px'
   }
+},
+ApproveMailContainer:{
+  padding: "20px",
 }
 }));
 

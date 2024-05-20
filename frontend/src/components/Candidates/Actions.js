@@ -24,6 +24,7 @@ const Actions = (props) => {
         key={props.index}
          className={classes.actions}
         onClick={(e) => {
+          e.stopPropagation();
           setMenu(e.currentTarget);
         }}
       />

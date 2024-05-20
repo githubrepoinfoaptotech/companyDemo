@@ -2,45 +2,65 @@ import { Button } from "@material-ui/core";
 import { Grid } from "@material-ui/core";
 import useStyles from "../../themes/style.js";
 import Tooltip from "@material-ui/core/Tooltip";
+import jwtDecode from "jwt-decode";
 
-const Status = (props) => { 
+const Status = (props) => {
   const classes = useStyles();
+  const token = localStorage.getItem('token')
+  const decode = jwtDecode(token);
   return (
     <>
-      <Grid className={classes.button}>  
-        {props.list.statusCode === 302 || props.list.statusCode === 310 ||  props.list.statusCode === 311 || props.list.statusCode === 313 ? (
+      <Grid className={classes.button}>
+        {props.list.statusCode === 302 ||
+        props.list.statusCode === 310 ||
+        props.list.statusCode === 311 ||
+        props.list.statusCode === 313 ? (
           <>
-          
-          
-          <Tooltip 
-          disableHoverListener = { props.list.statusCode === 302? props.list?.droppedReason !==null? false : true: 
-            props.list.statusCode === 310  ? props.list?.offerDeclinedReason  !==null? false : true:  
-            props.list.statusCode === 311 ? props.list?.ditchReason   !==null? false : true : 
-            props.list?.creditNoteReason  !==null? false : true } 
-          
-          arrow= { true  }
-          title={ props.list.statusCode === 302? props.list?.droppedReason: 
-                          props.list.statusCode === 310  ? props.list?.offerDeclinedReason  : 
-                          props.list.statusCode === 311 ? props.list?.ditchReason 
-                          : props.list?.creditNoteReason 
-
-          } placement="right" aria-label="droppedReason">
-          
-          
-          <Button variant="contained" size="small" className={classes.red}>
-          {props.list.statusCode === 302? "Dropped": props.list.statusCode === 310  ? "Offer Declined"  : props.list.statusCode === 311
-            ? "Not Joined"     : "Credit Note"}    </Button> 
-
-
-          </Tooltip>
-
-          
-
-          
-        
-          
+            <Tooltip
+              disableHoverListener={
+                props.list.statusCode === 302
+                  ? props.list?.droppedReason !== null
+                    ? false
+                    : true
+                  : props.list.statusCode === 310
+                  ? props.list?.offerDeclinedReason !== null
+                    ? false
+                    : true
+                  : props.list.statusCode === 311
+                  ? props.list?.ditchReason !== null
+                    ? false
+                    : true
+                  : props.list?.creditNoteReason !== null
+                  ? false
+                  : true
+              }
+              arrow={true}
+              title={
+                props.list.statusCode === 302
+                  ? props.list?.droppedReason
+                  : props.list.statusCode === 310
+                  ? props.list?.offerDeclinedReason
+                  : props.list.statusCode === 311
+                  ? props.list?.ditchReason
+                  : props.list?.creditNoteReason
+              }
+              placement="right"
+              aria-label="droppedReason"
+            >
+              <Button variant="contained" size="small" className={classes.red}>
+                {props.list.statusCode === 302
+                  ? "Dropped"
+                  : props.list.statusCode === 310
+                  ? "Offer Declined"
+                  : props.list.statusCode === 311
+                  ? "Not Joined"
+                  : "Credit Note"}
+              </Button>
+            </Tooltip>
           </>
-        ) : ""}
+        ) : (
+          ""
+        )}
 
         {props.list.statusCode === 312 ? (
           <>
@@ -51,15 +71,21 @@ const Status = (props) => {
               onClick={(e) => {
                 props.setShortList({
                   ...props.shortList,
-                  "id": props.list.id,
-                  "cand_name": props.list.candidateDetail.firstName + " " + props.list.candidateDetail.lastName,
-                  "job_id": props.list.requirement.uniqueId,
-                  "job_name": props.list.requirement?.requirementName,
-                  "rec_name": props.list.recruiter.firstName + " " + props.list.recruiter.lastName,
-                  "rec_mobile_no": props.list.recruiter.mobile,
-                  "cand_mobile": props.list.candidateDetail.mobile,
-                  "free": props.list.isAnswered,
-                  "statusCode": props.list.statusCode, 
+                  id: props.list.id,
+                  cand_name:
+                    props.list.candidateDetail.firstName +
+                    " " +
+                    props.list.candidateDetail.lastName,
+                  job_id: props.list.requirement.uniqueId,
+                  job_name: props.list.requirement?.requirementName,
+                  rec_name:
+                    props.list.recruiter.firstName +
+                    " " +
+                    props.list.recruiter.lastName,
+                  rec_mobile_no: props.list.recruiter.mobile,
+                  cand_mobile: props.list.candidateDetail.mobile,
+                  free: props.list.isAnswered,
+                  statusCode: props.list.statusCode,
                 });
 
                 props.setValidation(false);
@@ -81,22 +107,37 @@ const Status = (props) => {
         props.list.statusCode !== 312 &&
         props.list.statusCode !== 313 ? (
           <>
+          {(decode.companyType === "COMPANY" && props.list.statusCode === 309)?
             <Button
               variant="contained"
               size="small"
-              className={ classes.blue  }
+              className={classes.green}
+            >
+              Joined
+            </Button>
+          :
+          <Button
+              variant="contained"
+              size="small"
+              className={classes.blue}
               onClick={(e) => {
                 props.setShortList({
                   ...props.shortList,
-                  "id": props.list.id,
-                "cand_name": props.list.candidateDetail.firstName + " " + props.list.candidateDetail.lastName,
-                "job_id": props.list.requirement.uniqueId,
-                "job_name": props.list.requirement?.requirementName,
-                "rec_name": props.list.recruiter.firstName + " " + props.list.recruiter.lastName,
-                "rec_mobile_no": props.list.recruiter.mobile,
-                "cand_mobile": props.list.candidateDetail.mobile,
-                "free": props.list.isAnswered,
-                "statusCode": props.list.statusCode, 
+                  id: props.list.id,
+                  cand_name:
+                    props.list.candidateDetail.firstName +
+                    " " +
+                    props.list.candidateDetail.lastName,
+                  job_id: props.list.requirement.uniqueId,
+                  job_name: props.list.requirement?.requirementName,
+                  rec_name:
+                    props.list.recruiter.firstName +
+                    " " +
+                    props.list.recruiter.lastName,
+                  rec_mobile_no: props.list.recruiter.mobile,
+                  cand_mobile: props.list.candidateDetail.mobile,
+                  free: props.list.isAnswered,
+                  statusCode: props.list.statusCode,
                 });
 
                 props.setValidation(false);
@@ -108,7 +149,7 @@ const Status = (props) => {
               {props.list.statusCode === 301
                 ? "Pending Validation"
                 : props.list.statusCode === 303
-                ? "Submitted to Client"
+                ? (decode.companyType === "COMPANY" ? "Submitted to HM" :"Submitted to Client")
                 : props.list.statusCode === 3031
                 ? "Schedule Interview"
                 : props.list.statusCode === 304
@@ -125,6 +166,7 @@ const Status = (props) => {
                 ? "Invoice"
                 : ""}
             </Button>
+          }
           </>
         ) : (
           ""
@@ -132,8 +174,6 @@ const Status = (props) => {
 
         {props.list.statusCode === 308 ? (
           <>
-        
-
             <Button
               variant="contained"
               className={classes.blue}
@@ -141,15 +181,21 @@ const Status = (props) => {
               onClick={(e) => {
                 props.setShortList({
                   ...props.shortList,
-                  "id": props.list.id,
-                "cand_name": props.list.candidateDetail.firstName + " " + props.list.candidateDetail.lastName,
-                "job_id": props.list.requirement.uniqueId,
-                "job_name": props.list.requirement?.requirementName,
-                "rec_name": props.list.recruiter.firstName + " " + props.list.recruiter.lastName,
-                "rec_mobile_no": props.list.recruiter.mobile,
-                "cand_mobile": props.list.candidateDetail.mobile,
-                "free": props.list.isAnswered,
-                "statusCode": props.list.statusCode, 
+                  id: props.list.id,
+                  cand_name:
+                    props.list.candidateDetail.firstName +
+                    " " +
+                    props.list.candidateDetail.lastName,
+                  job_id: props.list.requirement.uniqueId,
+                  job_name: props.list.requirement?.requirementName,
+                  rec_name:
+                    props.list.recruiter.firstName +
+                    " " +
+                    props.list.recruiter.lastName,
+                  rec_mobile_no: props.list.recruiter.mobile,
+                  cand_mobile: props.list.candidateDetail.mobile,
+                  free: props.list.isAnswered,
+                  statusCode: props.list.statusCode,
                 });
 
                 props.setValidation(false);
@@ -167,15 +213,21 @@ const Status = (props) => {
               onClick={(e) => {
                 props.setShortList({
                   ...props.shortList,
-                  "id": props.list.id,
-                "cand_name": props.list.candidateDetail.firstName + " " + props.list.candidateDetail.lastName,
-                "job_id": props.list.requirement.uniqueId,
-                "job_name": props.list.requirement?.requirementName,
-                "rec_name": props.list.recruiter.firstName + " " + props.list.recruiter.lastName,
-                "rec_mobile_no": props.list.recruiter.mobile,
-                "cand_mobile": props.list.candidateDetail.mobile,
-                "free": props.list.isAnswered,
-                "statusCode": props.list.statusCode, 
+                  id: props.list.id,
+                  cand_name:
+                    props.list.candidateDetail.firstName +
+                    " " +
+                    props.list.candidateDetail.lastName,
+                  job_id: props.list.requirement.uniqueId,
+                  job_name: props.list.requirement?.requirementName,
+                  rec_name:
+                    props.list.recruiter.firstName +
+                    " " +
+                    props.list.recruiter.lastName,
+                  rec_mobile_no: props.list.recruiter.mobile,
+                  cand_mobile: props.list.candidateDetail.mobile,
+                  free: props.list.isAnswered,
+                  statusCode: props.list.statusCode,
                 });
 
                 props.setValidation(false);
@@ -192,31 +244,43 @@ const Status = (props) => {
         )}
 
         {props.list.statusCode === 309 || props.list.statusCode === 3081 ? (
-          <Button
-            variant="contained"
-            className={classes.red}
-            size="small"
-            onClick={(e) => {
-              props.setShortList({
-                ...props.shortList,
-                "id": props.list.id,
-                "cand_name": props.list.candidateDetail.firstName + " " + props.list.candidateDetail.lastName,
-                "job_id": props.list.requirement.uniqueId,
-                "job_name": props.list.requirement?.requirementName,
-                "rec_name": props.list.recruiter.firstName + " " + props.list.recruiter.lastName,
-                "rec_mobile_no": props.list.recruiter.mobile,
-                "cand_mobile": props.list.candidateDetail.mobile,
-                "free": props.list.isAnswered,
-                "statusCode": props.list.statusCode, 
-              });
+          <>
+          {(decode.companyType === "COMPANY" && props.list.statusCode === 309)?
+            <></>
+          :
+            <Button
+              variant="contained"
+              className={classes.red}
+              size="small"
+              onClick={(e) => {
+                props.setShortList({
+                  ...props.shortList,
+                  id: props.list.id,
+                  cand_name:
+                    props.list.candidateDetail.firstName +
+                    " " +
+                    props.list.candidateDetail.lastName,
+                  job_id: props.list.requirement.uniqueId,
+                  job_name: props.list.requirement?.requirementName,
+                  rec_name:
+                    props.list.recruiter.firstName +
+                    " " +
+                    props.list.recruiter.lastName,
+                  rec_mobile_no: props.list.recruiter.mobile,
+                  cand_mobile: props.list.candidateDetail.mobile,
+                  free: props.list.isAnswered,
+                  statusCode: props.list.statusCode,
+                });
 
-              props.setValidation(false);
-              props.handleStatusNewOpen();
-              props.setView("Ditch");
-            }}
-          >
-            Ditch
-          </Button>
+                props.setValidation(false);
+                props.handleStatusNewOpen();
+                props.setView("Ditch");
+              }}
+            >
+              Ditch
+            </Button>
+          }
+          </>
         ) : (
           ""
         )}

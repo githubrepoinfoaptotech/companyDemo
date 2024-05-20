@@ -1273,7 +1273,7 @@ const Layout = (props) => {
       let header = [
         "S.No",
         "Requirement Name",
-        "Client Coordinator",
+        decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
         "Recruiter",
         "Candidate Name",
         "Email",
@@ -1724,7 +1724,7 @@ const Layout = (props) => {
                 name: "Recruiter",
               },
               {
-                name: "Client Coordinator",
+                name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
               },
               {
                 name: "Posted Date",

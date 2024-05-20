@@ -1,7 +1,10 @@
 import React from 'react';
 import Layout from "../../../components/Admin/ReportLayout"; 
+import jwtDecode from 'jwt-decode';
 
 function Invoiced() {
+  const token = localStorage.getItem('token')
+  const decode = jwtDecode(token)
   const candidateReportUrl=`${process.env.REACT_APP_SERVER}admin/InvoicedReport`;
   const userListUrl=`${process.env.REACT_APP_SERVER}admin/userList`;
   const getReportCountUrl=`${process.env.REACT_APP_SERVER}admin/getReportCount`;
@@ -12,7 +15,7 @@ function Invoiced() {
   return (
     <div>
       <Layout
-        title="Invoiced Report"
+        title={decode.companyType === "COMPANY" ? "Invoiced by Vendor Report": "Invoiced Report"}
         candidateReportUrl={candidateReportUrl}
         userListUrl={userListUrl}
         getReportCountUrl={getReportCountUrl}

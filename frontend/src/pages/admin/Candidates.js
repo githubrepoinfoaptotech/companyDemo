@@ -1614,7 +1614,7 @@ export default function Candidates(props) {
       },
     }).then(function (response) {
       if (response.data.status === true) {
-        aiResumeUpload(data);
+        // aiResumeUpload(data);
       } else {
         handleNotificationCall("error", response.data.message);
       }
@@ -2857,7 +2857,7 @@ export default function Candidates(props) {
                 name: "Requirement Name",
               },
               {
-                name: "Client Coordinator",
+                name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
               },
               {
                 name: "Recruiter Name",
@@ -2868,12 +2868,6 @@ export default function Candidates(props) {
               },
               {
                 name: "View Candidate",
-              },
-              {
-                name: "Match Jd",
-              },
-              {
-                name: "Resume Info ",
               },
               {
                 name: "Posted Date",
@@ -2924,7 +2918,7 @@ export default function Candidates(props) {
                 <Grid container row spacing={2}>
                   {item.candidateDetail?.isExternal === "YES" ? (
                     <Tooltip
-                      title="SUBVENDOR/FREELANCER"
+                      title="VENDOR"
                       placement="bottom"
                       aria-label="title"
                     >
@@ -3012,32 +3006,32 @@ export default function Candidates(props) {
                     className={classes.toolIcon}
                   />
                 </Tooltip>,
-                <Tooltip
-                  title="Match JD"
-                  placement="bottom"
-                  aria-label="view"
-                >
-                  <div className={classes.toolIcon+" "+classes.resumeUploadParent} 
-                    onClick={(e) => {
-                      handleJDOpen();
-                      cvMatchingPercentage(item.id);
-                      setCandidMatchId(item.id);
-                    }}>
-                    %
-                  </div>
-                </Tooltip>,
-                <Tooltip
-                  title="Get Resume Info"
-                  placement="bottom"
-                  aria-label="view"
-                >
-                  <div className={classes.toolIcon+" "+classes.resumeUploadParent} 
-                    onClick={(e) => {
-                      getCanididateResumeInfo(item.candidateDetailId,item.candidateDetail);
-                    }}>
-                    i
-                  </div>
-                </Tooltip>,
+                // <Tooltip
+                //   title="Match JD"
+                //   placement="bottom"
+                //   aria-label="view"
+                // >
+                //   <div className={classes.toolIcon+" "+classes.resumeUploadParent} 
+                //     onClick={(e) => {
+                //       handleJDOpen();
+                //       cvMatchingPercentage(item.id);
+                //       setCandidMatchId(item.id);
+                //     }}>
+                //     %
+                //   </div>
+                // </Tooltip>,
+                // <Tooltip
+                //   title="Get Resume Info"
+                //   placement="bottom"
+                //   aria-label="view"
+                // >
+                //   <div className={classes.toolIcon+" "+classes.resumeUploadParent} 
+                //     onClick={(e) => {
+                //       getCanididateResumeInfo(item.candidateDetailId,item.candidateDetail);
+                //     }}>
+                //     i
+                //   </div>
+                // </Tooltip>,
                 moment(item.createdAt).format("DD-MM-YYYY"),
               ];
             })}
@@ -3113,7 +3107,7 @@ export default function Candidates(props) {
         handleResumeClose={handleResumeClose}
       />
 
-      <MatchJDDialog
+      {/* <MatchJDDialog
         resumePercentage={resumePercentage}
         requirementName={requirementName}
         matchLoading={matchLoading}
@@ -3122,7 +3116,7 @@ export default function Candidates(props) {
         candidMatchId={candidMatchId}
         cvMatchingPercentage={cvMatchingPercentage}
         removePercentage={removePercentage}
-      />
+      /> */}
 
       <Drop
         handleDropClose={handleDropClose}

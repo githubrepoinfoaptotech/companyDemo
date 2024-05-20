@@ -166,7 +166,6 @@ export default function Tables() {
  
    
     const getRequirementName = async () => {
- 
 
       axios({
         method: "post",
@@ -180,12 +179,9 @@ export default function Tables() {
         .then(function (response) {
           if (response.data.status === true) {
             setLoader(false);
- 
             setRequirementName(response.data.data);
-          
           }
         })
-
         .catch(function (error) {
           console.log(error);
         });
@@ -228,8 +224,6 @@ export default function Tables() {
     };
 
     const getRequirementName = async () => {
-      
-
       axios({
         method: "post",
         url: `${process.env.REACT_APP_SERVER}admin/getAllRequirementList`,
@@ -247,13 +241,11 @@ export default function Tables() {
             setRequirementName(response.data.data);
           }
         })
-
         .catch(function (error) {
           console.log(error);
         });
     };
 
-    
     fetchData();
     getRequirementName();
   }, [reducerValue, token]);
@@ -892,7 +884,7 @@ function CheckAlreadyExit(addList){
     }).then(function (response) {
    
       if (response.data.status === true) {
-        aiResumeUpload(data)
+        // aiResumeUpload(data)
       } else {
         handleNotificationCall("error", response.data.message);
       }
@@ -1065,8 +1057,8 @@ function CheckAlreadyExit(addList){
                   <Grid item xs={12} sm={6} md={6} lg={6}>
                     
                     <Typography className={classes.boldtext}>
-                      
-                    Clients Name:
+                    {decode.companyType === "COMPANY" ? "Project Name:" :"Client Name:"}
+
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
@@ -1401,7 +1393,7 @@ function CheckAlreadyExit(addList){
             className={classes.filterFullWidth}
             options={requirementName}
             getOptionLabel={(option) =>
-              option?.requirement?.requirementName + " (" + option?.requirement?.uniqueId + ") (" + option?.requirement?.recruiter?.companyName + ")"
+              option?.requirementName + " (" + option?.uniqueId + ")"
             }
             // size="small"
             value={requirementId}
@@ -1494,13 +1486,13 @@ function CheckAlreadyExit(addList){
                   name: "Requirement Name",
                 }, 
                 {
-                  name: "Assigned Company",
+                  name: decode.companyType === "COMPANY" ? "Assigned Recruiter" : "Assigned Company",
                 },
                 {
-                  name: "Client Coordinator",
+                  name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
                 },
                 {
-                  name: "Clients Name",
+                  name: decode.companyType === "COMPANY" ? "Project Name" : "Client Name",
                 },
                 {
                   name: "Organization Recruiter Name",

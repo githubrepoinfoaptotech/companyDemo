@@ -642,7 +642,7 @@ export default function Layout(props) {
         name: "Recruiter Name",
       },
       {
-        name: "Client Coordinator",
+        name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
       },
       {
         name: "Posted Date",

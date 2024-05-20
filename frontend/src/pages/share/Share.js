@@ -37,7 +37,8 @@ function Layouts(props) {
   const positions = [toast.POSITION.TOP_RIGHT];
 
   const invoiceRef = useRef();
-
+  const token = localStorage.getItem("token");
+  const decode = jwt_decode(token);
   const candidate_search = props.location.search;  
  
      const [count, setCount] = useState(0);
@@ -1074,7 +1075,7 @@ function Layouts(props) {
               },
              
               {
-                name: "Client Coordinator",
+                name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
               }, 
               {
                 name: "View Candidate",

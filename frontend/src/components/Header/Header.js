@@ -877,7 +877,7 @@ export default function Header(props) {
       },
     }).then(function (response) {
       if (response.data.status === true) {
-        aiResumeUpload(data)
+        // aiResumeUpload(data)
       } else {
         handleNotificationCall("error", response.data.message);
       }
@@ -1007,7 +1007,7 @@ export default function Header(props) {
   const RequirementsSchema = Yup.object().shape({
     requirementName: Yup.string().required("Requirement Name is required"),
     jobLocation: Yup.string().required("Job Location is required"),
-    clientId: Yup.string().required("Clients Name is required"),
+    clientId: Yup.string().required(decode.companyType === "COMPANY" ? "Project Name is required" :"Client Name is required"),
     orgRecruiterId: Yup.string().required("Org Recruiter Name is required"),
     skills: Yup.string().required("Skill is required"),
     gist: Yup.string(),
@@ -1440,13 +1440,13 @@ export default function Header(props) {
   });
 
   const clientSchema = Yup.object().shape({
-    clientName: Yup.string().max(255).required("Clients Name is required"),
+    clientName: Yup.string().max(255).required(decode.companyType === "COMPANY" ? "Project Name is required" :"Client Name is required"),
     clientIndustry: Yup.string()
       .max(255)
-      .required("Clients Industry is required"),
-    clientWebsite: Yup.string()
-      .max(255)
-      .required("Clients Website is required"),
+      .required( decode.companyType === "COMPANY" ? "Project Division is required" :"Client Industry is required"),
+    // clientWebsite: Yup.string()
+    //   .max(255)
+    //   .required("Clients Website is required"),
     aggStartDate: Yup.string().max(255).required("Start Date is required"),
     aggEndDate: Yup.string().max(255).required("End Date is required"),
   });
@@ -2976,7 +2976,7 @@ export default function Header(props) {
                             }}
                           >
                             <img src={addClients} alt="img" />
-                            <p>Add Clients</p>
+                            <p>Add Projects</p>
                           </IconButton>
                         </div>
                         <div className={classes.quickAccessContainer}>
@@ -3428,7 +3428,7 @@ export default function Header(props) {
                           }}
                         >
                           <img src={addClients} alt="img" />
-                          <p>Add Clients</p>
+                          <p>Add Projects</p>
                         </IconButton>
                       </div>
                       <div className={classes.quickAccessContainer}>

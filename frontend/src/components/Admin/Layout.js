@@ -839,7 +839,7 @@ function uploadResume(File, Id) {
   }).then(function (response) {
  
     if (response.data.status === true) {
-      aiResumeUpload(data)
+      // aiResumeUpload(data)
     } else {
       handleNotificationCall("error", response.data.message);
     }
@@ -1743,7 +1743,7 @@ function uploadAssessment(File, Id) {
                 name: "Recruiter Name",
               },
               {
-                name: "Client Coordinator",
+                name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
               },
               {
                 name: "View Candidate",

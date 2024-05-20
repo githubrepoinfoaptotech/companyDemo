@@ -18,11 +18,14 @@ import CloseIcon from "@material-ui/icons/Close";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import RemoveCircle from "@material-ui/icons/RemoveCircle";
 import classNames from "classnames";
+import jwtDecode from "jwt-decode";
 
 
 export default function AddClient(props) {
     const classes = useStyles();
-   
+    const token = localStorage.getItem("token")
+    const decode = jwtDecode(token)
+    const gridSize = decode.companyType === "COMPANY" ? 6 : 4;
    return (
     <>
 <Box sx={{ width: "100%" }} role="presentation">
@@ -36,7 +39,7 @@ export default function AddClient(props) {
         className={classes.drawerHeader}
       >
         <Grid item xs={10} md={6}>
-          <Typography variant="subtitle1">Add New Clients</Typography>
+          <Typography variant="subtitle1">{decode.companyType ==="COMPANY"? "Add New Project" : "Add New Client"} </Typography>
         </Grid>
 
         <Grid item xs={2} lg={6} className={classes.drawerClose}>
@@ -50,16 +53,17 @@ export default function AddClient(props) {
     </CardHeader>
     <CardContent className={classes.scrollCard}>
       <Grid container direction="row" spacing={2}>
-        <Grid item xs={12} sm={4} md={4} lg={4}>
+        <Grid item xs={12} sm={gridSize} md={gridSize} lg={gridSize}>
           <InputLabel shrink htmlFor="clientName">
-          Clients Name
+          {decode.companyType ==="COMPANY"? "Project Name" : "Client Name"} 
+          
           </InputLabel>
           <FormControl className={classes.margin}>
             <TextField
               InputProps={{ disableUnderline: true }}
               classes={{ root: classes.customTextField }}
               size="small"
-              placeholder="Enter Clients Name"
+              placeholder={decode.companyType ==="COMPANY"?  "Enter Project Name":"Enter Client Name"}
               id="clientName"
               {...props.register("clientName")}
               error={props.errors.clientName ? true : false}
@@ -70,16 +74,16 @@ export default function AddClient(props) {
             </Typography>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={4} md={4} lg={4}>
+        <Grid item xs={12} sm={gridSize} md={gridSize} lg={gridSize}>
           <InputLabel shrink htmlFor="clientIndustry">
-          Clients Industry
+           {decode.companyType ==="COMPANY"?  "Project Division":"Client Industry"}
           </InputLabel>
           <FormControl className={classes.margin}>
             <TextField
               InputProps={{ disableUnderline: true }}
               classes={{ root: classes.customTextField }}
               size="small"
-              placeholder="Enter Clients Industry"
+              placeholder={decode.companyType ==="COMPANY"?  "Enter Project Division":"Enter Clients Industry"}
               id="clientIndustry"
               {...props.register("clientIndustry")}
               error={props.errors.clientIndustry ? true : false}
@@ -90,30 +94,34 @@ export default function AddClient(props) {
             </Typography>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={4} md={4} lg={4}>
-          <InputLabel shrink htmlFor="clientWebsite">
-          Clients Website
-          </InputLabel>
-          <FormControl className={classes.margin}>
-            <TextField
-              InputProps={{ disableUnderline: true }}
-              classes={{ root: classes.customTextField }}
-              size="small"
-              placeholder="Enter Clients Website"
-              id="clientWebsite"
-              {...props.register("clientWebsite")}
-              error={props.errors.clientWebsite ? true : false}
-            />
+        {decode.companyType ==="COMPANY" ?<></>
+        :
+          <Grid item xs={12} sm={4} md={4} lg={4}>
+            <InputLabel shrink htmlFor="clientWebsite">
+            Clients Website
+            </InputLabel>
+            <FormControl className={classes.margin}>
+              <TextField
+                InputProps={{ disableUnderline: true }}
+                classes={{ root: classes.customTextField }}
+                size="small"
+                placeholder="Enter Clients Website"
+                id="clientWebsite"
+                {...props.register("clientWebsite")}
+                error={props.errors.clientWebsite ? true : false}
+              />
 
-            <Typography variant="inherit" color="error">
-              {props.errors.clientWebsite?.message}
-            </Typography>
-          </FormControl>
-        </Grid>
+              <Typography variant="inherit" color="error">
+                {props.errors.clientWebsite?.message}
+              </Typography>
+            </FormControl>
+          </Grid>
 
-        <Grid item xs={12} sm={4} md={4} lg={4}>
+        }
+
+        <Grid item xs={12} sm={gridSize} md={6} lg={6}>
           <InputLabel shrink htmlFor="aggStartDate">
-            Agreement Start Date
+             {decode.companyType ==="COMPANY"?  "Project Start Date":"Agreement Start Date"}
           </InputLabel>
           <FormControl className={classes.margin}>
             <TextField
@@ -121,7 +129,7 @@ export default function AddClient(props) {
               classes={{ root: classes.customTextField }}
               size="small"
               type="date"
-              placeholder="Select Agreement Start Date"
+              placeholder={decode.companyType ==="COMPANY"?  "Select Project Start Date":"Enter Agreement Start Date"}
               id="aggStartDate"
               {...props.register("aggStartDate")}
               error={props.errors.aggStartDate ? true : false}
@@ -133,9 +141,9 @@ export default function AddClient(props) {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={4} md={4} lg={4}>
+        <Grid item xs={12} sm={6} md={6} lg={6}>
           <InputLabel shrink htmlFor="aggEndDate">
-            Agreement End Date
+          {decode.companyType ==="COMPANY"?  "Project End Date" :"Agreement End Date"}
           </InputLabel>
           <FormControl className={classes.margin}>
             <TextField
@@ -143,7 +151,7 @@ export default function AddClient(props) {
               classes={{ root: classes.customTextField }}
               size="small"
               type="date"
-              placeholder="Select Agreement End Date"
+              placeholder={decode.companyType ==="COMPANY"?  "Select Project End Date":"Select Agreement End Date"}
               id="aggEndDate"
               {...props.register("aggEndDate")}
               error={props.errors.aggEndDate ? true : false}
