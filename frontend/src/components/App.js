@@ -15,6 +15,7 @@ import CompanyRegister from "../pages/register/companyRegister";
 import candidateCPV from "../pages/register/candidateCPV";
 
 import Layouts from "../pages/share/Shortlist";
+import ApproveMail from "../pages/mailApproval/ApproveMail";
 
 
 export default function App() {
@@ -34,6 +35,7 @@ export default function App() {
         />
         <PrivateRoute path="/app" component={Layout} />
         <PublicRoute path="/login" component={Login} />
+        <PublicRoute path="/approvalMail" component={ApproveMail} />
         <PublicRoute path="/register" component={Register} />
         <PublicRoute path="/companyRegister" component={CompanyRegister} />
         <PublicRoute path="/auth/forget/:id" component={Forget} />

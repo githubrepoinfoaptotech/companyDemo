@@ -12,6 +12,7 @@ import ParsedResume from "../Candidates/ParsedResume";
  // pages
 import Dashboard from "../../pages/dashboard";
 import Clients from "../../pages/clients";
+import Projects from "../../pages/projects";
 import AdminCandidates from "../../pages/admin/Candidates";
 import AssignedCandidates from "../../pages/admin/AssignedCandidates";
 import Share from "../../pages/admin/Share";
@@ -589,22 +590,16 @@ function Layout(props) {
 
             <Switch>
             
-
               <AuthRoute  path="/app/dashboard" role={role} roles={[ "SUPERADMIN", "ADMIN", "RECRUITER", "CLIENTCOORDINATOR", "FREELANCER", "SUBVENDOR"]} component={Dashboard} /> <AuthRoute  path="/app/admin"  role={role}   roles={["SUPERADMIN"]} component={Admin}   /> <AuthRoute  path="/app/transaction" role={role} roles={["SUPERADMIN", "ADMIN"]} component={Transaction} /> <AuthRoute path="/app/price" role={role} roles={["SUPERADMIN"]} component={Price} />
               <AuthRoute path="/app/search" role={role} roles={["ADMIN", "RECRUITER", "CLIENTCOORDINATOR", "FREELANCER", "SUBVENDOR"]} component={Search} /> 
               <AuthRoute path="/app/pdf_view" role={role} roles={["SUPERADMIN"]} component={PDF} /> 
                <AuthRoute path="/app/company" role={role} roles={["SUPERADMIN"]} component={Company} />  
               <AuthRoute path="/app/contact" role={role} roles={["SUPERADMIN"]} component={Contact} /> 
-
-              
-
-
               <AuthRoute path="/app/ticket" role={role} roles={["SUPERADMIN","ADMIN"]} component={Ticket} />
               <AuthRoute path="/app/singlechat" role={role} roles={[   "SUPERADMIN",   "ADMIN",   "RECRUITER",   "CLIENTCOORDINATOR", ]} component={Singlechat} />
               <AuthRoute path="/app/assign_requirements" role={role} roles={["ADMIN"]} component={AssignRequirements} />
               <AuthRoute path="/app/assigned_candidates" role={role} roles={["ADMIN"]} component={AssignedCandidates} />
               <AuthRoute path="/app/requirements_Candidate" role={role} roles={["ADMIN"]} component={Share} />
-
               <AuthRoute path="/app/reports/all_candidates_stc" role={role} roles={["ADMIN"]} component={AllSTC} />
               <AuthRoute path="/app/reports/all_candidates_schedule_interview" role={role} roles={["ADMIN"]} component={AllScheduleInterview} /> 
               <AuthRoute path="/app/reports/all_candidates_fic" role={role} roles={["ADMIN"]} component={AllFinalInterviewCompleted} /> 
@@ -613,15 +608,12 @@ function Layout(props) {
               <AuthRoute path="/app/reports/all_candidates_offered" role={role} roles={["ADMIN"]} component={AllOffered} /> 
               <AuthRoute path="/app/reports/all_candidates_joined" role={role} roles={["ADMIN"]} component={AllJoined} /> 
               <AuthRoute path="/app/reports/all_candidates_ditched" role={role} roles={["ADMIN"]} component={AllDitched} /> 
-              <AuthRoute path="/app/reports/all_candidates_invoiced" role={role} roles={["ADMIN"]} component={AllInvoiced} />
               <AuthRoute path="/app/reports/all_candidates_credit_note" role={role} roles={["ADMIN"]} component={AllCreditNotes} /> 
               <AuthRoute path="/app/reports/all_candidates_Offered_declined" role={role} roles={["ADMIN"]} component={AllOfferedDeclined} />
               <AuthRoute path="/app/reports/all_candidates_drop" role={role} roles={["ADMIN"]} component={AllDrop} />
              
               <AuthRoute path="/app/users" role={role} roles={["ADMIN"]} component={Users} /> 
-              <AuthRoute path="/app/clients" role={role} roles={["ADMIN"]} component={Clients} /> 
               {/* <AuthRoute path="/app/invoice" role={role} roles={["ADMIN"]} component={Invoice} />  */}
-              <AuthRoute path="/app/resume_search" role={role} roles={["ADMIN"]} component={ResumeSearch} /> 
               <AuthRoute path="/app/chat" role={role} roles={["ADMIN"]} component={Chat} /> 
               <AuthRoute path="/app/settings/source" role={role} roles={["ADMIN", "CLIENTCOORDINATOR"]} component={Source} /> 
               <AuthRoute path="/app/activity" role={role} roles={["ADMIN"]} component={Activity} /> 
@@ -686,6 +678,19 @@ function Layout(props) {
               <AuthRoute path="/app/others_candidates_joined" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersJoined} /> 
               <AuthRoute path="/app/others_candidates_offer_declined" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersOfferedDeclined} /> 
                <AuthRoute path="/app/others_candidates_yet_to_join" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersYetToJoin} />
+
+               {decoded.companyType === "COMPANY" ?
+              (<>
+                <AuthRoute path="/app/projects" role={role} roles={["ADMIN"]} component={Projects} /> 
+                <AuthRoute path="/app/reports/vendor_onboarded_candidates" role={role} roles={["ADMIN"]} component={AllInvoiced} />
+              </>):
+              (<>
+                <AuthRoute path="/app/clients" role={role} roles={["ADMIN"]} component={Clients} /> 
+                <AuthRoute path="/app/resume_search" role={role} roles={["ADMIN"]} component={ResumeSearch} /> 
+                {/* Reports */}
+                <AuthRoute path="/app/reports/all_candidates_invoiced" role={role} roles={["ADMIN"]} component={AllInvoiced} />
+              </>)
+              }
       </Switch>
           </div>
           <ToastContainer

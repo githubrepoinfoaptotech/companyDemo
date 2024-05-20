@@ -1,10 +1,12 @@
 import { Button } from "@material-ui/core";
 import { Grid } from "@material-ui/core";
 import useStyles from "../../themes/style.js";
-
+import jwtDecode from 'jwt-decode';
 const Status = (props) => {
    
   const classes = useStyles();
+  const token = localStorage.getItem("token")
+  const decode = jwtDecode(token)
   return (
     <>
       <Grid className={classes.button}>  
@@ -52,7 +54,7 @@ const Status = (props) => {
               {props.list.statusCode === 301
                 ? "Pending Validation"
                 : props.list.statusCode === 303
-                ? "Submitted to Client"
+                ?  (decode.companyType === "COMPANY" ? "Submitted to HM" :"Submitted to Client")
                 : props.list.statusCode === 3031
                 ? "Schedule Interview"
                 : props.list.statusCode === 304

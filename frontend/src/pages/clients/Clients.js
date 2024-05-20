@@ -168,7 +168,7 @@ export default function Tables() {
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
-
+  console.log(errors)
   useEffect(() => {
     setLoader(true);
 
@@ -602,14 +602,14 @@ export default function Tables() {
                     </Grid>
                     <Grid item xs={12} sm={4} md={4} lg={4}>
                       <InputLabel shrink htmlFor="clientIndustry">
-                      Clients Industry
+                      Client Industry
                       </InputLabel>
                       <FormControl className={classes.margin}>
                         <TextField
                           InputProps={{ disableUnderline: true }}
                           classes={{ root: classes.customTextField }}
                           size="small"
-                          placeholder="Enter Clients Industry"
+                          placeholder="Enter Client Industry"
                           id="clientIndustry"
                           defaultValue={clientEdit.clientIndustry}
                           {...editClient("clientIndustry")}
@@ -645,7 +645,7 @@ export default function Tables() {
 
                     <Grid item xs={12} sm={4} md={4} lg={4}>
                       <InputLabel shrink htmlFor="aggStartDate">
-                        Agreement Start Date
+                      Agreement Start Date
                       </InputLabel>
                       <FormControl className={classes.margin}>
                         <TextField
@@ -668,7 +668,7 @@ export default function Tables() {
 
                     <Grid item xs={12} sm={4} md={4} lg={4}>
                       <InputLabel shrink htmlFor="aggEndDate">
-                        Agreement End Date
+                      Agreement End Date
                       </InputLabel>
                       <FormControl className={classes.margin}>
                         <TextField
@@ -1118,7 +1118,7 @@ export default function Tables() {
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>
                     <Typography className={classes.boldtext}>
-                    Clients Agreement Start Date:
+                    Agreement Start Date:
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
@@ -1127,7 +1127,7 @@ export default function Tables() {
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>
                     <Typography className={classes.boldtext}>
-                    Clients Agreement End Date:
+                    Agreement End Date:
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>

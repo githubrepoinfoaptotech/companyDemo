@@ -21,10 +21,13 @@ import CardActions from "@material-ui/core/CardActions";
 import CloseIcon from "@material-ui/icons/Close";
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
+import jwt_decode from "jwt-decode";
  
 function AddUser(props) {
     const classes = useStyles();
-  
+    const token = localStorage.getItem("token");
+    const decode = jwt_decode(token);
+
     const [values, setValues] = useState({
         showPassword: false,
       });
@@ -85,9 +88,13 @@ function AddUser(props) {
                           disableUnderline
                         >
                          <MenuItem value="RECRUITER">Recruiter</MenuItem>
-                          <MenuItem value="CLIENTCOORDINATOR"> Client Coordinator</MenuItem>
-                          <MenuItem value="SUBVENDOR"> Sub Vendor </MenuItem>
-                          <MenuItem value="FREELANCER"> Freelancer </MenuItem>
+                          <MenuItem value="CLIENTCOORDINATOR">{ decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator"  } </MenuItem>
+                          <MenuItem value="SUBVENDOR"> {decode.companyType === "COMPANY" ? "Vendor" :"Sub Vendor"} </MenuItem>
+                          {decode.companyType === "COMPANY" ? 
+                          <></> 
+                          : 
+                          <MenuItem value="FREELANCER">  Freelancer </MenuItem>
+                          }
                         </Select>
 
                         <Typography variant="inherit" color="error">

@@ -322,7 +322,7 @@ export default function Company() {
                   <Grid item xs={12} sm={6} md={6} lg={6}>   {companyDetails.hiringSupport}  </Grid> 
 
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>  <Typography className={classes.boldtext}>   List your Clients (Optional):   </Typography>       </Grid>
+                  <Grid item xs={12} sm={6} md={6} lg={6}>  <Typography className={classes.boldtext}>   List your Projects (Optional):   </Typography>       </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>   {companyDetails.clientList}  </Grid> 
 
 

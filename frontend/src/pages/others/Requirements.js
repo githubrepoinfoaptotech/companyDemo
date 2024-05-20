@@ -23,6 +23,7 @@ import axios from "axios";
 import { Autocomplete } from "@material-ui/lab";
 import useStyles from "../../themes/style.js";
 import useMediaQuery from '@material-ui/core/useMediaQuery'; 
+import jwtDecode from "jwt-decode";
 
 
 export default function Tables() {
@@ -30,6 +31,7 @@ export default function Tables() {
   const classes = useStyles(); 
   const mobileQuery = useMediaQuery('(max-width:600px)'); 
   const token = localStorage.getItem("token");
+  const decode = jwtDecode(token)
   const [count, setCount] = useState(0);
   const [loader, setLoader] = useState(false); 
   const [reducerValue,forceUpdate] = useReducer(x => x + 1, 0);  
@@ -293,8 +295,7 @@ export default function Tables() {
                   <Grid item xs={12} sm={6} md={6} lg={6}>
                    
                     <Typography className={classes.boldtext}>
-                     
-                    Clients Name:
+                    {decode.companyType === "COMPANY" ? "Project Name:" :"Client Name:"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
@@ -613,7 +614,7 @@ export default function Tables() {
               },
         
               {
-                name: "Clients Name",
+                name: "Projects Name",
               },
               {
                 name: "Organization Recruiter Name",

@@ -1100,7 +1100,7 @@ function Register() {
 
                   <Grid item xs={12} sm={6} lg={6} >
                     <InputLabel shrink htmlFor="clients">
-                      List your Clients (Optional)
+                      List your Projects (Optional)
                     </InputLabel>
                     <FormControl className={classes.customTagsInput}  >
                       <TagsInput
@@ -1109,7 +1109,7 @@ function Register() {
                         separators={["Enter", ","]}
                         id="clients"
                         name="clients"
-                        placeHolder="List your Clients"
+                        placeHolder="List your Projects"
                       />
                     </FormControl>
                   </Grid>

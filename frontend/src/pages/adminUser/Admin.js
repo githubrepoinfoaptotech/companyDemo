@@ -45,6 +45,7 @@ import "react-toastify/dist/ReactToastify.css";
 import useStyles from "../../themes/style.js";
 import { signOut, useUserDispatch } from "../../context/UserContext";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { Autocomplete } from "@material-ui/lab";
 
 const positions = [toast.POSITION.TOP_RIGHT];
 
@@ -62,6 +63,7 @@ export default function Admin(props) {
     lastName: "",
     mobile: "",
     companyName: "",
+    companyType: "",
     companyAddress: "",
     isActive: "",
     remainingMessage: "",
@@ -201,7 +203,7 @@ export default function Admin(props) {
       .min(8, "Password must be at least 8 characters"),
     company: Yup.string().max(255).required("Company Name is required"),
     address: Yup.string().max(255).required("Company Address is required"),
-
+    company_type: Yup.string().required("Select your company type")
   });
 
   const editSchema = Yup.object().shape({
@@ -366,37 +368,50 @@ export default function Admin(props) {
   }
 
   function handleAdd(values) {
-    return new Promise((resolve) => {
-      setLoader(true);
-
-      axios({
-        method: "post",
-        url: `${process.env.REACT_APP_SERVER}superAdmin/addAdmin`,
-        data: {
-          firstName: values.fname,
-          lastName: values.lname,
-          email: values.email,
-          password: values.password,
-          mobile: values.mobile,
-          companyName: values.company,
-          companyAddress: values.address,
-        },
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-      }).then(function (response) {
-        if (response.data.status === true) {
-          handleNotificationCall("success", response.data.message);
-          forceUpdate();
-          setState({ ...state, right: false });
-        } else {
-          handleNotificationCall("error", response.data.message);
-        }
+    return new Promise((resolve, reject) => {
+      try {
+        setLoader(true);
+  
+        axios({
+          method: "post",
+          url: `${process.env.REACT_APP_SERVER}superAdmin/addAdmin`,
+          data: {
+            firstName: values.fname,
+            lastName: values.lname,
+            email: values.email,
+            password: values.password,
+            mobile: values.mobile,
+            companyName: values.company,
+            companyAddress: values.address,
+            company_type: values.company_type
+          },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        }).then(function (response) {
+          if (response.data.status === true) {
+            handleNotificationCall("success", response.data.message);
+            forceUpdate();
+            setState({ ...state, right: false });
+          } else {
+            handleNotificationCall("error", response.data.message);
+          }
+          setLoader(false);
+          resolve();
+        }).catch(function (error) {
+          handleNotificationCall("error", error.message);
+          setLoader(false);
+          reject(error);
+        });
+      } catch (error) {
+        handleNotificationCall("error", error.message);
         setLoader(false);
-      });
+        reject(error);
+      }
     });
   }
+  
 
   function handleEdit(values) {
     return new Promise((resolve) => {
@@ -983,7 +998,7 @@ export default function Admin(props) {
                   </Grid>
 
 
-                  <Grid item xs={12}  md={12} lg={12}>
+                  <Grid item xs={12}  sm={6} md={6} lg={6}>
                     <InputLabel shrink htmlFor="address">
                       
                       Company Address
@@ -1005,6 +1020,34 @@ export default function Admin(props) {
                         {errors.address?.message}
                       </Typography>
                     </FormControl>
+                  </Grid>
+                  <Grid item xs={12}  sm={6} md={6} lg={6}>
+                  <FormControl className={classes.margin}>
+                  <InputLabel shrink htmlFor="company_type">
+                      Clients Type
+                  </InputLabel>
+                    <Autocomplete options={["RECRUITEMENT COMPANY","COMPANY"]}
+                      disableClearable
+                      getOptionLabel={option => option}
+                      getOptionvalue={option => option}
+                      // onChange={(event, value) => {props.handleChange(value.id);}}
+                      classes={{
+                        popupIndicator: classes.autocompleteIndicator
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...register('company_type')} error={errors.company_type ? true : false}
+                          {...params}
+                          variant="filled"
+                          name="company_type"
+                        />
+                      )}
+                    />
+
+                    <Typography variant="inherit" color="error">
+                      {errors.company_type?.message}
+                    </Typography>
+                  </FormControl>
                   </Grid>
                 </Grid>
               </CardContent>
@@ -1124,9 +1167,18 @@ export default function Admin(props) {
                     {userEdit.companyName}
                   </Grid>
 
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    
+                    <Typography className={classes.boldtext}>
+                      
+                      Company Type
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    
+                    {userEdit.companyType}
+                  </Grid>
 
-
-                  
                   <Grid item xs={12} sm={6} md={6} lg={6}>
                     
                     <Typography className={classes.boldtext}>
@@ -1889,6 +1941,7 @@ export default function Admin(props) {
                               lastName: item.recruiter.lastName,
                               mobile: item.recruiter.mobile,
                               companyName: item.recruiter.companyName,
+                              companyType: item.companyType,
                               companyAddress: item.recruiter.companyAddress,
                               isActive: item.isActive,
                               createdAt: item.createdAt,
@@ -1930,6 +1983,7 @@ export default function Admin(props) {
                                   lastName: item.recruiter.lastName,
                                   mobile: item.recruiter.mobile,
                                   companyName: item.recruiter.companyName,
+                                  companyType: item.companyType,
                                   companyAddress: item.recruiter.companyAddress,
                                   isActive: item.isActive,
                                   createdAt: item.createdAt,

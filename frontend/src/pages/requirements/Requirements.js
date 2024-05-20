@@ -29,7 +29,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import ViewIcon from "@material-ui/icons/Visibility";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import RemoveRedEyeIcon from "@material-ui/icons/RemoveRedEye";
-import { useHistory } from "react-router-dom"; 
+import { useHistory } from "react-router-dom";
 
 import { toast } from "react-toastify";
 import PageTitle from "../../components/PageTitle";
@@ -40,20 +40,20 @@ import EditIcon from "@material-ui/icons/Edit";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
 import { useForm } from "react-hook-form";
-import JoditEditor from 'jodit-react';
+import JoditEditor from "jodit-react";
 
 import * as Yup from "yup";
 import Notification from "../../components/Notification";
 import { Autocomplete } from "@material-ui/lab";
 import useStyles from "../../themes/style.js";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
-import DescriptionIcon from '@material-ui/icons/Description';
- //import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
-import DeleteIcon from '@material-ui/icons/Delete';
+import DescriptionIcon from "@material-ui/icons/Description";
+//import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
+import DeleteIcon from "@material-ui/icons/Delete";
 import AddRequirements from "../../components/Candidates/AddRequirements";
 // import { saveAs } from "file-saver";
 // import XlsxPopulate from "xlsx-populate";
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import "react-toastify/dist/ReactToastify.css";
 import "jodit/build/jodit.min.css";
 
@@ -63,15 +63,15 @@ export default function Tables() {
   const classes = useStyles();
   const history = useHistory();
 
-  const mobileQuery = useMediaQuery('(max-width:600px)'); 
+  const mobileQuery = useMediaQuery("(max-width:600px)");
   const token = localStorage.getItem("token");
   const decode = jwt_decode(token);
 
-  const [count, setCount] = useState(0); 
-  const [file, setFile] = useState([]); 
+  const [count, setCount] = useState(0);
+  const [file, setFile] = useState([]);
   const [loader, setLoader] = useState(false);
   const [Id, setId] = useState();
-
+  console.log(decode,"ioioi")
   const [requirementsData, setRequirementsData] = useState([]);
   const [requirementsEdit, setRequirementsEdit] = useState({
     id: "",
@@ -80,14 +80,16 @@ export default function Tables() {
     clientId: "",
     clientName: "",
     orgRecruiterId: "",
+    levelHrDataId:"",
     orgRecruiterName: "",
-    jobLocation: "", 
+    levelofHiringName: "",
+    jobLocation: "",
     experience: "",
-    gist:"",
-    jd:"",
-    modeOfWork:"",
-    specialHiring:"",
-    hideFromInternal:"",
+    gist: "",
+    jd: "",
+    modeOfWork: "",
+    specialHiring: "",
+    hideFromInternal: "",
   });
 
   const [requirementsView, setRequirementsView] = useState({
@@ -96,19 +98,21 @@ export default function Tables() {
     clientId: "",
     skills: "",
     orgRecruiterId: "",
+    levelHrDataId:"",
     orgRecruiterName: "",
+    levelofHiringName: "",
     jobLocation: "",
     experience: "",
     uniqueId: "",
     clientUniqueId: "",
     clientName: "",
-    gist:"",
-    jd:"",
-    hideFromInternal:"",
-    modeOfWork:"",
-    specialHiring:"",
+    gist: "",
+    jd: "",
+    hideFromInternal: "",
+    modeOfWork: "",
+    specialHiring: "",
     status: "",
-    candidateCount:"",
+    candidateCount: "",
     createdAt: "",
   });
 
@@ -123,17 +127,17 @@ export default function Tables() {
   const [clientEditList, setClientEditList] = useState([]);
 
   const [requirementsOrgId, setRequirementsOrgId] = useState("");
+  const [reqLevelHrDataId, setReqLevelHrDataId] = useState("");
   const [clientId, setClientId] = useState("");
 
   var [errorToastId, setErrorToastId] = useState(null);
 
-  const ContentRef = React.useRef();  
-  var [hideFromInternal, setHideFromInternal] = useState(false); 
+  const ContentRef = React.useRef();
+  var [hideFromInternal, setHideFromInternal] = useState(false);
   const [modeofWork, setModeofWork] = React.useState("");
   const [specialHiring, setSpecialHiring] = React.useState("");
- 
-  const [modalOpen, setModalOpen] = React.useState(false);
 
+  const [modalOpen, setModalOpen] = React.useState(false);
 
   const handleModalClose = () => {
     setModalOpen(false);
@@ -142,7 +146,6 @@ export default function Tables() {
   const handleModalOpen = () => {
     setModalOpen(true);
   };
-
 
   function sendNotification(componentProps, options) {
     return toast(
@@ -198,13 +201,14 @@ export default function Tables() {
   const validationSchema = Yup.object().shape({
     requirementName: Yup.string().required("Requirement Name is required"),
     jobLocation: Yup.string().required("Job Location is required"),
-    clientId: Yup.string().required("Clients Name is required"),
+    clientId: Yup.string().required(decode.companyType === "COMPANY" ? "Project Name is required" :"Client Name is required"),
     orgRecruiterId: Yup.string().required("Org Recruiter Name is required"),
+    levelHrDataId: Yup.string().required("Level of Hire Name is required"),
     skills: Yup.string().required("Skill is required"),
     gist: Yup.string(),
     hideFromInternal: Yup.string(),
-    work:Yup.string().required("Mode of work is required"),
-    hiring:Yup.string(),
+    work: Yup.string().required("Mode of work is required"),
+    hiring: Yup.string(),
     experience: Yup.string().required("Experience is required"),
   });
 
@@ -215,7 +219,7 @@ export default function Tables() {
     reset: editreset,
   } = useForm({
     mode: "onBlur",
-    resolver: yupResolver(validationSchema),
+    resolver: yupResolver(validationSchema)
   });
 
   const {
@@ -251,14 +255,19 @@ export default function Tables() {
           "Content-Type": "application/json",
           Authorization: token,
         },
-      }).then(function (response) {
-        if (response.data.status === true) {
-          setLoader(false);
+      })
+        .then(function (response) {
+          if (response.data.status === true) {
+            setLoader(false);
 
-          setRequirementsData(response.data.data);
-          setCount(response.data.count);
-        }
-      });
+            setRequirementsData(response.data.data);
+            setCount(response.data.count);
+          }
+        })
+        .catch(function (error) {
+          handleNotificationCall("error", error.message);
+          setLoader(false);
+        });
     };
 
     const getRequirementName = async () => {
@@ -443,63 +452,72 @@ export default function Tables() {
   };
 
   function handleAdd(values) {
-  
-    return new Promise((resolve) => {
-      setLoader(true);
-      var url="";
-      if (decode.role === "ADMIN") {
-        url = `${process.env.REACT_APP_SERVER}admin/addRequirement`; 
-      } else {
-        url = `${process.env.REACT_APP_SERVER}CC/addRequirement`;
-      }
-
-      axios({
-        method: "post",
-        url: url,
-        data: {
-          requirementName: values.requirementName,
-          skills: values.skills,
-          clientId: clientId,
-          orgRecruiterId: requirementsOrgId,
-          jobLocation: values.jobLocation,
-          experience: values.experience,
-          gist: ContentRef.current.value,
-          file: file?.name,
-          modeOfWork: values.work,
-          specialHiring: values.hiring,
-          hideFromInternal: values.hideFromInternal
-        },
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-      }).then(function (response) {
-        if (response.data.status === true) {
-
-          if(file?.name){
-            uploadJD(file, response.data.requirementId);
-          } 
-
-          handleNotificationCall("success", response.data.message);
-          forceUpdate();
-          setState({ ...state, right: false });
+    return new Promise((resolve, reject) => {
+      try {
+        setLoader(true);
+        var url = "";
+        if (decode.role === "ADMIN") {
+          url = `${process.env.REACT_APP_SERVER}admin/addRequirement`;
         } else {
-          handleNotificationCall("error", response.data.message);
+          url = `${process.env.REACT_APP_SERVER}CC/addRequirement`;
         }
-        resolve();
+
+        axios({
+          method: "post",
+          url: url,
+          data: {
+            requirementName: values.requirementName,
+            skills: values.skills,
+            clientId: clientId,
+            orgRecruiterId: requirementsOrgId,
+            levelOfHiringId: reqLevelHrDataId,
+            jobLocation: values.jobLocation,
+            experience: values.experience,
+            gist: ContentRef.current.value,
+            file: file?.name,
+            modeOfWork: values.work,
+            specialHiring: values.hiring,
+            hideFromInternal: values.hideFromInternal,
+          },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        })
+          .then(function (response) {
+            if (response.data.status === true) {
+              if (file?.name) {
+                uploadJD(file, response.data.requirementId);
+              }
+
+              handleNotificationCall("success", response.data.message);
+              forceUpdate();
+              setState({ ...state, right: false });
+            } else {
+              handleNotificationCall("error", response.data.message);
+            }
+            resolve();
+            setLoader(false);
+          })
+          .catch(function (error) {
+            handleNotificationCall("error", error.message);
+            setLoader(false);
+            reject(error);
+          });
+      } catch (error) {
+        handleNotificationCall("error", error.message);
         setLoader(false);
-      });
+        reject(error);
+      }
     });
   }
 
-
   function handleEdit(values) {
-   
     return new Promise((resolve) => {
       setLoader(true);
-      var url="";
+      var url = "";
       if (decode.role === "ADMIN") {
-        url = `${process.env.REACT_APP_SERVER}admin/editRequirement`; 
+        url = `${process.env.REACT_APP_SERVER}admin/editRequirement`;
       } else {
         url = `${process.env.REACT_APP_SERVER}CC/editRequirement`;
       }
@@ -512,13 +530,14 @@ export default function Tables() {
           skills: values.skills,
           clientId: clientId,
           orgRecruiterId: requirementsOrgId,
+          levelHrDataId: reqLevelHrDataId,
           jobLocation: values.jobLocation,
           experience: values.experience,
           gist: ContentRef.current.value,
           file: file?.name,
           modeOfWork: values.work,
           specialHiring: values.hiring,
-          hideFromInternal: values.hideFromInternal
+          hideFromInternal: values.hideFromInternal,
         },
         headers: {
           "Content-Type": "application/json",
@@ -528,9 +547,9 @@ export default function Tables() {
         .then(function (response) {
           if (response.data.status === true) {
             handleNotificationCall("success", response.data.message);
-            if(file?.name){
+            if (file?.name) {
               uploadJD(file, Id);
-            } 
+            }
             forceUpdate();
 
             setState({ ...state, right: false });
@@ -544,14 +563,13 @@ export default function Tables() {
           console.log(error);
         });
     });
-  } 
-  
-  function uploadJD(File, Id){ 
-    
+  }
+
+  function uploadJD(File, Id) {
     var FormData = require("form-data");
     var data = new FormData();
-    data.append("file", File); 
-    data.append("id", Id); 
+    data.append("file", File);
+    data.append("id", Id);
     axios({
       method: "post",
       url: `${process.env.REACT_APP_SERVER}cc/updateRequirementJd`,
@@ -561,16 +579,12 @@ export default function Tables() {
         Authorization: token,
       },
     }).then(function (response) {
-   
       if (response.data.status === true) {
-         
       } else {
         handleNotificationCall("error", response.data.message);
       }
     });
-
   }
-
 
   function handleShow(values, name) {
     setLoader(true);
@@ -594,12 +608,11 @@ export default function Tables() {
       },
     })
       .then(function (response) {
-         if (response.data.status === true) {  
-
-          handleChange(response.data.data.clientId); 
+        if (response.data.status === true) {
+          handleChange(response.data.data.clientId);
           setId(response.data.data.id);
           setRequirementsOrgId(response.data.data.orgRecruiterId);
-
+          setReqLevelHrDataId(response.data.data.levelOfHiringId)
           editreset({
             id: response.data.data.id,
             requirementName: response.data.data.requirementName,
@@ -607,17 +620,19 @@ export default function Tables() {
             clientId: response.data.data.clientId,
             clientName: response.data.data.client.clientName,
             orgRecruiterId: response.data.data.orgRecruiterId,
+            levelHrDataId: response.data.data.levelOfHiringId,
             orgRecruiterName: response.data.data.orgRecruiter.name,
+            levelofHiringName: response.data.data.levelOfHiring.name,
             jobLocation: response.data.data.jobLocation,
             experience: response.data.data.experience,
-            gist:  response.data.data.gist,
+            gist: response.data.data.gist,
             jd: response.data.data.requirementJd,
             hideFromInternal: response.data.data.hideFromInternal,
             work: response.data.data.modeOfWork,
-            hiring: response.data.data.specialHiring
-            })
+            hiring: response.data.data.specialHiring,
+          });
 
-           setRequirementsEdit({
+          setRequirementsEdit({
             ...requirementsEdit,
             id: response.data.data.id,
             requirementName: response.data.data.requirementName,
@@ -626,13 +641,15 @@ export default function Tables() {
             clientName: response.data.data.client.clientName,
             orgRecruiterId: response.data.data.orgRecruiterId,
             orgRecruiterName: response.data.data.orgRecruiter.name,
+            levelofHiringName: response.data.data.levelOfHiring.name,
+            levelHrDataId: response.data.data.levelOfHiringId,
             jobLocation: response.data.data.jobLocation,
             experience: response.data.data.experience,
-            gist:  response.data.data.gist,
+            gist: response.data.data.gist,
             jd: response.data.data.requirementJd,
             hideFromInternal: response.data.data.hideFromInternal,
-            modeOfWork:response.data.data.modeOfWork,
-            specialHiring: response.data.data.specialHiring
+            modeOfWork: response.data.data.modeOfWork,
+            specialHiring: response.data.data.specialHiring,
           });
 
           setRequirementsView({
@@ -643,15 +660,17 @@ export default function Tables() {
             skills: response.data.data.skills,
             orgRecruiterId: response.data.data.orgRecruiter.id,
             orgRecruiterName: response.data.data.orgRecruiter.name,
+            levelofHiringName: response.data.data.levelOfHiring.name,
+            levelHrDataId: response.data.data.levelOfHiring.id,
             jobLocation: response.data.data.jobLocation,
             experience: response.data.data.experience,
             uniqueId: response.data.data.uniqueId,
             clientUniqueId: response.data.data.client.uniqueId,
             clientName: response.data.data.client.clientName,
             status: response.data.data.statusList,
-            gist:  response.data.data.gist,
+            gist: response.data.data.gist,
             jd: response.data.data.requirementJd,
-            modeOfWork:response.data.data.modeOfWork,
+            modeOfWork: response.data.data.modeOfWork,
             specialHiring: response.data.data.specialHiring,
             hideFromInternal: response.data.data.hideFromInternal,
             candidateCount: response.data.candidateCount,
@@ -660,7 +679,7 @@ export default function Tables() {
 
           setState({ ...state, right: true });
           setLoader(false);
-        }  else{
+        } else {
           setLoader(false);
         }
       })
@@ -670,6 +689,7 @@ export default function Tables() {
   }
 
   const [recUser, setRecUser] = useState([]);
+  const [levelHrData, setLevelHrData] = useState([]);
   const [state, setState] = useState({
     right: false,
   });
@@ -688,7 +708,7 @@ export default function Tables() {
       },
     }).then(function (response) {
       if (response.data.status === true) {
-         setClientList(response.data.data);
+        setClientList(response.data.data);
       }
     });
 
@@ -702,36 +722,34 @@ export default function Tables() {
       },
     }).then(function (response) {
       if (response.data.status === true) {
-        
         setClientEditList(response.data.data);
       }
     });
   }, [token]);
 
   function handleChange(value) {
- 
-    setClientId(value); 
- 
+    setClientId(value);
+
     axios({
       method: "post",
       url: `${process.env.REACT_APP_SERVER}CC/getOrganisationReciruterList`,
       data: {
-        "id": value,
+        id: value,
       },
       headers: {
         "Content-Type": "application/json",
         Authorization: token,
       },
     }).then(function (response) {
-      if (response.data.status === true) { 
-        setRecUser(response.data.data); 
+      if (response.data.status === true) {
+        setRecUser(response.data.data);
+        setLevelHrData(response.data?.lvlHrData)
       }
     });
   }
 
-
   function handleEditChange(value) {
-    setClientId(value); 
+    setClientId(value);
 
     axios({
       method: "post",
@@ -744,167 +762,32 @@ export default function Tables() {
         Authorization: token,
       },
     }).then(function (response) {
- 
-      if (response.data.status === true) { 
+      if (response.data.status === true) {
         setRecUser(response.data.data);
-
-        if(response.data.data[0]?.id){
+        setLevelHrData(response.data?.lvlHrData)
+        if (response.data.data[0]?.id) {
           setRequirementsEdit({
-            ...requirementsEdit,   
+            ...requirementsEdit,
             clientId: value.id,
-            clientName: value.clientName, 
+            clientName: value.clientName,
             orgRecruiterId: response.data.data[0]?.id,
             orgRecruiterName: response.data.data[0]?.name,
+            levelHrDataId: response.data.data[0]?.id,
           });
-
-        } else{
-           setRequirementsEdit({
-            ...requirementsEdit,   
+        } else {
+          setRequirementsEdit({
+            ...requirementsEdit,
             clientId: value.id,
-            clientName: value.clientName, 
-           
+            clientName: value.clientName,
           });
         }
-       
-
-
       }
     });
   }
 
-  // function getSheetData(data, header) {
-  //   var fields = Object.keys(data[0]);
-  //   var sheetData = data.map(function (row) {
-  //     return fields.map(function (fieldName) {
-  //       return row[fieldName] ? row[fieldName] : "";
-  //     });
-  //   });
-  //   sheetData.unshift(header);
-  //   return sheetData;
-  // }
-
-  // async function saveAsExcel(data) {
-  //   var header = [];
-
-  //   if (decode.role === "ADMIN") {
-  //     header = [
-  //       "S.No",
-  //       "Requirement Name",
-  //       "ClientCoordinator",
-  //       "Clients Name",
-  //       "Organization Recruiter Name",
-  //       "Experience",
-  //       "Skills ",
-  //       "Location ",
-  //       "Requirement Gist",
-  //       "Status",
-  //       "Posted Date",
-  //     ];
-  //   } else {
-  //     header = [
-  //       "S.No",
-  //       "Requirement Name",
-  //       "Clients Name",
-  //       "Organization Recruiter Name",
-  //       "Experience",
-  //       "Skills ",
-  //       "Location ",
-  //       "Requirement Gist",
-  //       "Status",
-  //       "Posted Date",
-  //     ];
-  //   }
-
-  //   XlsxPopulate.fromBlankAsync().then(async (workbook) => {
-  //     const sheet1 = workbook.sheet(0);
-  //     const sheetData = getSheetData(data, header);
-  //     const totalColumns = sheetData[0].length;
-
-  //     sheet1.cell("A1").value(sheetData);
-  //     const range = sheet1.usedRange();
-  //     const endColumn = String.fromCharCode(64 + totalColumns);
-  //     sheet1.row(1).style("bold", true);
-  //     sheet1.range("A1:" + endColumn + "1").style("fill", "BFBFBF");
-  //     range.style("border", true);
-  //     return workbook.outputAsync().then((res) => {
-  //       saveAs(
-  //         res,
-  //         `Requirements_${moment(new Date()).format("DD_MM_YYYY_HH_mm")}.xlsx`,
-  //       );
-  //     });
-  //   });
-  // }
-
-  // function downloadExel() {
-  //   setLoader(true);
-
-  //   const form = filterRef.current;
-  //   var data = {};
-  //   var url = "";
- 
-  //   if (decode.role === "ADMIN") {
-  //     data = JSON.stringify({
-  //       page: 1,
-  //       fromDate: `${form["fromDate"].value}`,
-  //       toDate: `${form["toDate"].value}`,
-  //       recruiterId: recruiterId?.id,
-  //       requirementId: requirementId?.id,
-  //       fileDownload: "yes",
-  //     });
-
-  //     url = `${process.env.REACT_APP_SERVER}admin/allRequirements`;
-  //   } else {
-  //     data = JSON.stringify({
-  //       page: 1,
-  //       fromDate: `${form["fromDate"].value}`,
-  //       toDate: `${form["toDate"].value}`,
-  //       requirementId: requirementId?.id,
-  //       fileDownload: "yes",
-  //     });
-  //     url = `${process.env.REACT_APP_SERVER}CC/myRequirements`;
-  //   }
-
-  //   axios({
-  //     method: "post",
-  //     url: url,
-  //     data: data,
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Authorization: token,
-  //     },
-  //   })
-  //     .then(function (response) {
-  //       if (response.data.status === true) {
-  //         setLoader(false);
-  //         saveAsExcel(response.data.data);
-  //       }
-  //     })
-
-  //     .catch(function (error) {
-  //       console.log(error);
-  //     });
-  // }
-
   const HeaderElements = () => (
     <>
-      <Grid className={classes.HeaderElements}>
-
-        {/* {decode.role === "ADMIN"? 
-        <Tooltip title="Dowmload" placement="bottom" aria-label="download">
-          {count !== 0 ? (
-            <CloudDownloadIcon
-              className={classes.toolIcon}
-              onClick={(e) => {
-                downloadExel();
-              }}
-            />
-          ) : (
-            <CloudDownloadIcon className={classes.downloadIcon} />
-          )}
-        </Tooltip> :""
-         } */}
-        Total : {count}
-      </Grid>
+      <Grid className={classes.HeaderElements}>Total : {count}</Grid>
     </>
   );
 
@@ -937,7 +820,6 @@ export default function Tables() {
         });
         setRequirementsData(switchState);
         handleNotificationCall("success", response.data.message);
-
       }
     });
   }
@@ -977,27 +859,31 @@ export default function Tables() {
                     <Grid item xs={12} sm={6} md={6} lg={6}>
                       <FormControl className={classes.margin}>
                         <InputLabel shrink htmlFor="clientId">
-                          Select Clients Name
+                            {decode.companyType === "COMPANY" ? "Select Project Name" :"Select Client Name"}
                         </InputLabel>
 
                         <Autocomplete
                           options={clientEditList}
                           disableClearable
-                         
                           error={editErrors.clientId ? true : false}
-                          getOptionLabel={(option) => option.clientName +" ("+option.uniqueId+")"}
+                          getOptionLabel={(option) =>
+                            option.clientName + " (" + option.uniqueId + ")"
+                          }
                           getOptionSelected={(option) =>
                             option.clientName === requirementsEdit.clientName
                           }
                           defaultValue={{
                             id: requirementsEdit.clientId,
                             clientName: requirementsEdit.clientName,
-                            uniqueId:  clientEditList.filter((item) => item.id.includes(requirementsEdit.clientId))
-                            .map((recruiter) => recruiter.uniqueId)[0],
+                            uniqueId: clientEditList
+                              .filter((item) =>
+                                item.id.includes(requirementsEdit.clientId),
+                              )
+                              .map((recruiter) => recruiter.uniqueId)[0],
                           }}
                           {...editRequirements("clientId")}
                           onChange={(event, value) => {
-                            handleEditChange(value.id); 
+                            handleEditChange(value.id);
                           }}
                           renderInput={(params) => (
                             <TextField {...params} variant="filled" />
@@ -1019,7 +905,6 @@ export default function Tables() {
                         <Autocomplete
                           options={recUser}
                           disableClearable
-                         
                           error={editErrors.orgRecruiterId ? true : false}
                           defaultValue={{
                             id: requirementsEdit.orgRecruiterId,
@@ -1031,7 +916,6 @@ export default function Tables() {
                             option.name === requirementsEdit.orgRecruiterName
                           }
                           onChange={(event, value) => {
- 
                             setRequirementsOrgId(value.id);
                             setRequirementsEdit({
                               ...requirementsEdit,
@@ -1046,6 +930,44 @@ export default function Tables() {
 
                         <Typography variant="inherit" color="error">
                           {editErrors.orgRecruiterId?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
+    
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <FormControl className={classes.margin}>
+                        <InputLabel shrink htmlFor="levelHrDataId">
+                          Select Level Name
+                        </InputLabel>
+
+                        <Autocomplete
+                          options={levelHrData}
+                          disableClearable
+                          error={editErrors.levelHrDataId ? true : false}
+                          defaultValue={{
+                            id: requirementsEdit.levelHrDataId,
+                            name: requirementsEdit.levelofHiringName,
+                          }}
+                          {...editRequirements("levelHrDataId")}
+                          getOptionLabel={(option) => option.name}
+                          getOptionSelected={(option) =>
+                            option.name === requirementsEdit.levelofHiringName
+                          }
+                          onChange={(event, value) => {
+                            setRequirementsOrgId(value.id);
+                            setRequirementsEdit({
+                              ...requirementsEdit,
+                              levelHrDataId: value.id,
+                              levelofHiringName: value.name,
+                            });
+                          }}
+                          renderInput={(params) => (
+                            <TextField {...params} variant="filled" />
+                          )}
+                        />
+
+                        <Typography variant="inherit" color="error">
+                          {editErrors.levelHrDataId?.message}
                         </Typography>
                       </FormControl>
                     </Grid>
@@ -1136,36 +1058,37 @@ export default function Tables() {
                       </FormControl>
                     </Grid>
 
-
-
                     <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                       <FormControl className={classes.margin}>
-                      <InputLabel shrink htmlFor="work">
-                      Mode of work 
-                      </InputLabel>
-                           <Select 
-                           name="work"
-                           defaultValue={requirementsEdit.modeOfWork}
-                           {...editRequirements("work")}
-                           error={editErrors.roleName ? true : false}
-                           classes={{
-                             root: classes.customSelectField,
-                             icon: classes.customSelectIcon,
-                           }}
-                           disableUnderline 
-                           onChange={(e)=>{ 
-                             setRequirementsEdit({
-                               ...requirementsEdit, 
-                               modeOfWork: e.target.value
-                             });
-                           }}
-                         >
-                            <MenuItem value="Work from Office">Work from Office</MenuItem>
-                          <MenuItem value="Work from Home">Work from Home </MenuItem>
-                          <MenuItem value="Hybrid">  Hybrid </MenuItem>
-                          <MenuItem value="Onsight">  Onsight </MenuItem>
-                         </Select>
+                        <InputLabel shrink htmlFor="work">
+                          Mode of work
+                        </InputLabel>
+                        <Select
+                          name="work"
+                          defaultValue={requirementsEdit.modeOfWork}
+                          {...editRequirements("work")}
+                          error={editErrors.roleName ? true : false}
+                          classes={{
+                            root: classes.customSelectField,
+                            icon: classes.customSelectIcon,
+                          }}
+                          disableUnderline
+                          onChange={(e) => {
+                            setRequirementsEdit({
+                              ...requirementsEdit,
+                              modeOfWork: e.target.value,
+                            });
+                          }}
+                        >
+                          <MenuItem value="Work from Office">
+                            Work from Office
+                          </MenuItem>
+                          <MenuItem value="Work from Home">
+                            Work from Home
+                          </MenuItem>
+                          <MenuItem value="Hybrid"> Hybrid </MenuItem>
+                          <MenuItem value="Onsite"> Onsite </MenuItem>
+                        </Select>
 
                         <Typography variant="inherit" color="error">
                           {editErrors.work?.message}
@@ -1173,145 +1096,172 @@ export default function Tables() {
                       </FormControl>
                     </Grid>
 
-
                     <Grid item xs={12} sm={6} md={6} lg={6}>
                       <InputLabel shrink htmlFor="hiring">
-                      Special hiring 
+                        Special hiring
                       </InputLabel>
                       <FormControl className={classes.margin}>
-                      <Select
-                           label="Role"
-                           name="roleName"
-                           defaultValue={requirementsEdit.specialHiring}
-                           {...editRequirements("hiring")}
-                           error={editErrors.roleName ? true : false}
-                           classes={{
-                             root: classes.customSelectField,
-                             icon: classes.customSelectIcon,
-                           }}
-                           disableUnderline 
-                           onChange={(e)=>{ 
-                             setRequirementsEdit({
-                               ...requirementsEdit, 
-                               specialHiring: e.target.value
-                             });
-                           }}
-                         >
-                              <MenuItem value="Diversity">Diversity</MenuItem>
+                        <Select
+                          label="Role"
+                          name="roleName"
+                          defaultValue={requirementsEdit.specialHiring}
+                          {...editRequirements("hiring")}
+                          error={editErrors.roleName ? true : false}
+                          classes={{
+                            root: classes.customSelectField,
+                            icon: classes.customSelectIcon,
+                          }}
+                          disableUnderline
+                          onChange={(e) => {
+                            setRequirementsEdit({
+                              ...requirementsEdit,
+                              specialHiring: e.target.value,
+                            });
+                          }}
+                        >
+                          <MenuItem value="Diversity">Diversity</MenuItem>
                           <MenuItem value="Returnership">Returnership</MenuItem>
-                          <MenuItem value="Vetrans">  Vetrans </MenuItem>
-                          <MenuItem value="PWD (Persons With Disabilities)">  PWD (Persons With Disabilities) </MenuItem>
-                          <MenuItem value="LGBTQ">  LGBTQ </MenuItem>
-                         </Select>
+                          <MenuItem value="Vetrans"> Vetrans </MenuItem>
+                          <MenuItem value="PWD (Person With Disability)">
+                            PWD (Person With Disability)
+                          </MenuItem>
+                          <MenuItem value="LGBTQ"> LGBTQ </MenuItem>
+                        </Select>
                         <Typography variant="inherit" color="error">
                           {editErrors.hiring?.message}
                         </Typography>
                       </FormControl>
                     </Grid>
 
-
-
                     <Grid item xs={12} sm={6} md={6} lg={6}>
                       <InputLabel shrink htmlFor="hideFromInternal">
-                      Hide to Internal
+                        Hide to Internal
                       </InputLabel>
                       <FormControl className={classes.margin}>
-                          <Switch 
+                        <Switch
                           color="primary"
                           id="hideFromInternal"
                           name="hideFromInternal"
-                       
-                          checked={requirementsEdit.hideFromInternal} 
+                          checked={requirementsEdit.hideFromInternal}
                           {...editRequirements("hideFromInternal", {
-                          onChange: (e) => {
-
-                            setRequirementsEdit({
-                              ...requirementsEdit,
-                              hideFromInternal: e.target.checked 
-                            });  }
-                          }) }
+                            onChange: (e) => {
+                              setRequirementsEdit({
+                                ...requirementsEdit,
+                                hideFromInternal: e.target.checked,
+                              });
+                            },
+                          })}
                           error={editErrors.hideFromInternal ? true : false}
-                          inputProps={{ "aria-label": "primary checkbox" }} />
+                          inputProps={{ "aria-label": "primary checkbox" }}
+                        />
                         <Typography variant="inherit" color="error">
                           {editErrors.hideFromInternal?.message}
                         </Typography>
                       </FormControl>
                     </Grid>
 
-                    <Grid item xs={12} sm={6} md={3} lg={3}>  <InputLabel shrink htmlFor="jd">  Upload JD   </InputLabel>
-                    <FormControl className={classes.margin}>
-                    <div className={classes.space +" "+ classes.alignItemsEnd}  > 
-
-                      <div className={classes.marginTop}>
-                        <input
-                          accept=".pdf,.doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                          className={classes.input}
-                          id="icon-button-jd"
-                          type="file"
-                          style={{ display: "none" }}
-                         
-                          onChange={handleUploadChange}
-
-                        />
-                        <label htmlFor="icon-button-jd">
-                          <Button
-                            variant="contained"
-                            className={classes.button}
-                            color="primary"
-                            startIcon={<DescriptionIcon />}
-                            aria-label="upload JD"
-                            component="span"
-                          >
-                            Upload JD 
-                          </Button>
-                        </label>
-                      </div>
-                   
-                      { requirementsEdit?.jd !== "https://liverefo.s3.amazonaws.com/" && requirementsEdit?.jd !== ""? <>
-                      <Tooltip
-                            title="View JD"
-                            placement="bottom"
-                            aria-label="view"
-                          >
-                            <RemoveRedEyeIcon
-                              className={classes.toolIcon}
-                              onClick={handleModalOpen}
+                    <Grid item xs={12} sm={6} md={3} lg={3}>
+                      <InputLabel shrink htmlFor="jd">
+                        Upload JD
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <div
+                          className={
+                            classes.space + " " + classes.alignItemsEnd
+                          }
+                        >
+                          <div className={classes.marginTop}>
+                            <input
+                              accept=".pdf,.doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                              className={classes.input}
+                              id="icon-button-jd"
+                              type="file"
+                              style={{ display: "none" }}
+                              onChange={handleUploadChange}
                             />
-                          </Tooltip>
-
-                          <Tooltip
-                            title="Downlaod JD"
-                            placement="bottom"
-                            aria-label="downlaod"
-                          >
-                            <a  className={classes.messageContent} href={requirementsEdit?.jd} download>
-                              
-                              <GetAppIcon className={classes.toolIcon} /> 
-                            </a>
-                          </Tooltip>
-
-                          {file?.name?
-                    <Tooltip  title="Delete JD"  placement="bottom" aria-label="delete" >
-                         <DeleteIcon   className={classes.toolIconDelete}   onClick={(e) =>{ setFile([]) }} />
-                    </Tooltip>
-
-                  :""}  
-
-                          </> :""}
+                            <label htmlFor="icon-button-jd">
+                              <Button
+                                variant="contained"
+                                className={classes.button}
+                                color="primary"
+                                startIcon={<DescriptionIcon />}
+                                aria-label="upload JD"
+                                component="span"
+                              >
+                                Upload JD
+                              </Button>
+                            </label>
                           </div>
 
-                    </FormControl>
+                          {requirementsEdit?.jd !==
+                            "https://liverefo.s3.amazonaws.com/" &&
+                          requirementsEdit?.jd !== "" ? (
+                            <>
+                              <Tooltip
+                                title="View JD"
+                                placement="bottom"
+                                aria-label="view"
+                              >
+                                <RemoveRedEyeIcon
+                                  className={classes.toolIcon}
+                                  onClick={handleModalOpen}
+                                />
+                              </Tooltip>
 
-            
-            <Grid container direction="row"   className={classes.left +" "+ classes.button} >
-              <Typography   variant="inherit"     className={classes.lineBreak}   > {file?.name}  </Typography>
-                     
+                              <Tooltip
+                                title="Downlaod JD"
+                                placement="bottom"
+                                aria-label="downlaod"
+                              >
+                                <a
+                                  className={classes.messageContent}
+                                  href={requirementsEdit?.jd}
+                                  download
+                                >
+                                  <GetAppIcon className={classes.toolIcon} />
+                                </a>
+                              </Tooltip>
+
+                              {file?.name ? (
+                                <Tooltip
+                                  title="Delete JD"
+                                  placement="bottom"
+                                  aria-label="delete"
+                                >
+                                  <DeleteIcon
+                                    className={classes.toolIconDelete}
+                                    onClick={(e) => {
+                                      setFile([]);
+                                    }}
+                                  />
+                                </Tooltip>
+                              ) : (
+                                ""
+                              )}
+                            </>
+                          ) : (
+                            ""
+                          )}
+                        </div>
+                      </FormControl>
+                      <Grid
+                        container
+                        direction="row"
+                        className={classes.left + " " + classes.button}
+                      >
+                        <Typography
+                          variant="inherit"
+                          className={classes.lineBreak}
+                        >
+                          {file?.name}
+                        </Typography>
+                      </Grid>
                     </Grid>
-           
-                  </Grid>
 
-                    <Grid item xs={12} >
-                      <InputLabel shrink htmlFor="gist">  Requirement Gist </InputLabel>
+                    <Grid item xs={12}>
+                      <InputLabel shrink htmlFor="gist">
+                        Requirement Gist
+                      </InputLabel>
                       <FormControl className={classes.margin}>
                         {/* <TextField
                           multiline
@@ -1326,14 +1276,11 @@ export default function Tables() {
                           error={editErrors.gist ? true : false}
                         /> */}
 
-
-<JoditEditor
-		 
-			value={requirementsEdit?.gist}
-		 
-			tabIndex={1} // tabIndex of textarea
-      ref={ContentRef}
-		/>
+                        <JoditEditor
+                          value={requirementsEdit?.gist}
+                          tabIndex={1} // tabIndex of textarea
+                          ref={ContentRef}
+                        />
 
                         <Typography variant="inherit" color="error">
                           {editErrors.gist?.message}
@@ -1349,11 +1296,9 @@ export default function Tables() {
                     spacing={2}
                     className={classes.drawerFooter}
                   >
-                 
-
                     <Button
                       variant="contained"
-                      color="primary" 
+                      color="primary"
                       size="small"
                       disabled={editIsSubmitting}
                       type="submit"
@@ -1377,412 +1322,31 @@ export default function Tables() {
       </>
     ) : dataList === "ADD" ? (
       <>
-      <AddRequirements
-        handleAdd={handleAdd}
-        clientList={clientList}
-        handleChange={handleChange}
-        handleSubmit={handleSubmit}
-        toggleDrawer={toggleDrawer}
-        register={register}
-        errors={errors}
-        isSubmitting={isSubmitting}
-        recUser={recUser}
-        modeOfWork={modeofWork}
-        setModeofWork={setModeofWork}
-        specialHiring={specialHiring}
-        setSpecialHiring={setSpecialHiring}
-        hideFromInternal={hideFromInternal}
-        setHideFromInternal={setHideFromInternal}
-        handleUploadChange={handleUploadChange}
-        file={file}
-        setFile={setFile}
-        ContentRef={ContentRef}
-        setClientList ={setClientList }
-        setRequirementsOrgId={setRequirementsOrgId }
-      />
-        {/* <Box sx={{ width: "100%" }} role="presentation">
-          <List>
-            <Card className={classes.root}>
-              <CardHeader>
-                <Grid
-                  container
-                  direction="row"
-                  spacing={1}
-                  className={classes.drawerHeader}
-                >
-                  <Grid item xs={10} md={6}>
-                    <Typography variant="subtitle1">Add New Requirement</Typography>
-                  </Grid>
-
-                  <Grid item xs={2} lg={6} className={classes.drawerClose}>
-                    <CloseIcon
-                      className={classes.closeBtn}
-                      size="14px"
-                      onClick={toggleDrawer(anchor, false)}
-                    />
-                  </Grid>
-                </Grid>
-              </CardHeader>
-              <form onSubmit={handleSubmit(handleAdd)}>
-                <CardContent>
-                  <Grid container direction="row" spacing={2}>
-                    <Grid item xs={12} sm={6} md={6} lg={6}>
-                      <FormControl className={classes.margin}>
-                        <InputLabel shrink htmlFor="clientId">
-                          Select Clients Name
-                        </InputLabel>
-
-                        <Autocomplete options={clientList}
-                          disableClearable
-                          getOptionLabel={option => option.clientName +" ("+option.uniqueId+")"}
-                          getOptionvalue={option => option.id}
-                          onChange={(event, value) => {handleChange(value.id);}}
-                          classes={{
-                            popupIndicator: classes.autocompleteIndicator
-                          }}
-                          renderInput={(params) => (
-
-                            <TextField
-                              {...register('clientId')} error={errors.clientId ? true : false}
-                              {...params}
-                              variant="filled"
-                              name="clientId"
-                            />
-                          )}
-                        />
-
-                        <Typography variant="inherit" color="error">
-                          {errors.clientId?.message}
-                        </Typography>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={6} lg={6}>
-                      <FormControl className={classes.margin}>
-                        <InputLabel shrink htmlFor="orgRecruiterId">
-                          Select Organization Recruiter
-                        </InputLabel>
-
-                        <Autocomplete
-                          options={recUser} 
-                        
-                          disableClearable
-                          getOptionLabel={(option) => option.name} 
-
-                          onChange={(event, value) => { setRequirementsOrgId(value.id);}}
-                        
-                          renderInput={(params) => (
-                            <TextField
-                            {...register("orgRecruiterId")}
-                            error={errors.orgRecruiterId ? true : false}
-                              {...params}
-                              variant="filled"
-                              name="orgRecruiterId"
-                            />
-                          )}
-                        />
-
-                        <Typography variant="inherit" color="error">
-                          {errors.orgRecruiterId?.message}
-                        </Typography>
-                      </FormControl>
-                    </Grid>
-
-                    <Grid item xs={12} sm={6} md={6} lg={6}>
-                      <InputLabel shrink htmlFor="requirementName">
-                        Requirement Name
-                      </InputLabel>
-                      <FormControl className={classes.margin}>
-                        <TextField
-                          size="small"
-                          InputProps={{ disableUnderline: true }}
-                          classes={{ root: classes.customTextField }}
-                          placeholder="Enter Requirement Name"
-                          id="requirementName"
-                          name="requirementName"
-                          {...register("requirementName")}
-                          error={errors.requirementName ? true : false}
-                        />
-
-                        <Typography variant="inherit" color="error">
-                          {errors.requirementName?.message}
-                        </Typography>
-                      </FormControl>
-                    </Grid>
-
-                    <Grid item xs={12} sm={6} md={6} lg={6}>
-                      <InputLabel shrink htmlFor="jobLocation">
-                        Job Location
-                      </InputLabel>
-                      <FormControl className={classes.margin}>
-                        <TextField
-                          size="small"
-                          InputProps={{ disableUnderline: true }}
-                          classes={{ root: classes.customTextField }}
-                          placeholder="Enter Job Location"
-                          id="jobLocation"
-                          name="jobLocation"
-                          {...register("jobLocation")}
-                          error={errors.jobLocation ? true : false}
-                        />
-                        <Typography variant="inherit" color="error">
-                          {errors.jobLocation?.message}
-                        </Typography>
-                      </FormControl>
-                    </Grid>
-
-                    <Grid item xs={12} sm={6} md={6} lg={6}>
-                      <InputLabel shrink htmlFor="skills">
-                        Skill
-                      </InputLabel>
-                      <FormControl className={classes.margin}>
-                        <TextField
-                          size="small"
-                          InputProps={{ disableUnderline: true }}
-                          classes={{ root: classes.customTextField }}
-                          placeholder="Enter Skill"
-                          id="skills"
-                          name="skills"
-                          {...register("skills")}
-                          error={errors.skills ? true : false}
-                        />
-
-                        <Typography variant="inherit" color="error">
-                          {errors.skills?.message}
-                        </Typography>
-                      </FormControl>
-                    </Grid>
-
-                    <Grid item xs={12} sm={6} md={6} lg={6}>
-                      <InputLabel shrink htmlFor="experience">
-                        Experience
-                      </InputLabel>
-                      <FormControl className={classes.margin}>
-                        <TextField
-                          size="small"
-                          InputProps={{ disableUnderline: true }}
-                          classes={{ root: classes.customTextField }}
-                          placeholder="Enter Experience"
-                          id="experience"
-                          name="experience"
-                          {...register("experience")}
-                          error={errors.experience ? true : false}
-                        />
-                        <Typography variant="inherit" color="error">
-                          {errors.experience?.message}
-                        </Typography>
-                      </FormControl>
-                    </Grid>
-
-                    <Grid item xs={12} sm={6} md={6} lg={6}>
-                      <FormControl className={classes.margin}>
-                        <InputLabel shrink htmlFor="work">
-                          Mode of work
-                        </InputLabel>
-
-                        <Select 
-                          name="work" 
-                          defaultValue={modeofWork}
-                          classes={{
-                            root: classes.customSelectField,
-                            icon: classes.customSelectIcon,
-                          }}
-                           
-                          {...register("work", {
-                            onChange: (e) => {
-                              setModeofWork(e.target.value); 
-                            }
-                          })}
-
-                          error={errors.work ? true : false}
-                          disableUnderline
-                        >
-                          <MenuItem value="Work from Office">Work from Office</MenuItem>
-                          <MenuItem value="Work from home">Work from home </MenuItem>
-                          <MenuItem value="Hybrid">  Hybrid </MenuItem>
-                          <MenuItem value="Onsight">  Onsight </MenuItem>
-                        </Select>
-
-                        <Typography variant="inherit" color="error">
-                          {errors.work?.message}
-                        </Typography>
-                      </FormControl>
-                    </Grid>
-
-
-                    <Grid item xs={12} sm={6} md={6} lg={6}>
-                      <FormControl className={classes.margin}>
-                        <InputLabel shrink htmlFor="hiring">
-                        Special hiring
-                        </InputLabel>
-
-                        <Select 
-                          name="hiring" 
-                          defaultValue={specialHiring}
-                          classes={{
-                            root: classes.customSelectField,
-                            icon: classes.customSelectIcon,
-                          }}
-                           
-                          {...register("hiring", {
-                            onChange: (e) => {
-                              setSpecialHiring(e.target.value); 
-                            }
-                          })}
-
-                          error={errors.work ? true : false}
-                          disableUnderline
-                        >
-                          <MenuItem value="Diversity">Diversity</MenuItem>
-                          <MenuItem value="Returnership">Returnership</MenuItem>
-                          <MenuItem value="Vetrans">  Vetrans </MenuItem>
-                          <MenuItem value="PWD (Persons With Disabilities)">  PWD (Persons With Disabilities) </MenuItem>
-                          <MenuItem value="LGBTQ">  LGBTQ </MenuItem>
-                        </Select>
-
-                        <Typography variant="inherit" color="error">
-                          {errors.hiring?.message}
-                        </Typography>
-                      </FormControl>
-                    </Grid>
-                     
-
-                    <Grid item xs={12} sm={3} md={6} lg={6}>
-                      <InputLabel shrink htmlFor="hideFromInternal">
-                      Hide to Internal
-                      </InputLabel>
-                      <FormControl className={classes.margin}>
-                          <Switch
-                          checked={hideFromInternal}
-                           color="primary"
-                          id="hideFromInternal"
-                          name="hideFromInternal"
-                          {...register("hideFromInternal", {
-                            onChange: (e) => {
-                              setHideFromInternal(e.target.checked)
-                               }
-                            }) }
-                          inputProps={{ "aria-label": "primary checkbox" }} />
-                        <Typography variant="inherit" color="error">
-                          {errors.hideFromInternal?.message}
-                        </Typography>
-                      </FormControl>
-                    </Grid>
-
-
-                    <Grid item xs={12} sm={3} md={6} lg={6}>  <InputLabel shrink htmlFor="jd">  Upload JD   </InputLabel>
-                    <FormControl className={classes.margin}>
-                    <div className={classes.space +" "+ classes.alignItemsEnd}  > 
-
-                      <div className={classes.marginTop}>
-                        <input
-                          accept=".pdf,.doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                          className={classes.input}
-                          id="icon-button-jd"
-                          type="file"
-                          style={{ display: "none" }}
-                          onChange={handleUploadChange}
-                        />
-                        <label htmlFor="icon-button-jd">
-                          <Button
-                            variant="contained"
-                            className={classes.button}
-                            color="primary"
-                            startIcon={<DescriptionIcon />}
-                            aria-label="upload JD"
-                            component="span"
-                          >
-                            Upload JD
-                          </Button>
-                        </label>
-
-                        </div>
-
-                        {file?.name?
-                    <Tooltip  title="Delete JD"  placement="bottom" aria-label="delete" >
-                         <DeleteIcon   className={classes.toolIconDelete}   onClick={(e) =>{ setFile([]) }} />
-                    </Tooltip>
-
-                  :""}  
-
-
-                      </div>
-                    </FormControl>
-
-            
-            <Grid container direction="row"   className={classes.left +" "+ classes.button} >
-              <Typography   variant="inherit"     className={classes.lineBreak}   > {file?.name}  </Typography>
-                     
-                    </Grid>
-           
-                  </Grid>
-
-
-                 
-
-
-
-                    <Grid item xs={12}  >
-                      <InputLabel shrink htmlFor="gist"> Requirement Gist   </InputLabel>
-                      <FormControl className={classes.margin}>
-                        <TextField
-                         multiline
-                          size="small"
-                          rows={5}
-                          InputProps={{ disableUnderline: true }}
-                          classes={{ root: classes.customTextField }}
-                          placeholder="Enter Requirement Gist"
-                          id="gist"
-                          name="gist"
-                          {...register("gist")}
-                          error={errors.gist ? true : false}
-                        />
-
-
-<JoditEditor
-		  
-			tabIndex={1}  tabIndex of textarea
-      ref={ContentRef}
-		/>
-                          
-      
-                        <Typography variant="inherit" color="error">
-                          {errors.gist?.message}
-                        </Typography>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-                <CardActions >
-                  <Grid
-                    container
-                    direction="row"
-                    spacing={2}
-                    className={classes.drawerFooter}
-                  >
-                   
-                    <Button
-                      variant="contained"
-                      color="primary" 
-                      size="small"
-                      disabled={isSubmitting}
-                      type="submit"
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      color="secondary"
-                      onClick={toggleDrawer(anchor, false)}
-                    >
-                      Close
-                    </Button>
-                  </Grid>
-                </CardActions>
-              </form>
-            </Card>
-          </List>
-        </Box> */}
+        <AddRequirements
+          handleAdd={handleAdd}
+          clientList={clientList}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+          toggleDrawer={toggleDrawer}
+          register={register}
+          errors={errors}
+          isSubmitting={isSubmitting}
+          recUser={recUser}
+          levelHrData={levelHrData}
+          modeOfWork={modeofWork}
+          setModeofWork={setModeofWork}
+          specialHiring={specialHiring}
+          setSpecialHiring={setSpecialHiring}
+          hideFromInternal={hideFromInternal}
+          setHideFromInternal={setHideFromInternal}
+          handleUploadChange={handleUploadChange}
+          file={file}
+          setFile={setFile}
+          ContentRef={ContentRef}
+          setClientList={setClientList}
+          setRequirementsOrgId={setRequirementsOrgId }
+          setReqLevelHrDataId={setReqLevelHrDataId}
+        />
       </>
     ) : (
       <>
@@ -1798,7 +1362,7 @@ export default function Tables() {
                 >
                   <Grid item xs={10} md={6}>
                     <Typography variant="subtitle1">
-                    View Requirement - {requirementsView.requirementName}
+                      View Requirement - {requirementsView.requirementName}
                     </Typography>
                   </Grid>
 
@@ -1815,14 +1379,11 @@ export default function Tables() {
               <CardContent className={classes.drawerViewContent}>
                 <Grid container direction="row" spacing={2}>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     <Typography className={classes.boldtext}>
-                      
                       Requirement Name:
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     {requirementsView.requirementName +
                       " (" +
                       requirementsView.uniqueId +
@@ -1830,197 +1391,177 @@ export default function Tables() {
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     <Typography className={classes.boldtext}>
-                      
-                    Clients Name:
+                      {decode.companyType === "COMPANY" && decode.companyType === "COMPANY"  ? "Project Name:" :"Client Name:"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     {requirementsView.clientName +
                       " (" +
                       requirementsView.clientUniqueId +
                       ") "}
                   </Grid>
-
+          
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     <Typography className={classes.boldtext}>
-                      
                       Organization Recruiter Name:
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     {requirementsView.orgRecruiterName}
+                  </Grid>
+     
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    <Typography className={classes.boldtext}>
+                      Level of Hiring Name:
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    {requirementsView.levelofHiringName}
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     <Typography className={classes.boldtext}>
-                      
                       Experience:
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     {requirementsView.experience}
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     <Typography className={classes.boldtext}>
-                      
                       Skills:
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     {requirementsView.skills}
                   </Grid>
 
-
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     <Typography className={classes.boldtext}>
-                      
                       Location:
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>   {requirementsView.jobLocation}
-                  </Grid>
-
-
-
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
-                    Mode of work:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>   {requirementsView.modeOfWork}
+                    {requirementsView.jobLocation}
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     <Typography className={classes.boldtext}>
-                      
-                    Special hiring:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>   {requirementsView.specialHiring}
-                  </Grid>
-
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
-                    Hide to Internal:
+                      Mode of work:
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    {requirementsView.hideFromInternal=== true? "YES" :"NO"}
+                    {requirementsView.modeOfWork}
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     <Typography className={classes.boldtext}>
-                      
-                    JD :
+                      Special hiring:
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}> 
-
-                    <div className={classes.space +" "+ classes.alignItemsEnd}  > 
-
-  
-{ requirementsView?.jd !== "https://liverefo.s3.amazonaws.com/"? <>
-<Tooltip
-      title="View JD"
-      placement="bottom"
-      aria-label="view"
-    >
-      <RemoveRedEyeIcon
-        className={classes.toolIcon}
-        onClick={handleModalOpen}
-      />
-    </Tooltip>
-
-    <Tooltip
-      title="Downlaod JD"
-      placement="bottom"
-      aria-label="downlaod"
-    >
-      <a  className={classes.messageContent} href={requirementsEdit?.jd} download>
-        
-        <GetAppIcon className={classes.toolIcon} />
-      </a>
-    </Tooltip>
-    </> :""}
-    </div>
-
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    {requirementsView.specialHiring}
                   </Grid>
 
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    <Typography className={classes.boldtext}>
+                      Hide to Internal:
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    {requirementsView.hideFromInternal === true ? "YES" : "NO"}
+                  </Grid>
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
+                    <Typography className={classes.boldtext}>JD :</Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    <div
+                      className={classes.space + " " + classes.alignItemsEnd}
+                    >
+                      {requirementsView?.jd !==
+                      "https://liverefo.s3.amazonaws.com/" ? (
+                        <>
+                          <Tooltip
+                            title="View JD"
+                            placement="bottom"
+                            aria-label="view"
+                          >
+                            <RemoveRedEyeIcon
+                              className={classes.toolIcon}
+                              onClick={handleModalOpen}
+                            />
+                          </Tooltip>
+
+                          <Tooltip
+                            title="Downlaod JD"
+                            placement="bottom"
+                            aria-label="downlaod"
+                          >
+                            <a
+                              className={classes.messageContent}
+                              href={requirementsEdit?.jd}
+                              download
+                            >
+                              <GetAppIcon className={classes.toolIcon} />
+                            </a>
+                          </Tooltip>
+                        </>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
                     <Typography className={classes.boldtext}>
-                      
                       Requirement Gist:
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                   
-                    <div dangerouslySetInnerHTML={{ __html: requirementsView.gist }}></div>
-
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: requirementsView.gist,
+                      }}
+                    ></div>
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     <Typography className={classes.boldtext}>
-                      
                       Posted Candidate:
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                   
-                 
+                    <Button
+                      variant="contained"
+                      size="small"
+                      className={classes.blue}
+                      onClick={(e) => {
+                        if (decode.role === "ADMIN") {
+                          sessionStorage.setItem(
+                            "recruitmentId",
+                            requirementsView.id,
+                          );
 
-                  <Button
-                            variant="contained"
-                            size="small"
-                            className={classes.blue}
-                            onClick={(e)=>{
-                              
-                              if (decode.role === "ADMIN") {
-                                sessionStorage.setItem('recruitmentId', requirementsView.id);
+                          history.push("/app/admin_candidates");
+                        } else if (decode.role === "CLIENTCOORDINATOR") {
+                          sessionStorage.setItem(
+                            "recruitmentId",
+                            requirementsView.id,
+                          );
 
-                                history.push("/app/admin_candidates") 
-                                
-                              } else if (decode.role === "CLIENTCOORDINATOR") {
-                                sessionStorage.setItem('recruitmentId', requirementsView.id);
-
-                                history.push("/app/cc_candidates")
-
-                              }
-
-                            }}
-                          >
-                             {requirementsView.candidateCount}
-                          </Button>
-
+                          history.push("/app/cc_candidates");
+                        }
+                      }}
+                    >
+                      {requirementsView.candidateCount}
+                    </Button>
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     <Typography className={classes.boldtext}>
-                      
                       Status:
                     </Typography>
                   </Grid>
@@ -2031,7 +1572,7 @@ export default function Tables() {
                           <Button
                             variant="contained"
                             size="small"
-                            className={classes.green+" "+ classes.noPointer}
+                            className={classes.green + " " + classes.noPointer}
                           >
                             ACTIVE
                           </Button>
@@ -2041,7 +1582,7 @@ export default function Tables() {
                           <Button
                             variant="contained"
                             size="small"
-                            className={classes.red+" "+ classes.noPointer}
+                            className={classes.red + " " + classes.noPointer}
                           >
                             INACTIVE
                           </Button>
@@ -2053,17 +1594,12 @@ export default function Tables() {
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
                     <Typography className={classes.boldtext}>
-                      
                       Posted Date:
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    {moment(requirementsView.createdAt).format(
-                      "DD-MM-YYYY",
-                    )}
+                    {moment(requirementsView.createdAt).format("DD-MM-YYYY")}
                   </Grid>
                 </Grid>
               </CardContent>
@@ -2102,15 +1638,18 @@ export default function Tables() {
         name: "Requirement Name",
       },
       {
-        name: "Client Coordinator",
+        name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
       },
       {
-        name: "Clients Name",
+        name: decode.companyType === "COMPANY" ? "Project Name" : "Client Name",
       },
-      {
-        name: "Organization Recruiter Name",
-      },
-
+      ...(decode.companyType === "COMPANY"
+        ? []
+        : [
+            {
+              name: "Organization Recruiter Name",
+            },
+          ]),
       {
         name: "Experience",
       },
@@ -2129,6 +1668,7 @@ export default function Tables() {
     ];
 
     var table_data = requirementsData.map((item, index) => {
+
       return [
         <>
           {currerntPage !== 0 ? 10 * currerntPage - 10 + index + 1 : index + 1}
@@ -2163,18 +1703,19 @@ export default function Tables() {
                 />
               </Tooltip>
               <Tooltip
-                title="Client Preview"
+                title={decode.companyType ==="COMPANY"? "Project Preview":"Client Preview"}
                 placement="bottom"
                 aria-label="view"
               >
                 <DescriptionIcon
                   className={classes.toolIcon}
                   onClick={(e) => {
-                    history.push(`requirements_Candidate?requirementId=${item.id}`);
+                    history.push(
+                      `requirements_Candidate?requirementId=${item.id}`,
+                    );
                   }}
                 />
               </Tooltip>
-
             </Grid>
           </Grid>
         </>,
@@ -2183,7 +1724,11 @@ export default function Tables() {
         </>,
         <>{item.recruiter.firstName + " " + item.recruiter.lastName} </>,
         <>{item.client.clientName + " (" + item.client.uniqueId + ")"} </>,
-        item.orgRecruiter.name,
+        ...(decode.companyType === "COMPANY"
+        ? []
+        : [
+          item.orgRecruiter.name
+          ]),
         item.experience,
         item.skills,
         item.jobLocation,
@@ -2215,16 +1760,19 @@ export default function Tables() {
       },
 
       {
-        name: "Clients Name",
+        name: decode.companyType === "COMPANY" ? "Project Name" : "Client Name",
       },
-      {
-        name: "Organization Recruiter Name",
-      },
-
+      ...(decode.companyType === "COMPANY"
+        ? []
+        : [
+            {
+              name: "Organization Recruiter Name",
+            },
+          ]),
       {
         name: "Experience",
       },
-      
+
       {
         name: "Location ",
       },
@@ -2237,6 +1785,8 @@ export default function Tables() {
     ];
 
     table_data = requirementsData.map((item, index) => {
+   
+
       return [
         <>
           {currerntPage !== 0 ? 10 * currerntPage - 10 + index + 1 : index + 1}
@@ -2275,9 +1825,13 @@ export default function Tables() {
         </>,
         <>{item.requirementName + " (" + item.uniqueId + ")"}</>,
         <>{item.client.clientName + " (" + item.client.uniqueId + ")"} </>,
-        item.orgRecruiter.name,
+        ...(decode.companyType === "COMPANY"
+        ? []
+        : [
+          item.orgRecruiter.name
+          ]),
         item.experience,
-        
+
         item.jobLocation,
         item.statusList ? (
           <Switch
@@ -2335,7 +1889,6 @@ export default function Tables() {
                 setState({ ...state, right: true });
               }}
             >
-              
               Add
             </Button>
           </div>
@@ -2369,7 +1922,12 @@ export default function Tables() {
                   ? option.firstName + " " + option.lastName + " (You)"
                   : option.employeeId === ""
                   ? option.firstName + " " + option.lastName + " "
-                  : option.firstName + " " + option.lastName + " (" + option.employeeId + ")"
+                  : option.firstName +
+                    " " +
+                    option.lastName +
+                    " (" +
+                    option.employeeId +
+                    ")"
               }
               // size="small"
               value={recruiterId}
@@ -2378,7 +1936,7 @@ export default function Tables() {
                 <TextField
                   {...params}
                   name="recruiterId"
-                  label="Client Coordinator"
+                  label={decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator"}
                   InputLabelProps={{ shrink: true }}
                   type="text"
                   size="small"
@@ -2419,7 +1977,6 @@ export default function Tables() {
             defaultValue={fromDate}
             onChange={handleFromDateChange}
             className={classes.filterWidth}
-            
           />
 
           <TextField
@@ -2431,14 +1988,13 @@ export default function Tables() {
             defaultValue={toDate}
             onChange={handleToDateChange}
             className={classes.filterWidth}
-            
           />
 
           <div className={classes.buttons}>
             <Button
               variant="contained"
               size="small"
-              color="primary" 
+              color="primary"
               type="submit"
             >
               Search
@@ -2468,11 +2024,11 @@ export default function Tables() {
               download: false,
               print: false,
               customToolbar: () => <HeaderElements />,
-              responsive: mobileQuery===true? 'vertical' : 'standard',
+              responsive: mobileQuery === true ? "vertical" : "standard",
               textLabels: {
                 body: {
-                  noMatch: 'Oops! Matching record could not be found',
-                }
+                  noMatch: "Oops! Matching record could not be found",
+                },
               },
             }}
             columns={table_column}
@@ -2508,33 +2064,37 @@ export default function Tables() {
           <Grid container direction="row" spacing={2}>
             <div className={classes.heading + " " + classes.inputRoot}>
               <Typography variant="subtitle2" className={classes.inputRoot}>
-                
                 JD
               </Typography>
               <div className={classes.drawerClose}>
-                <CloseIcon className={classes.closeBtn} onClick={handleModalClose} />
+                <CloseIcon
+                  className={classes.closeBtn}
+                  onClick={handleModalClose}
+                />
               </div>
             </div>
             <div className={classes.iframediv}>
-            <iframe
-              src={
-                "https://docs.google.com/a/umd.edu/viewer?url=" +
-                requirementsEdit?.jd +
-                "&embedded=true"
-              }
-              title="File"
-              width="100%"
-              height="500"
-            >
-              
-            </iframe>
+              <iframe
+                src={
+                  "https://docs.google.com/a/umd.edu/viewer?url=" +
+                  requirementsEdit?.jd +
+                  "&embedded=true"
+                }
+                title="File"
+                width="100%"
+                height="500"
+              ></iframe>
 
-            <div className={classes.iframeLogo} > 
-</div>
-      </div>
+              <div className={classes.iframeLogo}></div>
+            </div>
 
             <div className={classes.sendWhatsapp + " " + classes.inputRoot}>
-              <Button variant="contained" size="small"  color="secondary" onClick={handleModalClose}>
+              <Button
+                variant="contained"
+                size="small"
+                color="secondary"
+                onClick={handleModalClose}
+              >
                 Close
               </Button>
             </div>
@@ -2542,11 +2102,9 @@ export default function Tables() {
         </DialogContent>
       </Dialog>
 
-
       <Backdrop className={classes.backdrop} open={loader}>
         <CircularProgress color="inherit" />
       </Backdrop>
     </>
   );
 }
-

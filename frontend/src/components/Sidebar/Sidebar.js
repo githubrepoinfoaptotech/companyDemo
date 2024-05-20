@@ -185,15 +185,15 @@ function Sidebar({ location }) {
     },
     {
       id: 2,
-      label: "Clients",
-      link: "/app/clients",
+      label: decode.companyType === "COMPANY"? "Projects" :"Clients",
+      link: decode.companyType === "COMPANY"? "/app/projects" :"/app/clients",
       view: true,
       icon: (
-        <Tooltip title="Clients" placement="right">
+        <Tooltip title={decode.companyType === "COMPANY"? "Projects" :"Clients"} placement="right">
           <IconButton>
             <img
               src={clients}
-              alt="clients"
+              alt={decode.companyType === "COMPANY"? "Projects" :"Clients"}
               className={classNames(classes.Icon1)}
             />
           </IconButton>
@@ -286,23 +286,23 @@ function Sidebar({ location }) {
     //     </Tooltip>
     //   ),
     // },
-    {
-      id: 7,
-      label: "Resume Parsing",
-      link: "/app/resume_search",
-      view: true,
-      icon: (
-        <Tooltip title="Resume Parsing" placement="right">
-          <IconButton>
-            <img
-              src={resumeSearch}
-              alt="resume_search"
-              className={classNames(classes.Icon1)}
-            />
-          </IconButton>
-        </Tooltip>
-      ),
-    },
+    // {
+    //   id: 7,
+    //   label: "Resume Parsing",
+    //   link: "/app/resume_search",
+    //   view: true,
+    //   icon: (
+    //     <Tooltip title="Resume Parsing" placement="right">
+    //       <IconButton>
+    //         <img
+    //           src={resumeSearch}
+    //           alt="resume_search"
+    //           className={classNames(classes.Icon1)}
+    //         />
+    //       </IconButton>
+    //     </Tooltip>
+    //   ),
+    // },
     {
       id: 8,
       label: "Chat",
@@ -340,7 +340,7 @@ function Sidebar({ location }) {
       subMenu: [
         {
           id: 0,
-          label: "Submitted to Client",
+          label: decode.companyType === "COMPANY" ? "Submitted to Hiring Manager" : "Submitted to Client",
           link: "/app/reports/all_candidates_stc",
           icon: (
             <IconButton>
@@ -420,8 +420,8 @@ function Sidebar({ location }) {
         },
         {
           id: 8,
-          label: "Invoiced Candidates",
-          link: "/app/reports/all_candidates_invoiced",
+          label: decode.companyType === "COMPANY" ? "Vendor On-boarded Candidates" :"Invoiced Candidates",
+          link: decode.companyType === "COMPANY" ? "/app/reports/vendor_onboarded_candidates" : "/app/reports/all_candidates_invoiced" ,
           icon: (
             <IconButton>
               <ArrowLeftIcon />
@@ -798,7 +798,9 @@ function Sidebar({ location }) {
                     />
                   ))
                 : role === "ADMIN"
-                ? admin.map((link) => (
+                ? admin
+                  .filter((link) => decode.companyType !== "COMPANY" || link.label !== "Refo Billing")
+                  .map((link) => (
                     <SidebarLink
                       key={link.id}
                       location={location}
@@ -806,6 +808,7 @@ function Sidebar({ location }) {
                       {...link}
                     />
                   ))
+
                 : role === "RECRUITER"
                 ? recruiter.map((link) => (
                     <SidebarLink
