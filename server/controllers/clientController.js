@@ -48,6 +48,17 @@ exports.addClient = async (req, res) => {
                 aggEndDate:req.body.aggEndDate,
                 handlerId:req.body.handlerId
               };
+              const cliunidata = await client.findOne({
+                where: { mainId: req.mainId },
+                order: [["clientInt", "DESC"]],
+              });
+              if (cliunidata) {
+                myclient.clientInt = Number(cliunidata.clientInt) + 1;
+                myclient.clientText = "PROJ";
+              } else {
+                myclient.clientInt = 1001;
+                myclient.clientText = "PROJ";
+              }
             }
             else
             {
@@ -62,19 +73,20 @@ exports.addClient = async (req, res) => {
                 aggStartDate:req.body.aggStartDate,
                 aggEndDate:req.body.aggEndDate
               };
+              const cliunidata = await client.findOne({
+                where: { mainId: req.mainId },
+                order: [["clientInt", "DESC"]],
+              });
+              if (cliunidata) {
+                myclient.clientInt = Number(cliunidata.clientInt) + 1;
+                myclient.clientText = "CLI";
+              } else {
+                myclient.clientInt = 1001;
+                myclient.clientText = "CLI";
+              }
             }
           
-          const cliunidata = await client.findOne({
-            where: { mainId: req.mainId },
-            order: [["clientInt", "DESC"]],
-          });
-          if (cliunidata) {
-            myclient.clientInt = Number(cliunidata.clientInt) + 1;
-            myclient.clientText = "CLI";
-          } else {
-            myclient.clientInt = 1001;
-            myclient.clientText = "CLI";
-          }
+          
           myclient.uniqueId = `${myclient.clientText}${myclient.clientInt}`;
           await client.create(myclient).then(async (client_data) => {
             if(req.body.levelOfHiring.length>0)
@@ -130,7 +142,7 @@ exports.addClient = async (req, res) => {
 exports.sendApprovalMail=async(req,res)=>{
   try
   {
-    var c_data=client.findOne({where:{id:req.body.id}});
+    var c_data=await client.findOne({where:{id:req.body.id}});
     await c_data.update({
       token:c_data.id
     });
@@ -140,6 +152,7 @@ exports.sendApprovalMail=async(req,res)=>{
   }
   catch(e)
   {
+  console.log(e);
     res.status(500).json({status:false,message:"Error"});
   }
 };
@@ -158,7 +171,8 @@ exports.approveClient=async(req,res)=>{
 exports.checkApprovalValidity=async(req,res)=>{
   try
   {
-    c_data=await client.findOne({ where: { id: req.body.clientId } });
+  console.log("infetch");
+    c_data=await client.findOne({ where: { id: req.body.clientId } ,include:[{model:recruiter,attributes:['firstName','lastName']}]});
     if((c_data&&c_data.token!=""))
       {
         var ordrec_data= await orgRecruiter.findAll({ where: {clientId:req.body.clientId},order:[['createdAt','DESC']]});
@@ -175,6 +189,7 @@ exports.checkApprovalValidity=async(req,res)=>{
   }
   catch(e)
   {
+  console.log(e);
     res.status(500).json({status:false,message:"Error"});
   }
 };
@@ -332,7 +347,8 @@ exports.addHiringLevel = async(req,res)=>{
         .create({
           name:name,
           clientId:clientId,
-          noOfHires:noOfHires
+          noOfHires:noOfHires,
+          mainId:req.mainId
         });  
         res.status(200).json({ message: "Successfully Created A Hiring Level",status:true});
      }   
@@ -343,16 +359,34 @@ exports.addHiringLevel = async(req,res)=>{
 };
 
 exports.editHiringLevel=async(req,res)=>{
-
-  const { name,noOfHires,clientId } = req.body;
-  await orgRecruiter.findOne({ where: { id: req.body.id,mainId: req.mainId } }).then(async (data) => {
-    data.name=name;
-    data.noOfHires=noOfHires;
-    await data.update();
-  }).catch(e=>{
-    console.log(e);
-    res.status(500).json({ status: false, message: "Error" });
-  });
+  const { name,noOfHires,id } = req.body;
+  var isName=await levelOfHiring.findOne({ where: { name:req.body.name } });
+  if(!isName)
+    {
+      levelOfHiring.findOne({ where: { id,mainId: req.mainId } }).then(async (data) => {
+    
+        if(data){
+        
+        data.name=name;
+        data.noOfHires=noOfHires;
+        data.save().then(()=>{
+        
+         res.status(200).json({data,"status":true});
+        })
+        }else{
+          res.status(200).json({message:"There is no data","status":false});
+        }
+        
+      }).catch(e=>{
+        console.log(e);
+        res.status(500).json({ status: false, message: "Error" });
+      });
+    }
+    else
+    {
+      res.status(200).json({message:"Name Already Exist","status":false});
+    }
+ 
 };
 
 exports.addOrgRecruiter = async (req, res) => {
@@ -468,8 +502,9 @@ exports.getAllClientList=async(req,res)=>{
   });
 };
 exports.getOrganisationReciruterList=async(req,res)=>{
-  orgRecruiter.findAll({where:{clientId:req.body.id,mainId:req.mainId,isActive:true},attributes:['id','name']}).then(data=>{
-    res.status(200).json({status:true,data:data});
+  await orgRecruiter.findAll({where:{clientId:req.body.id,mainId:req.mainId,isActive:true},attributes:['id','name']}).then(async data=>{
+    lvlHrData=await levelOfHiring.findAll({where:{clientId:req.body.id,mainId:req.mainId},attributes:['id','name']});
+    res.status(200).json({status:true,data:data,lvlHrData:lvlHrData});
   }).catch(e=>{
     res.status(500).json({ status: false, message: "Error" });
   });
