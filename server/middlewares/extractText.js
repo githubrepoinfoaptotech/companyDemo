@@ -122,8 +122,8 @@ exports.textExtract = async function (req, res, next) {
                 //console.log('Extracted Text:', text);
                 // Attach extracted text to req.body
                 //console.log(req.file)
-                req.body.extractedText = text;
-                req.body.fileName=req.file.originalname;
+                // req.body.extractedText = text;
+                // req.body.fileName=req.file.originalname;
                 var candidate_email =  text.match(
                     /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi
                   ); //For 
@@ -131,7 +131,7 @@ exports.textExtract = async function (req, res, next) {
                     /(\+?\d{10})\b/
                   );
                 req.body.candidate_email=candidate_email;
-                req.body.candidate_mobile=candidate_mobilel;
+                req.body.candidate_mobile=candidate_mobile;
                 fs.unlinkSync(req.file.path);
                 res.status(200).json({data:req.body,status:true});
             } catch (extractionError) {
