@@ -129,8 +129,8 @@ const clients=sequelize.define("clients",{
 );
 clients.belongsTo(Recruiter);
 Recruiter.hasMany(clients);
-clients.belongsTo(Recruiter, { foreignKey: 'handlerId', targetKey: 'id' });
-Recruiter.hasMany(clients, { foreignKey: 'handlerId', sourceKey: 'id' });
+clients.belongsTo(Recruiter, {as:"handler",foreignKey: 'handlerId', targetKey: 'id' });
+Recruiter.hasMany(clients, {as:"handler", foreignKey: 'handlerId', sourceKey: 'id' });
 statusList.hasMany(clients, { foreignKey: 'statusCode' });
 clients.belongsTo(statusList, { foreignKey: 'statusCode', targetKey:'statusCode' });
 

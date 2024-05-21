@@ -81,10 +81,10 @@ exports.addAdmin = async (req, res) => {
             companyAddress:companyAddress
           });
           await data.update({ mainId: data.id });
-          if(company_type=="COMPANY")
-            {
-              await autoAddTheClient(req.body,rec_data,data.id);
-            }
+          // if(company_type=="COMPANY")
+          //   {
+          //     await autoAddTheClient(req.body,rec_data,data.id);
+          //   }
           await Source.create(
             {
                 mainId: data.id,
@@ -381,7 +381,7 @@ exports.viewAllAdmin = async (req, res) => {
 exports.editUser = async (req, res) => {
   try {
     console.log(req.body);
-    const { id, firstName, lastName, mobile, email, roleName, employeeId,companyName } = req.body;
+    const { id, firstName, lastName, mobile, email, roleName, employeeId,companyName,headOfficeLocation,branchOfficeLocation,capabilities,recruiterCapacity } = req.body;
     await recruiter.findOne({ where: { userId: id, mainId: req.mainId }, include: [user] }).then(async data => {
       if (data.user.email == req.body.email) {
         await user.update({
@@ -392,7 +392,11 @@ exports.editUser = async (req, res) => {
           lastName: lastName,
           mobile: mobile,
           employeeId: employeeId,
-          companyName:companyName
+          companyName:companyName,
+          headOfficeLocation:headOfficeLocation,
+          branchOfficeLocation:branchOfficeLocation,
+          capabilities:capabilities,
+          recruiterCapacity:recruiterCapacity
         });
         res.status(200).json({ message: "Edited Sucessfully", status: true });
       } else {
@@ -410,7 +414,12 @@ exports.editUser = async (req, res) => {
               lastName: lastName,
               mobile: mobile,
               employeeId: employeeId,
-              companyName:companyName
+              companyName:companyName,
+              headOfficeLocation:headOfficeLocation,
+              branchOfficeLocation:branchOfficeLocation,
+              capabilities:capabilities,
+              recruiterCapacity:recruiterCapacity
+
             });
             res.status(200).json({ message: "Edited Sucessfully", status: true });
           }
@@ -691,7 +700,7 @@ exports.viewAllUsers = async (req, res) => {
 exports.viewUser = async (req, res) => {
   try {
     await user.findOne({
-      where: { id: req.body.id, mainId: req.mainId }, attributes: ['email', 'roleName', 'isActive'],
+      where: { id: req.body.id, mainId: req.mainId }, attributes: ['email', 'roleName','isActive'],
       include: [{
         model: recruiter
       }],

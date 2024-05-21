@@ -130,8 +130,14 @@ exports.textExtract = async function (req, res, next) {
                 var candidate_mobile = text.match(
                     /(\+?\d{10})\b/
                   );
-                req.body.candidate_email=candidate_email;
-                req.body.candidate_mobile=candidate_mobile;
+                if(candidate_email)
+                    {
+                        req.body.candidate_email=candidate_email[0];
+                    }
+                if(candidate_mobile)
+                    {
+                        req.body.candidate_email=candidate_mobile[0];
+                    }
                 fs.unlinkSync(req.file.path);
                 res.status(200).json({data:req.body,status:true});
             } catch (extractionError) {

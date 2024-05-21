@@ -21,6 +21,8 @@ const e = require("express");
 exports.addRequirement = async (req, res) => {
   try{
   var client_data=await client.findOne({where:{id:req.body.clientId,mainId:req.mainId}});
+  let ord_data;
+  let rec_data;
   if(client_data){
     var myreq;
     if(req.companyType="COMPANY")
@@ -42,7 +44,14 @@ exports.addRequirement = async (req, res) => {
         levelOfHiringId:req.body.levelOfHiringId,
         createdBy:req.userId
       };
+      ord_data=await orgRecruiter.findOne({where:{id:req.body.orgRecruiterId,mainId:req.mainId}});
+      rec_data=await recruiter.findOne({where:{email:ord_data.email,mainId:req.mainId}});
+      
+
+
+
       }
+      
     else
     {
       myreq = {
@@ -74,7 +83,17 @@ exports.addRequirement = async (req, res) => {
       myreq.requirementText = "REQ";
     }
     myreq.uniqueId = `${myreq.requirementText}${myreq.requirementInt}`;
-    await requirements.create(myreq).then((data) => {
+    await requirements.create(myreq).then(async (data) => {
+      var isAssigned=await assignedRequirements.findOne({where:{recruiterId:rec_data.id,requirementId:req.body.requirementId,mainId:req.mainId}});
+      if(!isAssigned)
+        {
+          await assignedRequirements.create({
+            recruiterId:rec_data.id,//towho(req.body.)
+            assignedBy:req.recruiterId,//bywho(req.)
+            mainId:req.mainId,
+            requirementId:req.body.requirementId
+          });
+        }
       res
         .status(200)
         .json({ status: true, message: "Requirement Added Successfully",requirementId:data.dataValues.id });
@@ -382,7 +401,7 @@ exports.requirementList=async(req,res)=>{
 };
 
 exports.getAllRequirementList=async(req,res)=>{
-
+  
   await requirements.findAll({where:{mainId:req.mainId},attributes:['id','requirementName','uniqueId']}).then(data=>{
     res.status(200).json({ status: true, data: data });
   }).catch(e=>{

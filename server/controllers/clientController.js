@@ -182,9 +182,10 @@ exports.sendApprovalMail=async(req,res)=>{
     var otpData=await generateOTP();
     await c_data.update({
       token:c_data.id,
-      otp:otpData
+      otp:otpData,
+      approved:null
     });
-    var data={name:req.body.name,email:req.body.email,content:req.body.content,url:`https://refo.app/v1/#/approvalMail?approval_id=${req.body.id}`};
+    var data={name:req.body.name,email:req.body.email,designation:req.body.designation,content:req.body.content,url:`https://refo.app/v1/#/approvalMail?approval_id=${req.body.id}`};
     await mailFunction.sendProjectApproval(data);
     var content=`To complete the verification process for the project ${c_data.clientName}(${c_data.uniqueId}), please use the OTP below:`;
     var otp_data={name:req.body.name,email:req.body.email,content:content,otp:otpData.value};
@@ -224,39 +225,58 @@ exports.resendOtp=async(req,res)=>{
 exports.approveClient=async(req,res)=>{
   try
   {
-    await client.update({approved:req.body.approved,token:""},{where:{id:req.body.clientId}});
-    res.status(200).json({status:true,message:"Successfully Updated"});
+    await client.update({approved:req.body.approved,token:"",otp:""},{where:{id:req.body.clientId}});
+    res.status(200).json({status:true,message:"Successfully Updated",approved:req.body.approved});
   }
   catch(e)
   {
     res.status(500).json({status:false,message:"Error"});
   }
 };
+
 exports.checkApprovalValidity=async(req,res)=>{
   try
   {
-    c_data=await client.findOne({ where: { id: req.body.clientId } ,include:[{model:recruiter,attributes:['firstName','lastName']}]});
-    const otp = c_data.otp;
-    const validity = new Date(otp.validity);
-    const currentTime = new Date(); 
-    if(currentTime <= validity){
-      if((c_data&&c_data.token!=""))
-        {
-          var ordrec_data= await orgRecruiter.findAll({ where: {clientId:req.body.clientId},order:[['createdAt','DESC']]});
-          var levelOfHiring_data= await levelOfHiring.findAll({ where: {clientId:req.body.clientId},order:[['createdAt','DESC']]});
-          res.status(200).json({status:true,c_data:c_data,ordrec_data:ordrec_data,levelOfHiring_data:levelOfHiring_data});
+    c_data=await client.findOne({ where: { id: req.body.clientId } ,include: [
+      { model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+      { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }
+    ]});
+    if(c_data.approved==null)
+      {
+    if(c_data.otp.value==req.body.otp)
+      {
+
+        const otp = c_data.otp;
+        const validity = new Date(otp.validity);
+        const currentTime = new Date(); 
+        if(currentTime <= validity){
+          if((c_data&&c_data.token!=""))
+            {
+              var ordrec_data= await orgRecruiter.findAll({ where: {clientId:req.body.clientId},order:[['createdAt','DESC']]});
+              var levelOfHiring_data= await levelOfHiring.findAll({ where: {clientId:req.body.clientId},order:[['createdAt','DESC']]});
+              res.status(200).json({status:true,c_data:c_data,ordrec_data:ordrec_data,levelOfHiring_data:levelOfHiring_data});
+            }
+            else
+            {
+              var ordrec_data= await orgRecruiter.findAll({ where: {clientId:req.body.clientId},order:[['createdAt','DESC']]});
+              var levelOfHiring_data= await levelOfHiring.findAll({ where: {clientId:req.body.clientId},order:[['createdAt','DESC']]});
+              res.status(200).json({status:false,c_data:c_data,ordrec_data:ordrec_data,levelOfHiring_data:levelOfHiring_data});
+            }
         }
         else
         {
-          var ordrec_data= await orgRecruiter.findAll({ where: {clientId:req.body.clientId},order:[['createdAt','DESC']]});
-          var levelOfHiring_data= await levelOfHiring.findAll({ where: {clientId:req.body.clientId},order:[['createdAt','DESC']]});
-          res.status(200).json({status:false,c_data:c_data,ordrec_data:ordrec_data,levelOfHiring_data:levelOfHiring_data});
+          res.status(200).json({status:false,message:"Otp Has expired"});
         }
-    }
-    else
-    {
-      res.status(200).json({status:false,message:"Otp Has expired"});
-    }
+      }
+        else
+      {
+        res.status(200).json({status:false,message:"Otp Mismatch"});
+      }
+      }
+      else
+      {
+        res.status(200).json({status:false,message:"This Session has already been submitted!",approved:c_data.approved});
+      }
   }
   catch(e)
   {

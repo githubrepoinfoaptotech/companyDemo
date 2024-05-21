@@ -28,7 +28,7 @@ route.post("/getEditOrganisationReciruterList",check_auth_CC,ClientController.ge
 route.post("/resetStatus",check_auth_CC,candidateController.resetStatus);
 route.post("/updateRequirementJd",check_auth_CC,filefunctions.jdUpload,requirementController.updateRequirementJd);
 route.post("/sendApprovalMail",check_auth_CC,ClientController.sendApprovalMail);
-route.post("/checkIsApproved",check_auth_mail,ClientController.approveClient);
+route.post("/approveClient",check_auth_mail,ClientController.approveClient);
 route.post("/checkApprovalValidity",check_auth_mail,ClientController.checkApprovalValidity);
 route.post("/addHiringLevel",check_auth_CC,validation.addHiringLevelValidation,ClientController.addHiringLevel);
 route.post("/editHiringLevel",check_auth_CC,validation.editHiringLevelValidation,ClientController.editHiringLevel);

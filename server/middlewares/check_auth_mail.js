@@ -8,12 +8,12 @@ module.exports = async (req,res,next) => {
     
    try { 
         
-        if (!req.headers['token']){
+        if (!req.headers['Token']){
             return res.status(403).send({ 
                 auth: false, message: 'No token provided.' 
             });
         }
-        req.body.clientId =  req.headers['token'];
+        req.body.clientId =  req.headers['Token'];
         next();
     }   
     catch(err){
