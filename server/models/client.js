@@ -33,7 +33,7 @@ const clients=sequelize.define("clients",{
         allowNull:true
     },
     approved:{
-        type:Sequelize.BOOLEAN,
+        type:Sequelize.STRING,
         allowNull:true
     },
     billable:{

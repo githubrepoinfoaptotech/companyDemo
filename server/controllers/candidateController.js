@@ -843,7 +843,7 @@ exports.viewAllCanditates = async (req, res) => {
     var page = req.body.page;
     var limit = 50;
     var mywhere = { mainId: req.mainId };
-
+    reqWhere={};
     if (req.body.fromDate && req.body.toDate) {
       const fromDate = moment(req.body.fromDate).startOf("day").toISOString();
       const toDate = moment(req.body.toDate).endOf("day").toISOString();
@@ -855,7 +855,7 @@ exports.viewAllCanditates = async (req, res) => {
       mywhere.requirementId=req.body.requirementId;
     }
     // if(req.body.clientId){
-    //   mywhere["$requirement.client.id$"]=req.body.clientId;
+    //   reqWhere.clientId=req.body.clientId;
     // }
     if (req.body.search && req.body.search != "") {
       mywhere[Op.or] = [
@@ -877,6 +877,7 @@ exports.viewAllCanditates = async (req, res) => {
     if (req.body.recruiterId) {
       mywhere.recruiterId = req.body.recruiterId;
     }
+    console.log(mywhere);
     if (req.body.fileDownload) {
       await candidate
         .findAll({
@@ -915,7 +916,8 @@ exports.viewAllCanditates = async (req, res) => {
             
             {
               model: requirement,
-              attributes: ["requirementName", "uniqueId"],
+              attributes: ["requirementName", "uniqueId","clientId"],
+              //where:reqWhere,
               include: [
                 {
                   model: statusCode,
@@ -924,7 +926,8 @@ exports.viewAllCanditates = async (req, res) => {
                 {
                   model: client,
                   attributes: ["clientName",'id'],
-                  include: [{ model: statusCode, attributes: ["statusName"] }],
+                  include: [{ model: statusCode, attributes: ["statusName"] },{ model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+                  { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }],
                 },
                 {
                   model: recruiter,
@@ -1042,6 +1045,7 @@ exports.viewAllCanditates = async (req, res) => {
             {
               model: requirement,
               attributes: ["requirementName", "uniqueId"],
+              //where:reqWhere,
               include: [
                 {
                   model: statusCode,
@@ -1050,7 +1054,8 @@ exports.viewAllCanditates = async (req, res) => {
                 {
                   model: client,
                   attributes: ["clientName"],
-                  include: [{ model: statusCode, attributes: ["statusName"] }],
+                  include: [{ model: statusCode, attributes: ["statusName"] },{ model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+                  { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }],
                 },
                 {
                   model: recruiter,
@@ -1183,6 +1188,8 @@ exports.viewCandidate = async (req, res) => {
                     model: statusCode,
                     attributes: ["statusCode", "statusName"],
                   },
+                  { model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+          { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }
                 ],
               },
               {
@@ -1311,7 +1318,8 @@ exports.myCandidates = async (req, res) => {
               {
                 model: client,
                 attributes: ["clientName"],
-                include: [{ model: statusCode, attributes: ["statusName","statusCode"] }],
+                include: [{ model: statusCode, attributes: ["statusName","statusCode"] },{ model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+                { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }],
               },
               {
                 model: recruiter,
@@ -1673,7 +1681,8 @@ exports.invoicedCandidates = async (req, res) => {
               {
                 model: client,
                 attributes: ["clientName"],
-                include: [{ model: statusCode, attributes: ["statusName"] }],
+                include: [{ model: statusCode, attributes: ["statusName"] },{ model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+                { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }],
               },
               {
                 model: recruiter,
@@ -1742,7 +1751,8 @@ exports.invoicedCandidates = async (req, res) => {
               {
                 model: client,
                 attributes: ["clientName", "id", "uniqueId"],
-                include: [{ model: statusCode, attributes: ["statusName"] }],
+                include: [{ model: statusCode, attributes: ["statusName"] },{ model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+                { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }],
               },
             ],
           },
@@ -1917,6 +1927,8 @@ exports.getMonthlyData = async (req, res) => {
                   model: statusCode,
                   attributes: ["statusName"],
                 },
+                { model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+          { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }
               ],
             },
           ],
@@ -1998,7 +2010,8 @@ exports.candidateReports = async (req, res) => {
             {
               model: client,
               attributes: ["clientName", "id", "uniqueId"],
-              include: [{ model: statusCode, attributes: ["statusName"] }],
+              include: [{ model: statusCode, attributes: ["statusName"] },{ model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+              { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }],
             },
             {
               model: recruiter,
@@ -2387,7 +2400,8 @@ exports.getAllDropedCandidate = async (req, res) => {
                 {
                   model: client,
                   attributes: ["clientName", "id", "uniqueId"],
-                  include: [{ model: statusCode, attributes: ["statusName"] }],
+                  include: [{ model: statusCode, attributes: ["statusName"] },{ model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+                  { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }],
                 },
                 {
                   model: recruiter,
@@ -2813,7 +2827,8 @@ exports.singleCandidateSearch = async (req, res) => {
               {
                 model: client,
                 attributes: ["clientName"],
-                include: [{ model: statusCode, attributes: ["statusName"] }],
+                include: [{ model: statusCode, attributes: ["statusName"] },{ model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+                { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }],
               },
               {
                 model: recruiter,
@@ -2892,7 +2907,8 @@ exports.singleMyCandidateSearch = async (req, res) => {
               {
                 model: client,
                 attributes: ["clientName"],
-                include: [{ model: statusCode, attributes: ["statusName"] }],
+                include: [{ model: statusCode, attributes: ["statusName"] },{ model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+                { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }],
               },
               {
                 model: recruiter,
@@ -3143,7 +3159,7 @@ else{
 exports.sendCPVLink=async(req,res)=>{
   try{
     var myCandidate=await candidate.findOne({where:{id:req.body.candidateId},include:[{model:candidateDetails,attributes:['email','firstName','lastName']},{model:requirement,include:[{model:clients,attributes:['clientName']}]}]});
-    var cpv_url = `${process.env.prodUrl}/candidateCPV?candidateId=${req.body.candidateId}`; 
+    var cpv_url = `${process.env.prodUrl}#/candidateCPV?candidateId=${req.body.candidateId}`; 
     var mailOptions = {
       from: '<no-reply@refo.app>',
       // to:"vishallegend7775@gmail.com",

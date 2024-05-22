@@ -4,7 +4,7 @@ const recruiter=require("../models/recruiter");
 
 exports.viewCandidateNotes=async(req,res)=>{
     try{
-        const can_notes=await candidateNotes.findAll({where:{candidateId:req.body.candidateId},include:[candaidate,recruiter],order:[['createdAt','ASC']]});
+        const can_notes=await candidateNotes.findAll({where:{candidateId:req.body.candidateId},include:[candaidate,recruiter,{ model: recruiter, as: 'approver',attributes:['firstName','lastName']}],order:[['createdAt','ASC']]});
         res.status(200).json({status:true,data:can_notes});
     }
     catch(err){
@@ -27,13 +27,13 @@ exports.addCandidateNotes=async(req,res)=>{
 };
 
 exports.approveNotes=async(req,res)=>{
-    await candidateNotes.findOne({where:{id:req.body.id,recruiterId:req.recruiterId}}).then(async data=>{
+    await candidateNotes.findOne({where:{id:req.body.id}}).then(async data=>{
         if(data){
             data.update({
-                approve:req.body.approve,
+                approve:true,
                 approvedBy:req.recruiterId
             });
-            res.status(200).json({status:true,message:"Note Approved"});
+            res.status(200).json({status:true,message:"Approved"});
         }
         else{
             res.status(200).json({status:false,message:"Invalid Action"});

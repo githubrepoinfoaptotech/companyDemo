@@ -183,7 +183,7 @@ exports.sendApprovalMail=async(req,res)=>{
     await c_data.update({
       token:c_data.id,
       otp:otpData,
-      approved:null
+      approved:""
     });
     var data={name:req.body.name,email:req.body.email,designation:req.body.designation,content:req.body.content,url:`https://refo.app/v1/#/approvalMail?approval_id=${req.body.id}`};
     await mailFunction.sendProjectApproval(data);
@@ -207,7 +207,8 @@ exports.resendOtp=async(req,res)=>{
     var otpData=await generateOTP();
       await c_data.update({
         token:c_data.id,
-        otp:otpData
+        otp:otpData,
+        approved:""
       });
     var content=`To complete the verification process for the project ${c_data.clientName}(${c_data.uniqueId}), please use the OTP below:`;
     var otp_data={name:req.body.name,email:req.body.email,content:content,otp:otpData.value};
@@ -241,7 +242,7 @@ exports.checkApprovalValidity=async(req,res)=>{
       { model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
       { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }
     ]});
-    if(c_data.approved==null)
+    if(!c_data.approved)
       {
     if(c_data.otp.value==req.body.otp)
       {
@@ -272,7 +273,7 @@ exports.checkApprovalValidity=async(req,res)=>{
       {
         res.status(200).json({status:false,message:"Otp Mismatch"});
       }
-      }
+    }
       else
       {
         res.status(200).json({status:false,message:"This Session has already been submitted!",approved:c_data.approved});
@@ -405,10 +406,14 @@ exports.viewAllClients = async (req, res) => {
 };
 exports.viewClient = async (req, res) => {
   client
-    .findOne({ where: { id: req.body.id,mainId:req.mainId },include:[{
+    .findOne({ where: { id: req.body.id,mainId:req.mainId },include:[
+      {
       model:statusCode,
       attributes:['statusName','id']
-     }]})
+      },
+      { model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+      { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }
+    ]})
     .then(async (data) => {
       if (data) {
        var ordrec_data= await orgRecruiter.findAll({ where: {clientId:req.body.id},order:[['createdAt','DESC']]});
@@ -475,7 +480,32 @@ exports.editHiringLevel=async(req,res)=>{
     }
     else
     {
-      res.status(200).json({message:"Name Already Exist","status":false});
+      if(isName.id==req.body.id)
+        {
+          levelOfHiring.findOne({ where: { id,mainId: req.mainId } }).then(async (data) => {
+    
+            if(data){
+            
+            data.name=name;
+            data.noOfHires=noOfHires;
+            data.save().then(()=>{
+            
+             res.status(200).json({data,"status":true});
+            })
+            }else{
+              res.status(200).json({message:"There is no data","status":false});
+            }
+            
+          }).catch(e=>{
+            console.log(e);
+            res.status(500).json({ status: false, message: "Error" });
+          });
+        }
+        else
+        {
+          res.status(200).json({message:"Name Already Exist","status":false});
+        }
+      
     }
  
 };

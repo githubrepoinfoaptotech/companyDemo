@@ -64,6 +64,7 @@ route.post("/updateStcStatus",check_auth,candidateController.updateStcStatus);
 route.post("/candidateExist",check_auth,candidateController.candidateExist);
 route.post("/getAssignedRequierments",check_auth,requirementController.getAssignedRequierments);
 route.post("/myAssignedRequirements",check_auth,requirementController.myAssignedRequirements);
+route.post("/myassignedRequirementsList",check_auth,requirementController.myassignedRequirementsList);
 route.post('/getRequirement',check_auth,requirementController.viewRequirement);
 route.post('/reuseCandidate',check_auth,candidateController.reuseCandidate);
 route.post('/checkEmailExist',check_auth,candidateController.checkEmailExist);

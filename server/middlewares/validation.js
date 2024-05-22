@@ -105,7 +105,11 @@ exports.editOrgRecValidation=async(req,res,next)=>{
 exports.addHiringLevelValidation=async(req,res,next)=>{
     const addOrgSchema= Joi.object({
         name:Joi.string().required(),
-        noOfHires:Joi.number().required(),
+        noOfHires:Joi.number().required().messages({
+            'number.base': 'Number of hires should be a type of number',
+            'number.empty': 'Number of hires is required',
+            'any.required': 'Number of hires is required'
+        }),
         clientId:Joi.string().required(),
     });
     compObj={
@@ -126,7 +130,11 @@ exports.editHiringLevelValidation=async(req,res,next)=>{
 
     const addOrgSchema= Joi.object({
         name:Joi.string().required(),
-        noOfHires:Joi.number().required(),
+        noOfHires:Joi.number().required().messages({
+            'number.base': 'Number of hires should be a type of number',
+            'number.empty': 'Number of hires is required',
+            'any.required': 'Number of hires is required'
+        }),
         id:Joi.string().required(),
     });
     compObj={

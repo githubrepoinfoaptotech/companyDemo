@@ -14,6 +14,7 @@ const levelOfHiring=require("../models/levelOfHiring");
 const { Op, col } = require("sequelize");
 const Sequelize = require("../db/db");
 const fn = Sequelize.fn;
+
 const candidate=require("../models/candidate");
 const e = require("express");
 //
@@ -45,11 +46,8 @@ exports.addRequirement = async (req, res) => {
         createdBy:req.userId
       };
       ord_data=await orgRecruiter.findOne({where:{id:req.body.orgRecruiterId,mainId:req.mainId}});
-      rec_data=await recruiter.findOne({where:{email:ord_data.email,mainId:req.mainId}});
-      
-
-
-
+      user_data=await user.findOne({where:{email:ord_data.email,mainId:req.mainId},include:[recruiter]});
+      console.log(user_data);
       }
       
     else
@@ -84,14 +82,14 @@ exports.addRequirement = async (req, res) => {
     }
     myreq.uniqueId = `${myreq.requirementText}${myreq.requirementInt}`;
     await requirements.create(myreq).then(async (data) => {
-      var isAssigned=await assignedRequirements.findOne({where:{recruiterId:rec_data.id,requirementId:req.body.requirementId,mainId:req.mainId}});
+      var isAssigned=await assignedRequirements.findOne({where:{recruiterId:user_data.recruiter.id,requirementId:data.id,mainId:req.mainId}});
       if(!isAssigned)
         {
           await assignedRequirements.create({
-            recruiterId:rec_data.id,//towho(req.body.)
+            recruiterId:user_data.recruiter.id,//towho(req.body.)
             assignedBy:req.recruiterId,//bywho(req.)
             mainId:req.mainId,
-            requirementId:req.body.requirementId
+            requirementId:data.id
           });
         }
       res
@@ -138,10 +136,16 @@ exports.viewAllRequirements = async (req, res) => {
     .findAll({
       distinct: true,
       where: mywhere,
+      attributes: [
+        '*',
+        [fn('COUNT', col('candidate.id')), 'candidateCount']
+      ],
       include:[
         {
           model:client,
-          attributes:['clientName','uniqueId']
+          attributes:['clientName','uniqueId'],
+          include:[ { model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+          { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }]
         },
         {
           model:orgRecruiter,
@@ -154,6 +158,10 @@ exports.viewAllRequirements = async (req, res) => {
         {
           model:statusList,
           attributes:["statusName"]
+        },
+        {
+          model:candidate,
+          
         }
       ],
    //   attributes:[''],
@@ -192,7 +200,9 @@ exports.viewAllRequirements = async (req, res) => {
       include:[
         {
           model:client,
-          attributes:['id','clientName','uniqueId']
+          attributes:['id','clientName','uniqueId'],
+          include:[ { model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+          { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }]
         },
         {
           model:orgRecruiter,
@@ -250,7 +260,9 @@ exports.myRequirements = async (req, res) => {
       include:[
         {
           model:client,
-          attributes:['id','clientName','uniqueId']
+          attributes:['id','clientName','uniqueId'],
+          include:[ { model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+          { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }]
         },
         {
           model:orgRecruiter,
@@ -285,7 +297,9 @@ exports.viewRequirement = async (req, res) => {
     .findOne({ where: { id: req.body.id },include:[
       {
         model:client,
-        attributes:['clientName','uniqueId']
+        attributes:['clientName','uniqueId'],
+        include:[ { model: recruiter, as: 'recruiter', attributes: ['id', 'firstName', 'lastName'] },
+          { model: recruiter, as: 'handler', attributes: ['id', 'firstName', 'lastName'] }]
       },
       {
         model:orgRecruiter,
@@ -737,3 +751,22 @@ exports.updateRequirementJd= async (req, res) => {
     });
 };
 
+exports.myassignedRequirementsList= async (req, res) => {
+  mywhere={};
+  if(req.roleName=="RECRUITER")
+    {
+      mywhere={recruiterId:req.recruiterId};
+    }
+    else
+    {
+      mywhere={mainId:req.mainId};
+    }
+  await assignedRequirements.findAndCountAll({where:mywhere,include:[{model:requirements,include:[orgRecruiter,client,statusList,recruiter]},{model:recruiter,attributes:['firstName','lastName']}], 
+  order:[['createdAt','DESC']]}).then(data=>{
+    console.log(data);
+    res.status(200).json({status:true,data:data.rows,count:data.count});
+  }).catch(e=>{
+    console.log(e);
+    res.status(500).json({status:false,message:"ERROR"});
+  });
+};

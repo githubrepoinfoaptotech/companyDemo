@@ -381,7 +381,7 @@ exports.viewAllAdmin = async (req, res) => {
 exports.editUser = async (req, res) => {
   try {
     console.log(req.body);
-    const { id, firstName, lastName, mobile, email, roleName, employeeId,companyName,headOfficeLocation,branchOfficeLocation,capabilities,recruiterCapacity } = req.body;
+    const { id, firstName, lastName, mobile, email, roleName, employeeId,companyName,headOfficeLocation,branchOfficeLocation,capabilities,recruiterCapacity,companyAddress } = req.body;
     await recruiter.findOne({ where: { userId: id, mainId: req.mainId }, include: [user] }).then(async data => {
       if (data.user.email == req.body.email) {
         await user.update({
@@ -393,6 +393,7 @@ exports.editUser = async (req, res) => {
           mobile: mobile,
           employeeId: employeeId,
           companyName:companyName,
+          companyAddress:companyAddress,
           headOfficeLocation:headOfficeLocation,
           branchOfficeLocation:branchOfficeLocation,
           capabilities:capabilities,
@@ -833,7 +834,7 @@ exports.userList = async (req, res) => {
 };
 
 exports.allRecruiterList = async (req, res) => {
-  recruiter.findAll({ where: { mainId: req.mainId, userId: { [Op.ne]: req.mainId } }, attributes: ['id', 'firstName', 'lastName', 'employeeId'],include:[{model:user,attributes:['isActive'],include:[role],where:{isActive:true},required:true}] }).then(data => {
+  recruiter.findAll({ where: { mainId: req.mainId, userId: { [Op.ne]: req.mainId } }, attributes: ['id', 'firstName', 'lastName', 'employeeId','companyName'],include:[{model:user,attributes:['isActive'],include:[role],where:{isActive:true},required:true}] }).then(data => {
     res.status(200).json({ status: true, data: data });
   }).catch(e => {
     console.log(e);

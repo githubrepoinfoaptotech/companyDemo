@@ -12,19 +12,20 @@ const express = require('express');
 const route = express.Router();
 require("dotenv").config();
 const check_auth_admin=require('../middlewares/check_auth_admin');
+const check_auth_CC=require('../middlewares/check_auth_clientCoordinater');
 const validation=require("../middlewares/validation");
 const { adminDashboard,adminDashboardCopy } = require('../controllers/dashboardController');
 const fileUploader=require("../middlewares/fileUploadMulter");
 const message=require("../functions/messageValidation");
 
 //-------------------------------------
-route.post('/addClient',check_auth_admin,validation.addClientValidation,clientController.addClient);
-route.post('/editClient',check_auth_admin,clientController.editClient);
-route.post('/getAllClients',check_auth_admin,clientController.viewAllClients);
-route.post('/viewClient',check_auth_admin,clientController.viewClient);
-route.post('/clientStatusCodeList',check_auth_admin,clientController.clientStatusCodeList);
-route.post('/changeClientStatus',check_auth_admin,clientController.changeClientStatus);
-route.post('/getAllClientList',check_auth_admin,clientController.getAllClientList);
+route.post('/addClient',check_auth_CC,validation.addClientValidation,clientController.addClient);
+route.post('/editClient',check_auth_CC,clientController.editClient);
+route.post('/getAllClients',check_auth_CC,clientController.viewAllClients);
+route.post('/viewClient',check_auth_CC,clientController.viewClient);
+route.post('/clientStatusCodeList',check_auth_CC,clientController.clientStatusCodeList);
+route.post('/changeClientStatus',check_auth_CC,clientController.changeClientStatus);
+route.post('/getAllClientList',check_auth_CC,clientController.getAllClientList);
 
 // -------------------------------------
 route.post("/adminDashboard",check_auth_admin,adminDashboard);
