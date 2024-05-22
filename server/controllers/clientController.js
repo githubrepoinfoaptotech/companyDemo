@@ -341,7 +341,7 @@ exports.viewAllClients = async (req, res) => {
 
   var page = req.body.page;
   var limit = 50;
-  const attributes=["id","mainId","statusCode","uniqueId","clientName","clientWebsite","clientIndustry","aggStartDate","aggEndDate","createdAt"]
+  const attributes=["id","mainId","statusCode","uniqueId","clientName","approved","clientWebsite","clientIndustry","aggStartDate","aggEndDate","createdAt"]
   var mywhere={ mainId: req.mainId };
   if(req.body.clientId){
     mywhere.id=req.body.clientId;
