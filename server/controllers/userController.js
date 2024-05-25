@@ -825,7 +825,7 @@ exports.editMyCompanySettings = async (req, res) => {
 };
 
 exports.userList = async (req, res) => {
-  recruiter.findAll({ where: { mainId: req.mainId}, attributes: ['id', 'firstName', 'lastName', 'employeeId'] ,include:[{model:user,attributes:['isActive'],include:[role],where:{isActive:true},required:true}]}).then(data => {
+  recruiter.findAll({ where: { mainId: req.mainId}, attributes: ['id', 'firstName', 'lastName','companyName','employeeId'] ,include:[{model:user,attributes:['isActive'],include:[role],where:{isActive:true},required:true}]}).then(data => {
     res.status(200).json({ status: true, data: data });  
   }).catch(e => {
     console.log(e);

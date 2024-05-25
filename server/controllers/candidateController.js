@@ -3104,10 +3104,10 @@ exports.checkEmailExist=async(req,res)=>{
   if(roleName=="FREELANCER"||roleName=="SUBVENDOR"){
     candidateDetails.findOne({where:{email:req.body.email,mainId:req.mainId}}).then(data=>{
       if(data){
-        res.status(200).json({status:true,message:"Email Id Number is already in use"});
+        res.status(200).json({status:true,message:"Email Id  is already in use"});
       }
       else{
-        res.status(200).json({status:false,message:"Email Id Number not found"});
+        res.status(200).json({status:false,message:"Email Id  not found"});
       }
     });
 }
@@ -3122,7 +3122,7 @@ else{
       res.status(200).json({status:true,message:"Email Id is already in use"});
     }
     else{
-      res.status(200).json({status:false,message:"Email Id Number not found"});
+      res.status(200).json({status:false,message:"Email Id  not found"});
     }
   });
 }
