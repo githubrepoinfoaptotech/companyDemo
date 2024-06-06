@@ -1,17 +1,17 @@
-import React, { useState, useEffect,useRef, useReducer } from "react";
+import React, { useState, useEffect, useRef, useReducer } from "react";
 import MUIDataTable from "mui-datatables";
 import {
   Grid,
   Button,
   SwipeableDrawer,
-  TextField, 
+  TextField,
   TablePagination,
   Select,
   MenuItem,
   CircularProgress,
   Avatar,
   Typography,
- 
+
 } from "@material-ui/core";
 import ViewIcon from "@material-ui/icons/Visibility";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -21,35 +21,35 @@ import { Autocomplete } from "@material-ui/lab";
 import useStyles from "../../themes/style.js";
 import PageTitle from "../PageTitle/PageTitle.js";
 import { useTheme } from "@material-ui/styles";
-import { ToastContainer } from "react-toastify";
- import CloseIcon from "@material-ui/icons/Close";
+import { ToastContainer, toast } from "react-toastify";
+import CloseIcon from "@material-ui/icons/Close";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import View from "../Candidates/View";
-import { Backdrop, Box,  List } from "@material-ui/core";
+import { Backdrop, Box, List } from "@material-ui/core";
 import axios from "axios";
 // import XlsxPopulate from "xlsx-populate";
 // import { saveAs } from "file-saver";
 import external from "../../images/external.png"
 import "react-toastify/dist/ReactToastify.css";
-import jwt_decode from "jwt-decode"; 
+import { jwtDecode } from "jwt-decode";
 
 import {
   ResponsiveContainer,
-  ComposedChart, 
+  ComposedChart,
   YAxis,
   XAxis,
-  Bar, 
+  Bar,
   Cell,
 } from 'recharts';
- 
+
 export default function Layout(props) {
-  
+
   const classes = useStyles();
   var theme = useTheme();
   var currentYear = new Date().getFullYear();
   var startYear = 2023;
   var endYear = currentYear + 1;
-  const mobileQuery = useMediaQuery('(max-width:600px)');    
+  const mobileQuery = useMediaQuery('(max-width:600px)');
   const [reducerValue, forceUpdate] = useReducer((x) => x + 1, 0);
 
   const handleFromDateChange = (event) => {
@@ -63,7 +63,7 @@ export default function Layout(props) {
 
   const CustomTooltip = ({ position, content, onMouseEnter, onMouseLeave }) => {
     const { x, y } = position || {};
-  
+
     return (
       <div
         className={classes.customTooltip}
@@ -73,18 +73,19 @@ export default function Layout(props) {
       >
         {content}
       </div>
-      
+
     );
   };
 
   const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
 
   const [loader, setLoader] = useState(false);
   const [graphLoader, setGraphLoader] = useState(false);
 
   const [candidatesData, setCandidatesData] = useState([]);
   const [invoicedValue] = useState([]);
+  const [invoicedTotalAmt] = useState([]);
   const [invoicedCandidate, setInvoicedCandidate] = useState([]);
 
   const [listCanditate, setListCanditate] = useState([]);
@@ -102,7 +103,7 @@ export default function Layout(props) {
   };
 
   const [candidateView, setCandidateView] = useState({
-    id:"",
+    id: "",
     chatId: "",
     email: "",
     cc: "",
@@ -121,34 +122,33 @@ export default function Layout(props) {
     joinedDate: "",
     invoiceValue: "",
 
-    gender:"",
-    differentlyAbled:"", 
-    candidateProcessed:"",  
+    gender: "",
+    differentlyAbled: "",
+    candidateProcessed: "",
     currentLocation: "",
-    preferredLocation:"",
-    nativeLocation:"",
-    relevantExperience:null,
-    currentCtc:null,
-    expectedCtc:null,
-    dob:"",
-    noticePeriod:"",
-    reasonForJobChange:"",
-    reason:"",
-    educationalQualification:"",
+    preferredLocation: "",
+    nativeLocation: "",
+    relevantExperience: null,
+    currentCtc: null,
+    expectedCtc: null,
+    dob: "",
+    noticePeriod: "",
+    reasonForJobChange: "",
+    reason: "",
+    educationalQualification: "",
     alternateMobile: "",
-    candidateRecruiterDiscussionRecording:"",
-    candidateSkillExplanationRecording:"",
-    candidateMindsetAssessmentLink:"",
-    candidateAndTechPannelDiscussionRecording:"",
-    mainId:"",
-    isCandidateCpv:"",
-    currentCompanyName:"",
+    candidateRecruiterDiscussionRecording: "",
+    candidateSkillExplanationRecording: "",
+    candidateMindsetAssessmentLink: "",
+    candidateAndTechPannelDiscussionRecording: "",
+    mainId: "",
+    isCandidateCpv: "",
+    currentCompanyName: "",
   });
 
   useEffect(() => {
     const fetchData = async () => {
       setLoader(true);
-
       setCurrerntPage(1);
 
       var url = props.candidateReportUrl;
@@ -164,11 +164,10 @@ export default function Layout(props) {
         },
       }).then(function (response) {
         if (response.data.status === true) {
-        
-          setCandidatesData(response.data.data);
+          setCandidatesData(response?.data?.data);
           setCount(response.data.count);
-          
         }
+        setLoader(false);
       });
     };
 
@@ -183,6 +182,7 @@ export default function Layout(props) {
   const [userName, setUserName] = useState([]);
 
   const [recruiterId, setRecruiterId] = useState(null);
+  console.log(props.statusCode)
 
   useEffect(() => {
     axios({
@@ -203,14 +203,30 @@ export default function Layout(props) {
       .catch(function (error) {
         console.log(error);
       });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   function getFilterData() {
+    const form = filterRef.current;
+
+    if (form["fromDate"].value > form["toDate"].value) {
+      toast.error('Check your selected dates', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
+        
+      return
+    }
+
     setLoader(true);
     setCurrerntPage(1);
     setPage(0);
-    const form = filterRef.current;
 
     var data = JSON.stringify({
       page: 1,
@@ -268,33 +284,34 @@ export default function Layout(props) {
         for (var i = 0; i < response.data.data?.length; i++) {
           var month = response.data.data[i].month;
           invoicedValue.push(response.data.data[i].count);
+          invoicedTotalAmt.push(response.data.data[i].totalInvoiceValue)
           candidateDetail.current = candidateDetail.current.concat({
             month:
               month === "01"
                 ? "Jan"
                 : month === "02"
-                ? "Feb"
-                : month === "03"
-                ? "Mar"
-                : month === "04"
-                ? "Apr"
-                : month === "05"
-                ? "May"
-                : month === "06"
-                ? "Jun"
-                : month === "07"
-                ? "Jul"
-                : month === "08"
-                ? "Aug"
-                : month === "09"
-                ? "Sep"
-                : month === "10"
-                ? "Oct"
-                : month === "11"
-                ? "Nov"
-                : month === "12"
-                ? "Dec"
-                : "",
+                  ? "Feb"
+                  : month === "03"
+                    ? "Mar"
+                    : month === "04"
+                      ? "Apr"
+                      : month === "05"
+                        ? "May"
+                        : month === "06"
+                          ? "Jun"
+                          : month === "07"
+                            ? "Jul"
+                            : month === "08"
+                              ? "Aug"
+                              : month === "09"
+                                ? "Sep"
+                                : month === "10"
+                                  ? "Oct"
+                                  : month === "11"
+                                    ? "Nov"
+                                    : month === "12"
+                                      ? "Dec"
+                                      : "",
             value: response.data.data[i].count,
           });
         }
@@ -308,11 +325,13 @@ export default function Layout(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
+
   function handleYearData(e) {
     setGraphLoader(true);
     setYear(e.target.value);
     candidateDetail.current = [];
     invoicedValue.length = 0;
+    invoicedTotalAmt.length = 0;
     axios({
       method: "post",
       url: props.getReportCountUrl,
@@ -326,38 +345,38 @@ export default function Layout(props) {
       },
     }).then(function (response) {
       if (response.data.status === true) {
- 
+
         for (var i = 0; i < response.data.data?.length; i++) {
           var month = response.data.data[i].month;
           invoicedValue.push(response.data.data[i].count);
-          
+          invoicedTotalAmt.push(response.data.data[i].totalInvoiceValue)
           candidateDetail.current = candidateDetail.current.concat({
             month:
               month === "01"
                 ? "Jan"
                 : month === "02"
-                ? "Feb"
-                : month === "03"
-                ? "Mar"
-                : month === "04"
-                ? "Apr"
-                : month === "05"
-                ? "May"
-                : month === "06"
-                ? "Jun"
-                : month === "07"
-                ? "Jul"
-                : month === "08"
-                ? "Aug"
-                : month === "09"
-                ? "Sep"
-                : month === "10"
-                ? "Oct"
-                : month === "11"
-                ? "Nov"
-                : month === "12"
-                ? "Dec"
-                : "",
+                  ? "Feb"
+                  : month === "03"
+                    ? "Mar"
+                    : month === "04"
+                      ? "Apr"
+                      : month === "05"
+                        ? "May"
+                        : month === "06"
+                          ? "Jun"
+                          : month === "07"
+                            ? "Jul"
+                            : month === "08"
+                              ? "Aug"
+                              : month === "09"
+                                ? "Sep"
+                                : month === "10"
+                                  ? "Oct"
+                                  : month === "11"
+                                    ? "Nov"
+                                    : month === "12"
+                                      ? "Dec"
+                                      : "",
             value: response.data.data[i].count,
           });
         }
@@ -417,14 +436,14 @@ export default function Layout(props) {
     })
       .then(function (response) {
         if (response.data.status === true) {
-         
+
           setCandidateView({
             ...candidateView,
             id: response.data.data.id,
             chatId: response.data.chatUser?.id,
             email: response.data.data.candidateDetail?.email,
             mobile: response.data.data.candidateDetail?.mobile,
-            cc: response.data.data.requirement?.recruiter?.firstName +  " " + response.data.data.requirement?.recruiter?.lastName,
+            cc: response.data.data.requirement?.recruiter?.firstName + " " + response.data.data.requirement?.recruiter?.lastName,
             firstName: response.data.data.candidateDetail?.firstName,
             lastName: response.data.data.candidateDetail?.lastName,
             skills: response.data.data.candidateDetail?.skills,
@@ -442,7 +461,7 @@ export default function Layout(props) {
             preferredLocation: response.data.data.candidateDetail?.preferredLocation,
             nativeLocation: response.data.data.candidateDetail?.nativeLocation,
             experience: response.data.data.candidateDetail?.experience,
-            relevantExperience:  response.data.data.candidateDetail?.relevantExperience,
+            relevantExperience: response.data.data.candidateDetail?.relevantExperience,
             currentCtc: response.data.data.candidateDetail?.currentCtc,
             expectedCtc: response.data.data.candidateDetail?.expectedCtc,
             dob: response.data.data.candidateDetail?.dob,
@@ -450,23 +469,23 @@ export default function Layout(props) {
             reasonForJobChange: response.data.data.candidateDetail?.reasonForJobChange,
             reason: response.data.data.candidateDetail?.reason,
             candidateProcessed: response.data.data.candidateDetail?.candidateProcessed,
-            differentlyAbled:   response.data.data.candidateDetail?.differentlyAbled,
-            educationalQualification:  response.data.data.candidateDetail?.educationalQualification,
+            differentlyAbled: response.data.data.candidateDetail?.differentlyAbled,
+            educationalQualification: response.data.data.candidateDetail?.educationalQualification,
             gender: response.data.data.candidateDetail?.gender,
-            alternateMobile:   response.data.data.candidateDetail?.alternateMobile,
+            alternateMobile: response.data.data.candidateDetail?.alternateMobile,
             resume: response.data.data.candidateDetail?.resume,
-            candidateRecruiterDiscussionRecording:response.data.data.candidateRecruiterDiscussionRecording,
-            candidateSkillExplanationRecording:response.data.data.candidateSkillExplanationRecording,
-            candidateMindsetAssessmentLink:response.data.data.candidateMindsetAssessmentLink,
-            candidateAndTechPannelDiscussionRecording:response.data.data.candidateAndTechPannelDiscussionRecording,
-            mainId: response.data.data.mainId, 
+            candidateRecruiterDiscussionRecording: response.data.data.candidateRecruiterDiscussionRecording,
+            candidateSkillExplanationRecording: response.data.data.candidateSkillExplanationRecording,
+            candidateMindsetAssessmentLink: response.data.data.candidateMindsetAssessmentLink,
+            candidateAndTechPannelDiscussionRecording: response.data.data.candidateAndTechPannelDiscussionRecording,
+            mainId: response.data.data.mainId,
             isCandidateCpv: response.data.data.isCandidateCpv
           });
 
           setState({ ...state, right: true });
 
           setLoader(false);
-        }  else{
+        } else {
           setLoader(false);
         }
       })
@@ -613,8 +632,8 @@ export default function Layout(props) {
       </Grid>
     </>
   );
-   const [yearList] = React.useState([]);
- 
+  const [yearList] = React.useState([]);
+
   useEffect(() => {
     while (startYear <= endYear) {
       yearList.push(startYear++);
@@ -623,37 +642,37 @@ export default function Layout(props) {
 
 
   var table_column = [
-      {
-        name: "S.No",
-      },
-      {
-        name: "Action",
-      },
-      {
-        name: "Candidate Name",
-      },
-      {
-        name: "Email ID / Mobile",
-      },
-      {
-        name: "Requirement Name",
-      },
-      {
-        name: "Recruiter Name",
-      },
-      {
-        name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
-      },
-      {
-        name: "Posted Date",
-      },
-    ];
+    {
+      name: "S.No",
+    },
+    {
+      name: "Action",
+    },
+    {
+      name: "Candidate Name",
+    },
+    {
+      name: "Email ID / Mobile",
+    },
+    {
+      name: "Requirement Name",
+    },
+    {
+      name: "Recruiter Name",
+    },
+    {
+      name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
+    },
+    {
+      name: "Posted Date",
+    },
+  ];
 
-    var table_data ={};
+  var table_data = {};
 
-   if(props.statusCode === 302) {
-   
-    table_data=candidatesData.map((item, index) => {
+  if (props.statusCode === 302) {
+
+    table_data = candidatesData.map((item, index) => {
       return [
         <>
           {currerntPage !== 0
@@ -677,34 +696,36 @@ export default function Layout(props) {
                 />
               </Tooltip>
 
-            
+
             </Grid>
           </Grid>
         </>,
-        <Grid container row spacing={2} >  
-        {item.candidateDetail?.isExternal === "YES"?
-        <Tooltip title="SUBVENDOR/FREELANCER"  placement="bottom" aria-label="title">    
-                  <Avatar  alt="Profile"   src={external}   className={classes.externalIcon}  /> 
-        </Tooltip>   : "" }  
-      {item.candidateDetail?.firstName + " " +  item.candidateDetail?.lastName } <br /> {" (" +  item.uniqueId +   ")"} 
-       
-       </Grid>,
- item.mainId === decode.mainId ? 
- <>  { item.candidateDetail?.email + " /"} <br/>{"91 " + item.candidateDetail?.mobile.slice(2)}  </> 
- : item.hideContactDetails !== true?
- <>  { item.candidateDetail?.email + " /"} <br/>{"91 " + item.candidateDetail?.mobile.slice(2)}  </>  
- :"",
-<> {item.requirement?.requirementName} <br/> {"(" +   item.requirement?.uniqueId +  ")"}</>,
-item.recruiter?.firstName + " " + item.recruiter?.lastName,
-item.requirement?.recruiter?.firstName +   " " +  item.requirement?.recruiter?.lastName,
+        <div className={classes.externalIconContainer}>
+          {item.candidateDetail?.isExternal === "YES" ?
+            <Tooltip title="SUBVENDOR" placement="bottom" aria-label="title">
+              <Avatar alt="Profile" src={external} className={classes.externalIcon} />
+            </Tooltip> : ""}
+            <div>
+              {item.candidateDetail?.firstName + " " + item.candidateDetail?.lastName} <br /> {" (" + item.uniqueId + ")"}
+            </div>
+
+        </div>,
+        item.mainId === decode.mainId ?
+          <>  {item.candidateDetail?.email + " /"} <br />{"91 " + item.candidateDetail?.mobile.slice(2)}  </>
+          : item.hideContactDetails !== true ?
+            <>  {item.candidateDetail?.email + " /"} <br />{"91 " + item.candidateDetail?.mobile.slice(2)}  </>
+            : "",
+        <> {item.requirement?.requirementName} <br /> {"(" + item.requirement?.uniqueId + ")"}</>,
+        item.requirement?.recruiter?.firstName + " " + item.requirement?.recruiter?.lastName,
+        item.requirement?.client?.handler?.firstName +" " +item.requirement?.client?.handler?.lastName,
 
 
-       
+
         moment(item.createdAt).format("DD-MM-YYYY"),
       ];
     })
 
-   } else {
+  } else {
     table_data = candidatesData.map((item, index) => {
       return [
         <>
@@ -722,34 +743,39 @@ item.requirement?.recruiter?.firstName +   " " +  item.requirement?.recruiter?.l
             />
           </Tooltip>
         </Grid>,
-         <Grid container row spacing={2} >  
-         {item.candidate.candidateDetail?.isExternal === "YES"?
-        <Tooltip title="SUBVENDOR/FREELANCER"  placement="bottom" aria-label="title"> 
-           <Avatar  alt="Profile"   src={external}   className={classes.externalIcon}  /> 
-        </Tooltip>   : "" } {item.candidate.candidateDetail?.firstName +  " " +  item.candidate.candidateDetail?.lastName} <br/>{" (" + item.candidate.uniqueId + ")"} 
+        <Grid container row spacing={2} >
+        <div className={classes.externalIconContainer}>
+          {item.candidate.candidateDetail?.isExternal === "YES" ?
+            <Tooltip title="SUBVENDOR" placement="bottom" aria-label="title">
+              <Avatar alt="Profile" src={external} className={classes.externalIcon} />
+            </Tooltip> : ""}
+            <div>
+              {item.candidate.candidateDetail?.firstName + " " + item.candidate.candidateDetail?.lastName} <br />{" (" + item.candidate.uniqueId + ")"}
+            </div>
+        </div>
         </Grid>,
- 
-      item.mainId === decode.mainId ? 
-      <>  { item.candidate.candidateDetail?.email + " /"} <br/>{item.candidate.candidateDetail?.mobile}  </> 
-      : item.hideContactDetails !== true?
-      <>  { item.candidate.candidateDetail?.email + " /"} <br/>{item.candidate.candidateDetail?.mobile}  </>  
-      :"",
+
+        item.mainId === decode.mainId ?
+          <>  {item.candidate.candidateDetail?.email + " /"} <br />{item.candidate.candidateDetail?.mobile}  </>
+          : item.hideContactDetails !== true ?
+            <>  {item.candidate.candidateDetail?.email + " /"} <br />{item.candidate.candidateDetail?.mobile}  </>
+            : "",
 
         <>
-        {item.candidate.requirement?.requirementName} <br/>   { " (" +  item.candidate.requirement?.uniqueId +   ")" }</>,
-        item.candidate.recruiter?.firstName +  " " + item.candidate.recruiter?.lastName, 
-        item.candidate.requirement?.recruiter?.firstName +  " " +  item.candidate.requirement?.recruiter?.lastName,
-       
+          {item.candidate.requirement?.requirementName} <br />   {" (" + item.candidate.requirement?.uniqueId + ")"}</>,
+        item.candidate.recruiter?.firstName + " " + item.candidate.recruiter?.lastName,
+        item.candidate.requirement?.recruiter?.firstName + " " + item.candidate.requirement?.recruiter?.lastName,
+
 
         moment(item.createdAt).format("DD-MM-YYYY"),
       ];
     });
-   }
-
-    
+  }
 
 
-  
+
+
+
   const list = (anchor) => (
     <Box sx={{ width: "100%" }} role="presentation">
       <List>
@@ -762,17 +788,17 @@ item.requirement?.recruiter?.firstName +   " " +  item.requirement?.recruiter?.l
       </List>
     </Box>
 
-)
+  )
 
   return (
     <>
       <Grid container direction="row" spacing={2} className={classes.heading}>
         <Grid item xs={6}   >
-          
+
           <PageTitle title={props.title} />
         </Grid>
 
-        <Grid item xs={6}   className={classes.drawerClose}>
+        <Grid item xs={6} className={classes.drawerClose}>
           <Select
             labelId="year"
             id="year"
@@ -782,12 +808,12 @@ item.requirement?.recruiter?.firstName +   " " +  item.requirement?.recruiter?.l
               handleYearData(e);
             }}
             className={classes.filterFullWidth}
-          > 
+          >
             {yearList.map((item, index) => {
-              
+
               return [
                 <MenuItem key={index} value={item}>
-                  {item + "-" +  Number(item+1)}
+                  {item + "-" + Number(item + 1)}
                 </MenuItem>
               ];
             })}
@@ -805,86 +831,83 @@ item.requirement?.recruiter?.firstName +   " " +  item.requirement?.recruiter?.l
         </Grid>
       </Grid>
 
-      
-      { graphLoader===false?
-<>
-<Grid container spacing={2} className={Math.max(...invoicedValue)===0? classes.barBlur : classes.barGraph}  >
 
-<ResponsiveContainer width="100%" minWidth={300} height={175}  padding={2}>
-            
-<ComposedChart    margin={{ top: 20, right: 30, left: 0, bottom: 10 }}    data={invoicedCandidate}   >
-                 
+      {graphLoader === false ?
+        <>
+          <Grid container spacing={2} className={Math.max(...invoicedValue) === 0 ? classes.barBlur : classes.barGraph}  >
+        
+            <ResponsiveContainer width="100%" minWidth={300} height={175} padding={2}>
+
+              <ComposedChart margin={{ top: 20, right: 30, left: 0, bottom: 10 }} data={invoicedCandidate}   >
+
                 <YAxis
-                  
-                  ticks={[0, Math.max(...invoicedValue)/2, Math.max(...invoicedValue) ]}
+
+                  ticks={[0, Math.max(...invoicedValue) / 2, Math.max(...invoicedValue)]}
                   tick={{ fill: theme.palette.primary.dark + "80", fontSize: 14 }}
                   stroke={theme.palette.primary.light + "80"}
                   tickLine={true}
                 />
                 <XAxis
-                    dataKey="month"
-                    tick={{ fill: theme.palette.primary.dark + "80", fontSize: 14 }}
-                    stroke={theme.palette.primary.light + "80"}
-                    tickLine={true}
+                  dataKey="month"
+                  tick={{ fill: theme.palette.primary.dark + "80", fontSize: 14 }}
+                  stroke={theme.palette.primary.light + "80"}
+                  tickLine={true}
                 />
 
-            <Bar dataKey="value" barSize={20}    className={classes.closeBtn}  onMouseEnter={showTooltip}    onMouseLeave={hideTooltip} >
-              
-            {invoicedCandidate.map((entry, index) => {  
-  return[
-    <>
-     <Cell fill={ entry.month === "Jan"  ? "#413ea0" : entry.month  ===  "Feb"  ? "#f44336"
-          :  entry.month  === "Mar" ? "#e91e63" : entry.month  === "Apr"   ? "#9c27b0"
-          :  entry.month  === "May" ? "#009688" : entry.month  ===  "Jun"  ? "#4caf50" 
-          : entry.month  ===  "Jul"  ? "#cddc39"  : entry.month  === "Aug" ?  "#ffeb3b" 
-          : entry.month  === "Sep" ? "#ff9800" : entry.month  === "Oct" ? "#ff5722"
-          : entry.month  === "Nov" ? "#ff784e"   : entry.month  === "Dec" ? "#6573c3":""  }/> 
-     </>
+                <Bar dataKey="value" barSize={20} className={classes.closeBtn} onMouseEnter={showTooltip} onMouseLeave={hideTooltip} >
 
-  ]     
-})}
-              
-               </Bar>
-                
+                  {invoicedCandidate.map((entry, index) => {
+                    return [
+                      <>
+                        <Cell fill={entry.month === "Jan" ? "#413ea0" : entry.month === "Feb" ? "#f44336"
+                          : entry.month === "Mar" ? "#e91e63" : entry.month === "Apr" ? "#9c27b0"
+                            : entry.month === "May" ? "#009688" : entry.month === "Jun" ? "#4caf50"
+                              : entry.month === "Jul" ? "#cddc39" : entry.month === "Aug" ? "#ffeb3b"
+                                : entry.month === "Sep" ? "#ff9800" : entry.month === "Oct" ? "#ff5722"
+                                  : entry.month === "Nov" ? "#ff784e" : entry.month === "Dec" ? "#6573c3" : ""} />
+                      </>
+
+                    ]
+                  })}
+
+                </Bar>
+
               </ComposedChart>
             </ResponsiveContainer>
 
             {tooltip.show && (
-        <CustomTooltip
-          onMouseEnter={() => {
-            clearTimeout(tooltipTimeout);
-          }}
-          onMouseLeave={() => {
-            setTooltip({ show: false });
-            clearTimeout(tooltipTimeout);
-          }}
-          {...tooltip}
-        />
-      )}
+              <CustomTooltip
+                onMouseEnter={() => {
+                  clearTimeout(tooltipTimeout);
+                }}
+                onMouseLeave={() => {
+                  setTooltip({ show: false });
+                  clearTimeout(tooltipTimeout);
+                }}
+                {...tooltip}
+              />
+            )}
 
-<Grid item xs>
-<Typography  variant="subtitle1"> Total count of {year + "-" +  Number(year+1) + ":  "+ (invoicedValue.reduce((a,v) =>  a = a + v , 0 ))}  </Typography> 
+            <Grid item xs={12} style={{marginLeft:'20px'}}>
+              <Typography style={{color:'#303f9f'}} variant="body1"> Total count of {year + "-" + Number(year + 1) + ":  " + (invoicedValue.reduce((a, v) => a = a + v, 0))}  </Typography>
+              {props.statusCode === 312 &&
+                <Typography style={{color:'#368413'}} variant="body1"> Total Invoice Amount of {year + "-" + Number(year + 1) + ":  " + (invoicedTotalAmt.reduce((a, v) => a = a + v, 0))}  </Typography>
+              }
+            </Grid>
+          </Grid>
+        </>
+        :
+        <ResponsiveContainer width="100%" minWidth={300} height={175} padding={2}  >
+          <Grid
+            container
+            spacing={2}
+            className={classes.flexCenter}
+          >
+            <CircularProgress />
+          </Grid>
+        </ResponsiveContainer>
 
-</Grid>
-
-</Grid>
-
- 
-</>
- : 
- <ResponsiveContainer width="100%" minWidth={300} height={175} padding={2}  >
-<Grid
-container
-spacing={2}
-className={classes.flexCenter}
->
-<CircularProgress  />
-</Grid>
-</ResponsiveContainer>
-
-  }
-
-
+      }
 
       <form
         ref={filterRef}
@@ -897,11 +920,25 @@ className={classes.flexCenter}
           <Autocomplete
             options={userName}
             className={classes.filterFullWidth}
-            getOptionLabel={(option) =>
-              option.firstName + " " + option.lastName + " (" + option.user?.role?.title + ")" 
-            }
-            value={recruiterId} 
-            onChange={(event, value) => setRecruiterId(value)} 
+            getOptionLabel={(option) => {
+              const roleName = option.user?.role?.roleName;
+              const firstName = option.firstName;
+              const lastName = option.lastName;
+              let label = `${firstName} ${lastName}`;
+              if (roleName) {
+                label += ` (${roleName})`;
+
+                if (roleName === 'SUBVENDOR') {
+                  label = label.replace('(SUBVENDOR)', `(${option?.companyName})`);
+                } else if (roleName === 'CLIENTCOORDINATOR') {
+                  label = label.replace('(CLIENTCOORDINATOR)', '(Hiring Manager)');
+                }
+              }
+
+              return label;
+            }}
+            value={recruiterId}
+            onChange={(event, value) => setRecruiterId(value)}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -922,8 +959,6 @@ className={classes.flexCenter}
             defaultValue={fromDate}
             onChange={(e) => handleFromDateChange(e)}
             className={classes.filterWidth}
-            
-
           />
 
           <TextField
@@ -934,7 +969,6 @@ className={classes.flexCenter}
             className={classes.filterWidth}
             type="date"
             defaultValue={toDate}
-            
             onChange={handleToDateChange}
           />
 
@@ -951,7 +985,7 @@ className={classes.flexCenter}
               variant="contained"
               size="small"
               color="secondary"
-              onClick={() => resetForm()}
+              onClick={resetForm}
             >
               Reset
             </Button>
@@ -970,7 +1004,7 @@ className={classes.flexCenter}
               filter: false,
               print: false,
               download: false,
-              responsive: mobileQuery===true? 'vertical' : 'standard', 
+              responsive: mobileQuery === true ? 'vertical' : 'standard',
               customToolbar: () => <HeaderElements />,
               textLabels: {
                 body: {
@@ -1007,7 +1041,7 @@ className={classes.flexCenter}
       </Backdrop>
     </>
   );
-  
+
 }
 
 

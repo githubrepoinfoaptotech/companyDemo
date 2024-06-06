@@ -8,7 +8,8 @@ import {
   TablePagination,
   Backdrop,
   CircularProgress,
-  Avatar
+  Avatar,
+  Typography
 } from "@material-ui/core";
 import PageTitle from "../PageTitle";
 import { Autocomplete } from "@material-ui/lab";
@@ -19,7 +20,7 @@ import moment from "moment";
 import axios from "axios";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import { useForm } from "react-hook-form";
 import ViewIcon from "@material-ui/icons/Visibility";
 import Drop from "../Candidates/Drop";
@@ -46,7 +47,7 @@ const positions = [toast.POSITION.TOP_RIGHT];
 export default function Candidates(props) {
   var classes = useStyles();
    const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
   const mobileQuery = useMediaQuery('(max-width:600px)');  
 
   const filterRef = useRef(null);
@@ -526,10 +527,16 @@ export default function Candidates(props) {
   
 
   function getFilterData() {
+    const form = filterRef.current;
+
+    if (form["fromDate"].value > form["toDate"].value) {
+      handleNotificationCall("error","Check your selected dates")
+      return
+    }
+
     setLoader(true);
     setCurrerntPage(1);
     setPage(0);
-    const form = filterRef.current;
     var data = JSON.stringify({
       page: 1,
       fromDate: `${form["fromDate"].value}`,
@@ -1656,9 +1663,24 @@ function uploadAssessment(File, Id) {
           <Autocomplete
             className={classes.filterFullWidth}
             options={user}
-            getOptionLabel={(option) =>
-              option.firstName + " " + option.lastName + " (" +   option.user?.role?.title +   ")" 
-            }
+            getOptionLabel={(option) => {
+              console.log(option)
+              const roleName = option.user?.role?.roleName;
+              const firstName = option.firstName;
+              const lastName = option.lastName;
+              let label = `${firstName} ${lastName}`;
+              if (roleName) {
+                label += ` (${roleName})`;
+
+                if (roleName === 'SUBVENDOR') {
+                  label = label.replace('(SUBVENDOR)', `(${option?.companyName})`);
+                } else if (roleName === 'CLIENTCOORDINATOR') {
+                  label = label.replace('(CLIENTCOORDINATOR)', '(Hiring Manager)');
+                }
+              }
+
+              return label;
+            }}
             value={recruiterId}
             onChange={(event, value) => setRecruiterId(value)}
             renderInput={(params) => (
@@ -1793,24 +1815,26 @@ function uploadAssessment(File, Id) {
                   ""
                 ),
 
-                <Grid container row spacing={2} >  
+            <div className={classes.externalIconContainer}>  
               {item.candidateDetail?.isExternal === "YES"?
-             <Tooltip title="SUBVENDOR/FREELANCER"  placement="bottom" aria-label="title"> 
-                <Avatar  alt="Profile"   src={external}   className={classes.externalIcon}  /> 
-             </Tooltip>   : "" }  
-            {item.candidateDetail?.firstName + " " +  item.candidateDetail?.lastName } <br /> {" (" +  item.uniqueId +   ")"} 
-             
-             </Grid>,
+              <Tooltip title="SUBVENDOR"  placement="bottom" aria-label="title"> 
+                  <Avatar  alt="Profile"   src={external}   className={classes.externalIcon}  /> 
+              </Tooltip>   : "" }  
+              <div>
+                {item.candidateDetail?.firstName + " " +  item.candidateDetail?.lastName } <br /> {" (" +  item.uniqueId +   ")"} 
+              </div>
+                
+             </div>,
 
-item.mainId === decode.mainId ? 
-<>  { item.candidateDetail?.email + " /"} <br/>{"91 " + item.candidateDetail?.mobile.slice(2)}  </> 
-: item.hideContactDetails !== true?
-<>  { item.candidateDetail?.email + " /"} <br/>{"91 " + item.candidateDetail?.mobile.slice(2)}  </>  
-:"",
+              item.mainId === decode.mainId ? 
+              <>  { item.candidateDetail?.email + " /"} <br/>{"91 " + item.candidateDetail?.mobile.slice(2)}  </> 
+              : item.hideContactDetails !== true?
+              <>  { item.candidateDetail?.email + " /"} <br/>{"91 " + item.candidateDetail?.mobile.slice(2)}  </>  
+              :"",
 
                 <> {item.requirement?.requirementName} <br/> {"(" +   item.requirement?.uniqueId +  ")"}</>,
-                item.recruiter?.firstName + " " + item.recruiter?.lastName,
                 item.requirement?.recruiter?.firstName +   " " +  item.requirement?.recruiter?.lastName,
+                item.requirement?.client?.handler?.firstName +" " +item.requirement?.client?.handler?.lastName,
                 <Tooltip title="View Candidate" placement="bottom" aria-label="view">
                  <ViewIcon
                    className={classes.toolIcon}

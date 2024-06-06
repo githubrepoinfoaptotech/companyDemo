@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, useRef } from "react";
+import React from "react";
 import MUIDataTable from "mui-datatables";
 import {
   Grid,
@@ -12,12 +12,10 @@ import {
   Typography,
 } from "@material-ui/core";
 // components
-import Tooltip from "@material-ui/core/Tooltip";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardMedia";
 import CardActions from "@material-ui/core/CardActions";
-import { toast } from "react-toastify";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
@@ -38,7 +36,7 @@ function ProjectView({
   levelOfHireEditFields,
   handleViewProjClick,
 }) {
-
+  console.log(clientEdit)
     const classes = useStyles(); 
   return (
     <div>
@@ -93,14 +91,7 @@ function ProjectView({
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6} md={6} lg={6}>
-                  {(() => {
-                    const hiringManager = clientsName.find(
-                      (client) => client.id === clientEdit.handlerId,
-                    );
-                    return hiringManager
-                      ? `${hiringManager.firstName} ${hiringManager.lastName}`
-                      : "Hiring Manager not found";
-                  })()}
+                  {clientEdit.handler?.firstName+" "+clientEdit.handler?.lastName}
                 </Grid>
                 <Grid item xs={12} sm={6} md={6} lg={6}>
                   <Typography className={classes.boldtext}>
@@ -213,72 +204,20 @@ function ProjectView({
                 <Grid item xs={12} sm={6} md={6} lg={6}>
                   {moment(clientEdit.createdAt).format("DD-MM-YYYY")}
                 </Grid>
-                <ListItem
-                  button
-                  onClick={() => handleViewProjClick("hireLevelList")}
-                >
-                  <ListItemIcon>
-                    <SignalCellularAltIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Level Hire Lists" />
-                  {viewProjOpen.hireLevelList ? <ExpandLess /> : <ExpandMore />}
-                </ListItem>
-                <Collapse in={viewProjOpen.hireLevelList}>
-                  <Grid container spacing={2}>
-                      <MUIDataTable
-                        options={{
-                          pagination: false,
-                          sort: false,
-                          selectableRows: "none",
-                          search: false,
-                          filter: false,
-                          download: false,
-                          print: false,
-                          viewColumns: false,
-                          responsive:
-                            mobileQuery === true ? "vertical" : "standard",
-                          textLabels: {
-                            body: {
-                              noMatch:
-                                "Oops! Matching record could not be found",
-                            },
-                          },
-                        }}
-                        columns={[
-                          {
-                            name: "S.No",
-                          },
-                          {
-                            name: "Level Name",
-                          },
-                          {
-                            name: "Number of Hirings",
-                          },
-                        ]}
-                        data={levelOfHireEditFields.map((item, index) => {
-                          return [index + 1, item.name, item.noOfHires];
-                        })}
-                      />
-                  </Grid>
-                </Collapse>
-                <ListItem
-                  button
-                  onClick={() => handleViewProjClick("orgRecList")}
-                >
-                  <ListItemIcon>
-                    <PeopleAltIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Org Recruiter Lists" />
-                  {viewProjOpen.orgRecList ? <ExpandLess /> : <ExpandMore />}
-                </ListItem>
-                <Collapse in={viewProjOpen.orgRecList}>
-                  <List component="div" disablePadding>
-                    <Grid container direction="row" spacing={2}>
-                      <Grid item xs={12} md={12} lg={12}>
-                        <Typography className={classes.boldtext}>
-                          Org Point of Contact(POC):
-                        </Typography>
-                        <br />
+                <Grid item xs={12}>
+                  <ListItem
+                    button
+                    onClick={() => handleViewProjClick("hireLevelList")}
+                  >
+                    <ListItemIcon>
+                      <SignalCellularAltIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Number to be hired" />
+                    {viewProjOpen.hireLevelList ? <ExpandLess /> : <ExpandMore />}
+                  </ListItem>
+                  <Collapse in={viewProjOpen.hireLevelList}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} lg={12}>
                         <MUIDataTable
                           options={{
                             pagination: false,
@@ -303,29 +242,87 @@ function ProjectView({
                               name: "S.No",
                             },
                             {
-                              name: "Name",
+                              name: "Level Name",
                             },
                             {
-                              name: "Email",
-                            },
-
-                            {
-                              name: "Mobile No",
+                              name: "Number of Hirings",
                             },
                           ]}
-                          data={recruiterEditFields.map((item, index) => {
-                            return [
-                              index + 1,
-                              item.name,
-                              item.email,
-                              item.mobile,
-                            ];
+                          data={levelOfHireEditFields.map((item, index) => {
+                            return [index + 1, item.name, item.noOfHires];
                           })}
                         />
                       </Grid>
                     </Grid>
-                  </List>
-                </Collapse>
+                  </Collapse>
+                </Grid>
+                <Grid item xs={12}>
+                  <ListItem
+                    button
+                    onClick={() => handleViewProjClick("orgRecList")}
+                  >
+                    <ListItemIcon>
+                      <PeopleAltIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Org Recruiter Lists" />
+                    {viewProjOpen.orgRecList ? <ExpandLess /> : <ExpandMore />}
+                  </ListItem>
+                  <Collapse in={viewProjOpen.orgRecList}>
+                    <List component="div" disablePadding>
+                      <Grid container direction="row" spacing={2}>
+                        <Grid item xs={12} md={12} lg={12}>
+                          <Typography className={classes.boldtext}>
+                            Recruiter Point of Contact(POC):
+                          </Typography>
+                          <br />
+                          <MUIDataTable
+                            options={{
+                              pagination: false,
+                              sort: false,
+                              selectableRows: "none",
+                              search: false,
+                              filter: false,
+                              download: false,
+                              print: false,
+                              viewColumns: false,
+                              responsive:
+                                mobileQuery === true ? "vertical" : "standard",
+                              textLabels: {
+                                body: {
+                                  noMatch:
+                                    "Oops! Matching record could not be found",
+                                },
+                              },
+                            }}
+                            columns={[
+                              {
+                                name: "S.No",
+                              },
+                              {
+                                name: "Name",
+                              },
+                              {
+                                name: "Email",
+                              },
+
+                              {
+                                name: "Mobile No",
+                              },
+                            ]}
+                            data={recruiterEditFields.map((item, index) => {
+                              return [
+                                index + 1,
+                                item.name,
+                                item.email,
+                                item.mobile,
+                              ];
+                            })}
+                          />
+                        </Grid>
+                      </Grid>
+                    </List>
+                  </Collapse>
+                </Grid>
               </Grid>
             </CardContent>
             <CardActions>

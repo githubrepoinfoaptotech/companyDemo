@@ -23,7 +23,7 @@ import axios from "axios";
 import { Autocomplete } from "@material-ui/lab";
 import useStyles from "../../themes/style.js";
 import useMediaQuery from '@material-ui/core/useMediaQuery'; 
-import jwtDecode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 
 export default function Tables() {
@@ -209,8 +209,6 @@ export default function Tables() {
             requirementName: response.data.data.requirementName,
             clientId: response.data.data.clientId,
             skills: response.data.data.skills,
-            orgRecruiterId: response.data.data.orgRecruiter.id,
-            orgRecruiterName: response.data.data.orgRecruiter.name,
             jobLocation: response.data.data.jobLocation,
             experience: response.data.data.experience,
             uniqueId: response.data.data.uniqueId,
@@ -305,19 +303,6 @@ export default function Tables() {
                       requirementsView.clientUniqueId +
                       ") "}
                   </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                   
-                    <Typography className={classes.boldtext}>
-                     
-                      Organization Recruiter Name:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                   
-                    {requirementsView.orgRecruiterName}
-                  </Grid>
-
                   <Grid item xs={12} sm={6} md={6} lg={6}>
                    
                     <Typography className={classes.boldtext}>
@@ -614,10 +599,7 @@ export default function Tables() {
               },
         
               {
-                name: "Projects Name",
-              },
-              {
-                name: "Organization Recruiter Name",
+                name: "Project Name",
               },
         
               {
@@ -659,7 +641,6 @@ export default function Tables() {
                 </>,
                 <>{item.requirement?.requirementName + " (" + item.requirement?.uniqueId + ")"}</>,
                 <>{item.requirement?.client?.clientName + " (" + item.requirement?.client?.uniqueId + ")"} </>,
-                item.requirement?.orgRecruiter?.name,
                 item.requirement?.experience,
                 
                 item.requirement?.jobLocation, 

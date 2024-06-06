@@ -111,7 +111,7 @@ import othersSalaryBreakup from "../../pages/others/dashboard/SalaryBreakup";
 import othersYetToJoin from "../../pages/others/dashboard/YetToJoin";
 import { useLayoutState } from "../../context/LayoutContext";
 
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import red from '@material-ui/core/colors/red';
 import CloseIcon from "@material-ui/icons/Close";
 import { ToastContainer } from "react-toastify"; 
@@ -125,8 +125,10 @@ function Layout(props) {
   var layoutState = useLayoutState();
 
   const token = localStorage.getItem("token");
-  const decoded = jwt_decode(token);
+  const decoded = jwtDecode(token);
   const role = decoded.role;
+  const companyType = decoded.companyType || "";
+
   const getMuiTheme = () =>
     createTheme({
       overrides: {
@@ -528,14 +530,14 @@ function Layout(props) {
           }
         },
 
-        MuiChip: {
-          avatar: {
-            width: "50px !important",
-            height: "50px !important",
-            fontSize: "1.5rem !important",
-            margin: "0px",
-          },
-        },
+        // MuiChip: {
+        //   avatar: {
+        //     width: "50px !important",
+        //     height: "50px !important",
+        //     fontSize: "1.5rem !important",
+        //     margin: "0px",
+        //   },
+        // },
         MuiInputLabel: {
           shrink: {
             width: "max-content",
@@ -677,20 +679,8 @@ function Layout(props) {
               <AuthRoute path="/app/others_candidates_offered" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersOffered} /> 
               <AuthRoute path="/app/others_candidates_joined" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersJoined} /> 
               <AuthRoute path="/app/others_candidates_offer_declined" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersOfferedDeclined} /> 
-               <AuthRoute path="/app/others_candidates_yet_to_join" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersYetToJoin} />
-
-               {decoded.companyType === "COMPANY" ?
-              (<>
-                <AuthRoute path="/app/projects" role={role} roles={["ADMIN"]} component={Projects} /> 
-                <AuthRoute path="/app/reports/vendor_onboarded_candidates" role={role} roles={["ADMIN"]} component={AllInvoiced} />
-              </>):
-              (<>
-                <AuthRoute path="/app/clients" role={role} roles={["ADMIN"]} component={Clients} /> 
-                <AuthRoute path="/app/resume_search" role={role} roles={["ADMIN"]} component={ResumeSearch} /> 
-                {/* Reports */}
-                <AuthRoute path="/app/reports/all_candidates_invoiced" role={role} roles={["ADMIN"]} component={AllInvoiced} />
-              </>)
-              }
+              <AuthRoute path="/app/others_candidates_yet_to_join" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersYetToJoin} />
+              {renderRoutesBasedOnCompanyType(companyType, role)}
       </Switch>
           </div>
           <ToastContainer
@@ -728,4 +718,25 @@ function AuthRoute({ component, role, roles = [], ...rest }) {
       }
     />
   );
+}
+
+function renderRoutesBasedOnCompanyType(companyType, role) {
+  if (companyType === "COMPANY") {
+    return (
+      <>
+        <AuthRoute path="/app/projects" role={role} roles={["ADMIN","CLIENTCOORDINATOR"]} component={Projects} /> 
+        <AuthRoute path="/app/reports/vendor_onboarded_candidates" role={role} roles={["ADMIN"]} component={AllInvoiced} />
+      </>
+    );
+  }
+  else{
+    return(
+      <>
+        <AuthRoute path="/app/clients" role={role} roles={["ADMIN"]} component={Clients} /> 
+        <AuthRoute path="/app/resume_search" role={role} roles={["ADMIN"]} component={ResumeSearch} /> 
+        {/* Reports */}
+        <AuthRoute path="/app/reports/all_candidates_invoiced" role={role} roles={["ADMIN"]} component={AllInvoiced} />
+      </>
+    )
+  }
 }

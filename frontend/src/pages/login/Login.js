@@ -122,7 +122,7 @@ function Login(props) {
     formState: { errors: forgetErrors },
     handleSubmit: forgetSubmit,
     reset: forgetReset,
-   } = useForm({
+  } = useForm({
     resolver: yupResolver(emailSchema),
   });
 
@@ -142,7 +142,7 @@ function Login(props) {
 
     if (validateCaptcha(values.captcha) === true) {
 
- 
+
       return new Promise((resolve) => {
         setLoader(true);
 
@@ -151,9 +151,8 @@ function Login(props) {
           "password": values.password
         })
           .then((result) => {
-            
+
             if (result.data.status === true) {
-              localStorage.setItem('token', result.data.token);
               authUser(result.data.token, userDispatch, history)
 
             } else {
@@ -210,7 +209,7 @@ function Login(props) {
             handleNotificationCall("error", result.data.message);
           }
 
-         
+
 
         })
         .catch(function (error) {
@@ -293,57 +292,57 @@ function Login(props) {
           borderColor: "none",
         }
       },
-      
-      MuiButton: { 
 
-        root:{ 
-            fontFamily: '"Satoshi !important"',
-            fontSize: "14px",
-            fontWeight: 500,
-            boxShadow: "0 3px 9px 0 rgba(0,0,0,0.3) !important",
-            "@media (max-width:959.95px)": {
-              fontSize: "10px !important",
-            }, 
+      MuiButton: {
+
+        root: {
+          fontFamily: '"Satoshi !important"',
+          fontSize: "14px",
+          fontWeight: 500,
+          boxShadow: "0 3px 9px 0 rgba(0,0,0,0.3) !important",
+          "@media (max-width:959.95px)": {
+            fontSize: "10px !important",
+          },
         },
         label: {
-         fontFamily: '"Satoshi" !important',
+          fontFamily: '"Satoshi" !important',
           fontSize: "14px",
           "@media (max-width:959.95px)": {
             fontSize: "10px !important",
           },
         },
-        containedPrimary:{ 
-          backgroundColor: "#064be2 !important",   
-          textTransform:  "initial !important", 
-          '&:active':{
+        containedPrimary: {
+          backgroundColor: "#064be2 !important",
+          textTransform: "initial !important",
+          '&:active': {
             backgroundColor: "#064be2 !important",
-            color:"#fff !important",
+            color: "#fff !important",
           },
-          '&:hover':{
+          '&:hover': {
             backgroundColor: "#064be2 !important",
-            color:"#fff !important",
+            color: "#fff !important",
           },
-          '&:disabled':{
+          '&:disabled': {
             backgroundColor: "#064be2c7 !important",
-            color:"#fff !important",
+            color: "#fff !important",
           }
-      },
-      containedSizeSmall:{
-        textTransform:  "initial !important", 
-        padding:  "4px 10px !important",
-        fontWeight: "300 !important",
-      },
-      containedSecondary:{ 
-        backgroundColor: red[500] +"!important",
-        '&:active':{
-          backgroundColor: red[500] +"!important",
-          color:"#fff !important",
         },
-        '&:hover':{
-          backgroundColor: red[500] +"!important",
-          color:"#fff !important",
-        }
-      },
+        containedSizeSmall: {
+          textTransform: "initial !important",
+          padding: "4px 10px !important",
+          fontWeight: "300 !important",
+        },
+        containedSecondary: {
+          backgroundColor: red[500] + "!important",
+          '&:active': {
+            backgroundColor: red[500] + "!important",
+            color: "#fff !important",
+          },
+          '&:hover': {
+            backgroundColor: red[500] + "!important",
+            color: "#fff !important",
+          }
+        },
       },
 
     }
@@ -367,7 +366,7 @@ function Login(props) {
 
               <Card className={classes.root} >
 
-                <CardHeader >
+                <CardHeader>
 
 
                   <Grid container direction="row" spacing={1} className={classes.drawerHeader}>
@@ -379,7 +378,7 @@ function Login(props) {
 
                     </Grid>
                   </Grid>
-                </CardHeader >
+                </CardHeader>
                 <form onSubmit={forgetSubmit(forgetPassword)} >
                   <CardContent >
 
@@ -408,14 +407,14 @@ function Login(props) {
 
                       <Button
                         variant="contained"
-                        color="primary" 
+                        color="primary"
                         type="submit"
                       >
                         Send
                       </Button>
-                      <Button variant="contained" size="small"   color="secondary" onClick={toggleDrawer(anchor, false)}   >  Close  </Button>
+                      <Button variant="contained" size="small" color="secondary" onClick={toggleDrawer(anchor, false)}   >  Close  </Button>
 
-                    
+
                     </Grid>
 
                   </CardActions>
@@ -434,8 +433,8 @@ function Login(props) {
     <MuiThemeProvider theme={getMuiTheme()}>
       <Grid container className={classes.container}>
 
-      <Grid item xs={12} md={5} className={classes.leftContainer}>
-          
+        <Grid item xs={12} md={5} className={classes.leftContainer}>
+
           <Typography variant="h5" className={classes.text + " " + classes.bottom}   > <span className="refo-font">refo</span></Typography>
           <Typography variant="h3" className={classes.h1}   >Powerful Features</Typography>
 
@@ -469,7 +468,7 @@ function Login(props) {
                   <InputLabel shrink htmlFor="email" >  Email </InputLabel>
                   <FormControl className={classes.margin}>
 
-                    <TextField classes={{ root: classes.customTextField }} InputProps={{ disableUnderline: true }} placeholder='Enter Email' size="small"  {...register('email')} error={errors.email ? true : false} />
+                    <TextField classes={{ root: classes.customTextField }} InputProps={{ disableUnderline: true }} placeholder='Enter Email' size="small"  name="email" {...register('email')} error={errors.email ? true : false} />
 
                     <Typography variant="inherit" color="error"> {errors.email?.message} </Typography>
                   </FormControl>
@@ -478,8 +477,7 @@ function Login(props) {
                   <InputLabel shrink htmlFor="password">  Password  </InputLabel>
                   <FormControl className={classes.margin}>
 
-                    <TextField classes={{ root: classes.customTextField }} type={values.showPassword ? 'text' : 'password'} placeholder='Enter Password' id="password"
-
+                    <TextField classes={{ root: classes.customTextField }} type={values.showPassword ? 'text' : 'password'} name="password" placeholder='Enter Password' id="password"
                       InputProps={{
                         disableUnderline: true,
                         endAdornment: <InputAdornment position="end">
@@ -513,7 +511,7 @@ function Login(props) {
               <Grid className={classes.formButtons}>
                 <Button
                   variant="contained"
-                  color="primary" 
+                  color="primary"
                   onClick={handleSubmit(onLogin)}
                   disabled={isSubmitting}
                 >
@@ -522,10 +520,10 @@ function Login(props) {
 
                 <Typography
                   color="primary"
-                  
+
                   className={classes.forgetButton}
                   onClick={(e) => {
-                    setState({ ...state, "right": true}); 
+                    setState({ ...state, "right": true });
                     forgetReset();
                     setDataList("VIEW");
                   }}   >

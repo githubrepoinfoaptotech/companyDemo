@@ -9,7 +9,7 @@ import moment from "moment";
 import axios from "axios";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import { useForm } from "react-hook-form"; 
 import XlsxPopulate from "xlsx-populate";
 import { saveAs } from "file-saver"; 
@@ -37,7 +37,7 @@ const Layout = (props) => {
     var classes = useStyles();
     const history = useHistory();
     const token = localStorage.getItem("token");
-    const decode = jwt_decode(token);
+    const decode = jwtDecode(token);
     const mobileQuery = useMediaQuery('(max-width:600px)');  
   
     const filterRef = useRef(null);

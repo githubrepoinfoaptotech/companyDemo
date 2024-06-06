@@ -24,7 +24,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import CloseIcon from '@material-ui/icons/Close';
 import Notification from "../../components/Notification/Notification";
 import 'react-toastify/dist/ReactToastify.css';
-import jwt_decode from "jwt-decode"; 
+import {jwtDecode} from "jwt-decode"; 
 
 
 function Layouts(props) {
@@ -33,7 +33,7 @@ function Layouts(props) {
 
   const positions = [toast.POSITION.TOP_RIGHT];
   const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
 
   const invoiceRef = useRef();
 
@@ -285,7 +285,7 @@ function Layouts(props) {
           setCandidatesData(response.data.data);
  
         //   localStorage.setItem('token', response.data.token);
-        //   const decoded = jwt_decode(response.data.token);
+        //   const decoded = jwtDecode(response.data.token);
 
         // localStorage.setItem('firstName', decoded.firstName);
         // localStorage.setItem('email', decoded.email);
@@ -1032,15 +1032,15 @@ function Layouts(props) {
            
             <Grid container direction="row" spacing={2} className={classes.heading}>
         <Grid item xs={9} sm={7} md={8} lg={6}>
-
-        
-          
-          <PageTitle title={ candidatesData?.[0]?.requirement?.requirementName !== null?  "Candidates ("+ candidatesData?.[0]?.requirement?.requirementName+")":"Candidates"} />
+          {
+            candidatesData?.[0]?.requirement?.requirementName !== undefined? 
+            <PageTitle title={"Candidates ("+ candidatesData?.[0]?.requirement?.requirementName+")"} />
+            :
+            <PageTitle title={"Candidates"} />
+          }
         </Grid>
 
         <Grid item xs={3} sm={5} md={4} lg={6} className={classes.drawerClose}>
-        
-         
           <SwipeableDrawer
             anchor="right"
             open={state["right"]}

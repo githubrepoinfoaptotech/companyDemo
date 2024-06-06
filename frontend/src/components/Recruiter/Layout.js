@@ -17,7 +17,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
 import ViewIcon from "@material-ui/icons/Visibility";
@@ -46,7 +46,7 @@ export default function Tables(props) {
   const history = useHistory();
 
   const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
   const [count, setCount] = useState(0);
   const [loader, setLoader] = useState(false);
 
@@ -689,11 +689,14 @@ export default function Tables(props) {
   };
 
   function getFilterData() {
+    const form = filterRef.current;
+    if (form["fromDate"].value > form["toDate"].value) {
+      handleNotificationCall("error", "Check your selected dates");
+      return
+    }
     setLoader(true);
     setCurrerntPage(1);
     setPage(0);
-    const form = filterRef.current;
-
     var data = JSON.stringify({
       page: 1,
       fromDate: `${form["fromDate"].value}`,
@@ -1772,7 +1775,7 @@ export default function Tables(props) {
                 name: "Recruiter Name",
               },
               {
-                name: decode.companyType === "COMPANY" ? "LHiring Managereader" : "Client Coordinator",
+                name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
               },
               {
                 name: "View Candidate",

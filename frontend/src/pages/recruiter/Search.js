@@ -1,9 +1,9 @@
 import React from 'react';
 import Layout from "../../components/Candidates/SearchLayout"; 
-import jwt_decode from "jwt-decode"; 
+import {jwtDecode} from "jwt-decode"; 
 
 function Search() {
-  const decode = jwt_decode(localStorage.getItem("token")); 
+  const decode = jwtDecode(localStorage.getItem("token")); 
   const CandidateDetailExistUrl=`${process.env.REACT_APP_SERVER}recruiter/reuseCandidate`;  
   const SourcesListUrl= `${process.env.REACT_APP_SERVER}source/viewSourcesList`;  
   const RequirementUrl = `${process.env.REACT_APP_SERVER}CC/getRequirement`;

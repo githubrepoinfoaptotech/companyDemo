@@ -27,7 +27,7 @@ import DescriptionIcon from '@material-ui/icons/Description';
 import axios from "axios";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 import { useForm } from "react-hook-form";
 import Notification from "../../components/Notification";
@@ -60,7 +60,7 @@ export default function Candidates(props) {
   const history = useHistory();
   const mobileQuery = useMediaQuery('(max-width:600px)');   
   const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
 
    
   const filterRef = useRef(null);
@@ -2436,12 +2436,14 @@ function uploadAssessment(File, Id) {
                   ""
                 ),
 
-              <Grid container row spacing={2} >  
+              <Grid container row spacing={2} className={classes.externalIconContainer}>  
               {item.candidateDetail?.isExternal === "YES"?
-     <Tooltip title="SUBVENDOR/FREELANCER"  placement="bottom" aria-label="title">   
-             <Avatar  alt="Profile"   src={external}   className={classes.externalIcon}  />  
-     </Tooltip>   : "" }  
-            {item.candidateDetail?.firstName + " " +  item.candidateDetail?.lastName } <br /> {" (" +  item.uniqueId +   ")"} 
+                <Tooltip title="SUBVENDOR"  placement="bottom" aria-label="title">   
+                        <Avatar  alt="Profile"   src={external}   className={classes.externalIcon}  />  
+                </Tooltip>   : "" } 
+                <div>
+                  {item.candidateDetail?.firstName + " " +  item.candidateDetail?.lastName } <br /> {" (" +  item.uniqueId +   ")"} 
+                </div>
              
              </Grid>,
                     <>  

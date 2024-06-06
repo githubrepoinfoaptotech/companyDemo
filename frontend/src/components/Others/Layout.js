@@ -29,7 +29,7 @@ import Status from "../Recruiter/SearchStatus";
  import ExpandButton from "../Candidates/ExpandButton";
 import EditIcon from "@material-ui/icons/Edit";
 import ViewIcon from "@material-ui/icons/Visibility";
-import jwt_decode from "jwt-decode"; 
+import {jwtDecode} from "jwt-decode"; 
 
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 
@@ -40,7 +40,7 @@ export default function Tables(props) {
   const [reducerValue, forceUpdate] = useReducer((x) => x + 1, 0); 
   var classes = useStyles();
    const token = localStorage.getItem("token");
-   const decode = jwt_decode(token);
+   const decode = jwtDecode(token);
 
    const [count, setCount] = useState(0);
   const [loader, setLoader] = useState(false); 

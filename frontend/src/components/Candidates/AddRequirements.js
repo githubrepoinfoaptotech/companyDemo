@@ -27,7 +27,7 @@ import DescriptionIcon from "@material-ui/icons/Description";
 // data
 import Tooltip from "@material-ui/core/Tooltip";
 import JoditEditor from "jodit-react";
-import jwtDecode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 function AddRequirements(props) {
   const classes = useStyles();
@@ -117,35 +117,6 @@ function AddRequirements(props) {
                 </Grid>
                 <Grid item xs={12} sm={6} md={6} lg={6}>
                   <FormControl className={classes.margin}>
-                    <InputLabel shrink htmlFor="orgRecruiterId">
-                      Select Organization Recruiter
-                    </InputLabel>
-
-                    <Autocomplete
-                      options={props.recUser}
-                      disableClearable
-                      getOptionLabel={(option) => option.name}
-                      onChange={(event, value) => {
-                        props.setRequirementsOrgId(value.id);
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...props.register("orgRecruiterId")}
-                          error={props.errors.orgRecruiterId ? true : false}
-                          {...params}
-                          variant="filled"
-                          name="orgRecruiterId"
-                        />
-                      )}
-                    />
-
-                    <Typography variant="inherit" color="error">
-                      {props.errors.orgRecruiterId?.message}
-                    </Typography>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <FormControl className={classes.margin}>
                     <InputLabel shrink htmlFor="levelHrDataId">
                       Select Level Name
                     </InputLabel>
@@ -173,6 +144,54 @@ function AddRequirements(props) {
                     </Typography>
                   </FormControl>
                 </Grid>
+                <Grid item xs={12} sm={12} md={12} lg={12}>
+                    {/* <InputLabel shrink htmlFor="orgRecruiterId">
+                      Select Organization Recruiter
+                    </InputLabel> */}
+                    {/* <Autocomplete
+                      multiple
+                      id="tags-outlined"
+                      options={top100Films}
+                      getOptionLabel={(option) => option.title}
+                      filterSelectedOptions
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          variant="outlined"
+                          label="filterSelectedOptions"
+                          placeholder="Favorites"
+                        />
+                      )}
+                    /> */}
+                    <Autocomplete
+                      multiple
+                      options={props.recUser}
+                      disableClearable
+                      filterSelectedOptions
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        const selectedIds =  value.map(option => option.recruiterId);
+                        props.setValue("assignRecruitersList",selectedIds)
+                        props.setReqOrgRecId(selectedIds);
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          {...props.register("assignRecruitersList")}
+                          variant="outlined"
+                          name="assignRecruitersList"
+                          label="Org Recruiter"
+                          className={classes.MultiSelectRec}
+                          error={props.errors.assignRecruitersList ? true : false}
+                        />
+                      )}
+                    />
+
+                    <Typography variant="inherit" color="error">
+                      {props.errors.assignRecruitersList?.message}
+                    </Typography>
+                </Grid>
+                
                 <Grid item xs={12} sm={6} md={6} lg={6}>
                   <InputLabel shrink htmlFor="requirementName">
                     Requirement Name

@@ -32,7 +32,7 @@ import PageTitle from "../../components/PageTitle";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Tooltip from "@material-ui/core/Tooltip";
  import axios from "axios";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import { useForm } from "react-hook-form";
  
 import * as Yup from "yup";
@@ -54,7 +54,7 @@ export default function Tables() {
 
   const mobileQuery = useMediaQuery('(max-width:600px)'); 
   const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
 
   const [count, setCount] = useState(0); 
   const [file, setFile] = useState([]); 

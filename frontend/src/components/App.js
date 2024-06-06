@@ -1,5 +1,6 @@
 import React from "react";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
+import { pdfjs } from 'react-pdf';
 
 // components
 import Forget from "../pages/forget";
@@ -16,11 +17,13 @@ import candidateCPV from "../pages/register/candidateCPV";
 
 import Layouts from "../pages/share/Shortlist";
 import ApproveMail from "../pages/mailApproval/ApproveMail";
-
+import PageNotFound from "./page_not_found/PageNotFound";
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url,
+).toString();
 
 export default function App() {
-
-
   // global
   var { isAuthenticated } = useUserState();
 
@@ -42,7 +45,7 @@ export default function App() {
         <PublicRoute path="/author269" component={Author269} />
         <PublicRoute path="/candidateCPV" component={candidateCPV} />
         <PublicRoute path="/shortlist" component={Layouts} />
-
+        <Route path="" component={PageNotFound} />
         <Route component={Error} />
       </Switch>
     </HashRouter>

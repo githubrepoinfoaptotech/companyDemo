@@ -25,15 +25,12 @@ import { Autocomplete } from "@material-ui/lab";
 import ViewIcon from "@material-ui/icons/Visibility";
 import DescriptionIcon from "@material-ui/icons/Description";
 //import GetAppIcon from "@material-ui/icons/GetApp";
-
 import axios from "axios";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import jwt_decode from "jwt-decode";
-
+import {jwtDecode} from "jwt-decode";
 import { useForm } from "react-hook-form";
 import Notification from "../../components/Notification";
-
 import Status from "../../components/Admin/Status";
 import Dialogs from "../../components/Admin/Dialogs";
 import ResumeDialog from "../../components/Candidates/Dialogs";
@@ -48,11 +45,15 @@ import Note from "../../components/Candidates/Note";
 import Bar from "../../components/Candidates/Bar";
 import Message from "../../components/Candidates/Message";
 import ExpandButton from "../../components/Candidates/ExpandButton";
+import { IoMailOpenOutline } from "react-icons/io5";
+
 import useStyles from "../../themes/style.js";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import "react-toastify/dist/ReactToastify.css";
 import MatchJDDialog from "../../components/Candidates/MatchJDDialog.js";
 import {useResumeDataContext } from '../../context/CandidateDataContext.js'
+import ReactPdfDialog from "../../components/Candidates/ReactPdfDialog.js";
+import CPVFormView from "../../components/Candidates/CPVFormView.js";
 
 const positions = [toast.POSITION.TOP_RIGHT];
 
@@ -63,7 +64,7 @@ export default function Candidates(props) {
   const history = useHistory();
   const mobileQuery = useMediaQuery("(max-width:600px)");
   const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
   const filterRef = useRef(null);
   const [count, setCount] = useState(0);
   const [loader, setLoader] = useState(false);
@@ -114,7 +115,6 @@ export default function Candidates(props) {
   const [ resumePercentage , setResumePercentage]= useState([])
   const [ matchLoading, setMatchLoading] = useState(false)
   const [candidMatchId, setCandidMatchId] = useState("");
-
 
   function handleUse(mobile) {
     history.push("admin_candidates");
@@ -295,6 +295,8 @@ export default function Candidates(props) {
   const joiningRef = useRef();
   const invoiceRef = useRef();
   const [file, setFile] = useState([]);
+  const [docFile, setDocFile] = useState([]);
+  const [profile, setProfile] = useState([]);
   const [assessment, setAssessment] = useState([]);
   const [hideContactDetails, setHideContactDetails] = useState(false);
 
@@ -589,6 +591,7 @@ export default function Candidates(props) {
     reset,
     handleSubmit,
     formState: { errors, isSubmitting },
+    setValue
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
@@ -986,6 +989,10 @@ export default function Candidates(props) {
     setCurrerntPage(1);
     setPage(0);
     const form = filterRef.current;
+    if (form["fromDate"].value > form["toDate"].value) {
+      handleNotificationCall("error", "Check your Selected Dates");
+      return
+    }
     var data = JSON.stringify({
       page: 1,
       search: `${form["search"].value}`,
@@ -1035,6 +1042,8 @@ export default function Candidates(props) {
   const [messageOpen, setMessageOpen] = React.useState(false);
 
   const [resumeOpen, setResumeOpen] = React.useState(false);
+  const [cpvOpen, setCpvOpen] = React.useState(false);
+  const [cpvData, setCpvData] = React.useState([]);
   const [matchJDOpen, setMatchJDOpen] = React.useState(false);
 
   const handleResumeClose = () => {
@@ -1043,6 +1052,15 @@ export default function Candidates(props) {
 
   const handleResumeOpen = () => {
     setResumeOpen(true);
+  };
+
+  const handleCPVClose = () => {
+    setCpvOpen(false);
+  };
+
+  const handleCPVOpen = (item) => {
+    setCpvOpen(true);
+    setCpvData(item)
   };
 
   const handleJDClose = () => {
@@ -1500,6 +1518,8 @@ export default function Candidates(props) {
         if (file !== undefined) {
           if (file?.length !== 0) {
             uploadResume(file, response.data.candidateDetailsId);
+            updateCandidateDocument(docFile, response.data.candidateDetailsId);
+            updateCandidatePhoto(profile, response.data.candidateDetailsId);
           }
         }
 
@@ -1582,6 +1602,24 @@ export default function Candidates(props) {
     });
   }
 
+  function resumeExtract() {
+    axios({
+      method: "post",
+      url: `${process.env.REACT_APP_SERVER}recruiter/extractInfo`,
+      data: {},
+      headers: {
+        "Content-Type": "Application/Jsom",
+        Authorization: token,
+      },
+    }).then(function (response) {
+      if (response.data.status === true) {
+        console.log(response.data.data,'[][][][][')
+      } else {
+        handleNotificationCall("error", response.data.message);
+      }
+    });
+  }
+
   function aiResumeUpload(resumeData) {
     axios({
       method: "post",
@@ -1615,6 +1653,48 @@ export default function Candidates(props) {
     }).then(function (response) {
       if (response.data.status === true) {
         // aiResumeUpload(data);
+      } else {
+        handleNotificationCall("error", response.data.message);
+      }
+    });
+  }
+
+  function updateCandidateDocument(File, Id) {
+    var FormData = require("form-data");
+    var data = new FormData();
+    data.append("document", File);
+    data.append("id", Id);
+    axios({
+      method: "post",
+      url: `${process.env.REACT_APP_SERVER}recruiter/updateCandidateDocument`,
+      data: data,
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: token,
+      },
+    }).then(function (response) {
+      if (response.data.status === true) {
+      } else {
+        handleNotificationCall("error", response.data.message);
+      }
+    });
+  }
+
+  function updateCandidatePhoto(File, Id) {
+    var FormData = require("form-data");
+    var data = new FormData();
+    data.append("image", File);
+    data.append("id", Id);
+    axios({
+      method: "post",
+      url: `${process.env.REACT_APP_SERVER}recruiter/updateCandidatePhoto`,
+      data: data,
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: token,
+      },
+    }).then(function (response) {
+      if (response.data.status === true) {
       } else {
         handleNotificationCall("error", response.data.message);
       }
@@ -2399,7 +2479,11 @@ export default function Candidates(props) {
           toggleDrawer={toggleDrawer}
           source={source}
           setFile={setFile}
+          setDocFile={setDocFile}
+          setProfile={setProfile}
           file={file}
+          docFile={docFile}
+          profile={profile}
           setAssessment={setAssessment}
           assessment={assessment}
           days={days}
@@ -2420,6 +2504,7 @@ export default function Candidates(props) {
     ) : dataList === "ADD" ? (
       <>
         <Add
+          setValue={setValue}
           setValidation={setValidation}
           validation={validation}
           handleAddList={handleAddList}
@@ -2442,7 +2527,11 @@ export default function Candidates(props) {
           setCandidate={setCandidate}
           candidate={candidate}
           setFile={setFile}
+          setDocFile={setDocFile}
+          setProfile={setProfile}
           file={file}
+          docFile={docFile}
+          profile={profile}
           setAssessment={setAssessment}
           assessment={assessment}
           setRecruitmentId={setRecruitmentId}
@@ -2661,6 +2750,8 @@ export default function Candidates(props) {
                 setState({ ...state, right: true });
                 setValidation(false);
                 setFile([]);
+                setDocFile([]);
+                setProfile([]);
                 setAssessment([]);
               }}
             >
@@ -2746,7 +2837,7 @@ export default function Candidates(props) {
               />
             )}
           />
-
+{ decode.companyType !== "COMPANY" &&
           <Autocomplete
             className={classes.filterFullWidth}
             options={clientName}
@@ -2759,24 +2850,34 @@ export default function Candidates(props) {
               <TextField
                 {...params}
                 name="clientId"
-                label="Client"
+                label="Project"
                 InputLabelProps={{ shrink: true }}
                 type="text"
               />
             )}
           />
+}
 
           <Autocomplete
             options={userName}
             className={classes.filterFullWidth}
-            getOptionLabel={(option) =>
-              option.firstName +
-              " " +
-              option.lastName +
-              " (" +
-              option.user?.role?.title +
-              ")"
-            }
+            getOptionLabel={(option) => {
+              const roleName = option.user?.role?.roleName;
+              const firstName = option.firstName;
+              const lastName = option.lastName;
+              let label = `${firstName} ${lastName}`;
+              if (roleName) {
+                label += ` (${roleName})`;
+
+                if (roleName === 'SUBVENDOR') {
+                  label = label.replace('(SUBVENDOR)', `(${option?.companyName})`);
+                } else if (roleName === 'CLIENTCOORDINATOR') {
+                  label = label.replace('(CLIENTCOORDINATOR)', '(Hiring Manager)');
+                }
+              }
+
+              return label;
+            }}
             value={recruiterId}
             onChange={(event, value) => setRecruiterId(value)}
             renderInput={(params) => (
@@ -2870,6 +2971,9 @@ export default function Candidates(props) {
                 name: "View Candidate",
               },
               {
+                name: "View CPV",
+              },
+              {
                 name: "Posted Date",
               },
             ]}
@@ -2915,7 +3019,7 @@ export default function Candidates(props) {
                   ""
                 ),
 
-                <Grid container row spacing={2}>
+                <Grid container row spacing={2} className={classes.externalIconContainer} data-candidatename={item.candidateDetail?.firstName +" " +item.candidateDetail?.lastName}>
                   {item.candidateDetail?.isExternal === "YES" ? (
                     <Tooltip
                       title="VENDOR"
@@ -2931,10 +3035,12 @@ export default function Candidates(props) {
                   ) : (
                     ""
                   )}
-                  {item.candidateDetail?.firstName +
-                    " " +
-                    item.candidateDetail?.lastName}
-                  <br /> {" (" + item.uniqueId + ")"}
+                  <div>
+                    {item.candidateDetail?.firstName +
+                      " " +
+                      item.candidateDetail?.lastName}
+                    <br /> {" (" + item.uniqueId + ")"}
+                  </div>
                 </Grid>,
                 item.mainId === decode.mainId ? (
                   <>
@@ -2955,17 +3061,13 @@ export default function Candidates(props) {
                   {item.requirement?.requirementName} <br />
                   {" (" + item.requirement?.uniqueId + ")"}
                 </>,
-                item.requirement?.recruiter?.firstName +
-                  " " +
-                  item.requirement?.recruiter?.lastName,
-                item.recruiter?.firstName + " " + item.recruiter?.lastName,
+                item.requirement?.client?.handler?.firstName +" " +item.requirement?.client?.handler?.lastName,
+                item.requirement?.recruiter?.firstName + " " + item?.requirement?.recruiter?.lastName,
                 <>
                   {item.candidateDetail?.resume !==
                   "https://liverefo.s3.amazonaws.com/" ? (
-                    <>
-                      
+                    <> 
                       <Grid container className={classes.space}>
-                        
                         <Grid item xs className={classes.toolAlign}>
                           <Tooltip
                             title="View Resume"
@@ -3004,6 +3106,18 @@ export default function Candidates(props) {
                       handleShow(item.id, "VIEW");
                     }}
                     className={classes.toolIcon}
+                  />
+                </Tooltip>,
+                <Tooltip
+                  title="View CPV"
+                  placement="bottom"
+                  aria-label="view"
+                >
+                  <IoMailOpenOutline  
+                    onClick={(e) => {
+                      handleCPVOpen(item);
+                    }}
+                    className={classes.cpvIcon}
                   />
                 </Tooltip>,
                 // <Tooltip
@@ -3101,12 +3215,24 @@ export default function Candidates(props) {
         handleReasonClose={handleReasonClose}
       />
 
-      <ResumeDialog
+      {/* <ResumeDialog
+        resume={file}
+        resumeOpen={resumeOpen}
+        handleResumeClose={handleResumeClose}
+      /> */}
+      <CPVFormView
+        setLoader={setLoader}
+        handleNotificationCall={handleNotificationCall}
+        candidateView={candidateView}
+        cpvOpen={cpvOpen}
+        cpvData={cpvData}
+        handleCPVClose={handleCPVClose}
+      />
+      <ReactPdfDialog
         resume={file}
         resumeOpen={resumeOpen}
         handleResumeClose={handleResumeClose}
       />
-
       {/* <MatchJDDialog
         resumePercentage={resumePercentage}
         requirementName={requirementName}
@@ -3131,6 +3257,7 @@ export default function Candidates(props) {
         reverseConfirmation={reverseConfirmation}
         candidateList={candidateList}
       />
+
 
       <Backdrop className={classes.backdrop} open={loader}>
         <CircularProgress color="inherit" />

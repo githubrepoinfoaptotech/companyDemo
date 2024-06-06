@@ -39,7 +39,7 @@ import Avatar from "@material-ui/core/Avatar";
 import Badge from "@material-ui/core/Badge";
 import CloseIcon from "@material-ui/icons/Close";
 import Chip from "@material-ui/core/Chip";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
 import useStyles from "../../themes/style.js";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -107,7 +107,7 @@ export default function Header(props) {
   var [errorToastId, setErrorToastId] = useState(null);
   var [profileMenu, setProfileMenu] = useState(null);
   var token = localStorage.getItem("token");
-  var decode = jwt_decode(token);
+  var decode = jwtDecode(token);
   var [WalletValue, setWalletValue] = useState(0);
   var [image, setImage] = useState();
   var [view, setView] = useState("");
@@ -335,8 +335,10 @@ export default function Header(props) {
   const canBeOpen = popperOpen && Boolean(anchorEl);
   const poperId = canBeOpen ? "spring-popper" : undefined;
 
+
   const toggleDrawer = (anchor, open) => (event) => {
     setState({ ...state, [anchor]: open });
+    financialData();
   };
 
   /** Start Client **/
@@ -568,8 +570,8 @@ export default function Header(props) {
       decode.isEnableFree === true
         ? "YES"
         : decode.isEnablePaid === true
-        ? "NO"
-        : "YES",
+          ? "NO"
+          : "YES",
   });
 
   const [requirementList, setRequirementList] = useState({
@@ -651,8 +653,8 @@ export default function Header(props) {
           addList.day === undefined
             ? ""
             : dob !== "--"
-            ? addList.day + "-" + addList.month + "-" + addList.year
-            : "",
+              ? addList.day + "-" + addList.month + "-" + addList.year
+              : "",
         noticePeriod: addList.noticePeriod,
         reasonForJobChange: addList.reasonForJobChange,
         candidateProcessed: addList.candidateProcessed,
@@ -705,8 +707,8 @@ export default function Header(props) {
           addList.day === undefined
             ? ""
             : dob !== "--"
-            ? addList.day + "-" + addList.month + "-" + addList.year
-            : "",
+              ? addList.day + "-" + addList.month + "-" + addList.year
+              : "",
         noticePeriod: addList.noticePeriod,
         reasonForJobChange: addList.reasonForJobChange,
         candidateProcessed: addList.candidateProcessed,
@@ -747,8 +749,8 @@ export default function Header(props) {
           addList.day === undefined
             ? ""
             : dob !== "--"
-            ? addList.day + "-" + addList.month + "-" + addList.year
-            : "",
+              ? addList.day + "-" + addList.month + "-" + addList.year
+              : "",
         noticePeriod: addList.noticePeriod,
         reasonForJobChange: addList.reasonForJobChange,
         candidateProcessed: addList.candidateProcessed,
@@ -799,10 +801,10 @@ export default function Header(props) {
 
             window.open(
               "https://api.whatsapp.com/send?phone=+91" +
-                addList.mobile +
-                "&text=" +
-                message +
-                "",
+              addList.mobile +
+              "&text=" +
+              message +
+              "",
             );
           } else {
             message =
@@ -829,10 +831,10 @@ export default function Header(props) {
         decode.role === "ADMIN"
           ? history.push("/app/admin_candidates")
           : decode.role === "RECRUITER"
-          ? history.push("/app/recruiter_candidates")
-          : decode.role === "CLIENTCOORDINATOR"
-          ? history.push("/app/cc_candidates")
-          : history.push("/app/others_candidates");
+            ? history.push("/app/recruiter_candidates")
+            : decode.role === "CLIENTCOORDINATOR"
+              ? history.push("/app/cc_candidates")
+              : history.push("/app/others_candidates");
         setState({ ...state, right: false });
         candidateReset();
       } else {
@@ -854,14 +856,14 @@ export default function Header(props) {
         Authorization: token,
       },
     }).then(function (response) {
-    
+
       if (response.data.status === true) {
       } else {
         handleNotificationCall("error", response.data.message);
       }
     });
   }
-  
+
   function uploadResume(File, Id) {
     var FormData = require("form-data");
     var data = new FormData();
@@ -1007,7 +1009,7 @@ export default function Header(props) {
   const RequirementsSchema = Yup.object().shape({
     requirementName: Yup.string().required("Requirement Name is required"),
     jobLocation: Yup.string().required("Job Location is required"),
-    clientId: Yup.string().required(decode.companyType === "COMPANY" ? "Project Name is required" :"Client Name is required"),
+    clientId: Yup.string().required(decode.companyType === "COMPANY" ? "Project Name is required" : "Client Name is required"),
     orgRecruiterId: Yup.string().required("Org Recruiter Name is required"),
     skills: Yup.string().required("Skill is required"),
     gist: Yup.string(),
@@ -1383,6 +1385,9 @@ export default function Header(props) {
     fromMonth: "",
   });
 
+
+
+
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .required("Email is required")
@@ -1440,10 +1445,10 @@ export default function Header(props) {
   });
 
   const clientSchema = Yup.object().shape({
-    clientName: Yup.string().max(255).required(decode.companyType === "COMPANY" ? "Project Name is required" :"Client Name is required"),
+    clientName: Yup.string().max(255).required(decode.companyType === "COMPANY" ? "Project Name is required" : "Client Name is required"),
     clientIndustry: Yup.string()
       .max(255)
-      .required( decode.companyType === "COMPANY" ? "Project Division is required" :"Client Industry is required"),
+      .required(decode.companyType === "COMPANY" ? "Project Division is required" : "Client Industry is required"),
     // clientWebsite: Yup.string()
     //   .max(255)
     //   .required("Clients Website is required"),
@@ -1500,9 +1505,9 @@ export default function Header(props) {
     alternateMobile:
       phoneValidation === true
         ? Yup.string()
-            .required("Alternate Contact Number is required")
-            .min(10, "Must be exactly 10 digits")
-            .max(10, "Must be exactly 10 digits")
+          .required("Alternate Contact Number is required")
+          .min(10, "Must be exactly 10 digits")
+          .max(10, "Must be exactly 10 digits")
         : Yup.string(),
     day: Yup.string().nullable().notRequired(),
     month: Yup.string().nullable().notRequired(),
@@ -1644,6 +1649,11 @@ export default function Header(props) {
   }
 
   function handleCompanySettings(values) {
+    if(fromRef.current.value !=="" && toRef.current.value !==""){
+      handleNotificationCall("error", "Check Finacial Year Properly");
+      return
+    }
+
     return new Promise((resolve) => {
       setLoader(true);
       axios({
@@ -1887,7 +1897,7 @@ export default function Header(props) {
   }
 
   useEffect(() => {
-    var decode = jwt_decode(token);
+    var decode = jwtDecode(token);
     if (decode.role !== "SUPERADMIN") {
       axios({
         method: "post",
@@ -1938,25 +1948,6 @@ export default function Header(props) {
       };
 
       if (decode.role === "ADMIN") {
-        const financialData = async () => {
-          axios({
-            method: "post",
-            url: `${process.env.REACT_APP_SERVER}admin/myCompanySettings`,
-            data: {},
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token,
-            },
-          }).then(function (response) {
-            if (response.data.status === true) {
-              setMonthValue({
-                toMonth: response.data.data.toMonth,
-                fromMonth: response.data.data.fromMonth,
-              });
-            }
-          });
-        };
-
         financialData();
       }
       fetchData();
@@ -1964,6 +1955,25 @@ export default function Header(props) {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reducerValue, token]);
+
+  const financialData = async () => {
+    axios({
+      method: "post",
+      url: `${process.env.REACT_APP_SERVER}admin/myCompanySettings`,
+      data: {},
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+    }).then(function (response) {
+      if (response.data.status === true) {
+        setMonthValue({
+          toMonth: response.data.data.toMonth,
+          fromMonth: response.data.data.fromMonth,
+        });
+      }
+    });
+  };
 
   function updateProfile(values) {
     return new Promise((resolve) => {
@@ -2009,48 +2019,42 @@ export default function Header(props) {
     });
   }
 
-  function handleChangePassword(values) {
-    if (values.password === values.confirm) {
-      return new Promise((resolve) => {
-        setLoader(true);
-        var decode = jwt_decode(token);
+  async function handleChangePassword(values) {
+    if (values.password !== values.confirm) {
+        handleNotificationCall("error", "Password is mismatch");
+        return
+    }
+    setLoader(true);
+    try {
+        var decode = jwtDecode(token);
+        var url = decode.role === "SUPERADMIN"
+            ? `${process.env.REACT_APP_SERVER}superadmin/changeMyPassword`
+            : `${process.env.REACT_APP_SERVER}auth/changeMyPassword`;
 
-        var url = "";
-        if (decode.role === "SUPERADMIN") {
-          url = `${process.env.REACT_APP_SERVER}superadmin/changeMyPassword`;
+        const response = await axios({
+            method: "post",
+            url: url,
+            data: {
+                newPassword: values.password,
+                oldPassword: values.old,
+            },
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token,
+            },
+        });
+
+        if (response.data.status === true) {
+            handleNotificationCall("success", response.data.message);
+            forceUpdate();
+            setState({ ...state, right: false });
         } else {
-          url = `${process.env.REACT_APP_SERVER}auth/changeMyPassword`;
+            handleNotificationCall("error", response.data.message);
         }
-
-        axios({
-          method: "post",
-          url: url,
-          data: {
-            newPassword: values.password,
-            oldPassword: values.old,
-          },
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token,
-          },
-        })
-          .then(function (response) {
-            if (response.data.status === true) {
-              handleNotificationCall("success", response.data.message);
-              forceUpdate();
-              resolve();
-              setState({ ...state, right: false });
-            } else {
-              handleNotificationCall("error", response.data.message);
-            }
-            setLoader(false);
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
-      });
-    } else {
-      handleNotificationCall("error", "Password is mismatch");
+    } catch (error) {
+        console.error(error);
+    } finally {
+        setLoader(false);
     }
   }
 
@@ -2101,7 +2105,7 @@ export default function Header(props) {
   }
 
   useEffect(() => {
-    var decode = jwt_decode(token);
+    var decode = jwtDecode(token);
 
     if (decode.role !== "SUPERADMIN") {
       const fetchData = async () => {
@@ -2238,12 +2242,11 @@ export default function Header(props) {
                             inputRef={fromRef}
                             disableUnderline
                           >
-                            <MenuItem value=""> Select </MenuItem>
                             {monthDropdown.map((item, index) => {
                               return [
                                 <MenuItem value={item.id}>
-                                  {" "}
-                                  {item.Month}{" "}
+
+                                  {item.Month}
                                 </MenuItem>,
                               ];
                             })}
@@ -2266,12 +2269,11 @@ export default function Header(props) {
                             inputRef={toRef}
                             disableUnderline
                           >
-                            <MenuItem value=""> Select </MenuItem>
                             {monthDropdown.map((item, index) => {
                               return [
                                 <MenuItem value={item.id}>
-                                  {" "}
-                                  {item.Month}{" "}
+
+                                  {item.Month}
                                 </MenuItem>,
                               ];
                             })}
@@ -2322,8 +2324,7 @@ export default function Header(props) {
                 >
                   <Grid item xs={10} md={6}>
                     <Typography variant="subtitle1">
-                      {" "}
-                      Change Password{" "}
+                      Change Password
                     </Typography>
                   </Grid>
 
@@ -2342,8 +2343,8 @@ export default function Header(props) {
                   <Grid container direction="row" spacing={2}>
                     <Grid item xs={12}>
                       <InputLabel shrink htmlFor="old">
-                        {" "}
-                        Old Password{" "}
+
+                        Old Password
                       </InputLabel>
                       <FormControl className={classes.margin}>
                         <TextField
@@ -2379,8 +2380,8 @@ export default function Header(props) {
 
                     <Grid item xs={12} sm={6} lg={6}>
                       <InputLabel shrink htmlFor="password">
-                        {" "}
-                        Password{" "}
+
+                        Password
                       </InputLabel>
                       <FormControl className={classes.margin}>
                         <TextField
@@ -2416,8 +2417,8 @@ export default function Header(props) {
 
                     <Grid item xs={12} sm={6} lg={6}>
                       <InputLabel shrink htmlFor="confirm">
-                        {" "}
-                        Confirm Password{" "}
+
+                        Confirm Password
                       </InputLabel>
                       <FormControl className={classes.margin}>
                         <TextField
@@ -2448,8 +2449,8 @@ export default function Header(props) {
                         />
 
                         <Typography variant="inherit" color="error">
-                          {" "}
-                          {changeErrors.confirm?.message}{" "}
+
+                          {changeErrors.confirm?.message}
                         </Typography>
                       </FormControl>
                     </Grid>
@@ -2899,7 +2900,7 @@ export default function Header(props) {
               <Typography variant="h5" className={classes.title}>
                 <span className="refo-font">refo</span>
               </Typography>
-              <div className={classes.lgQuickButton}>
+              {/* <div className={classes.lgQuickButton}>
                 {decode.role !== "SUPERADMIN" ? (
                   <Tooltip title="Quick Access" placement="bottom">
                     <IconButton>
@@ -2908,8 +2909,7 @@ export default function Header(props) {
                         onClick={handleQAClick}
                         className={classes.quickAccessArrow}
                       />
-                      {/* {!isScrollOpen? <ArrowLeftIcon onClick={ ()=>{setIsScrollOpen(true)}} fontSize:"30px",background: "blue",color: "#fff",borderRadius: "22px"}}/>
-                    :<ArrowRightIcon onClick={ ()=>{setIsScrollOpen(false)}} style={{fontSize:"30px",background: "blue",color: "#fff",borderRadius: "22px"}}/>} */}
+                      
                     </IconButton>
                   </Tooltip>
                 ) : (
@@ -2926,14 +2926,13 @@ export default function Header(props) {
                         onClick={handleQAMobileClick}
                         className={classes.quickAccessArrow}
                       />
-                      {/* {!isScrollOpen? <ArrowLeftIcon onClick={ ()=>{setIsScrollOpen(true)}} style={{fontSize:"30px",background: "blue",color: "#fff",borderRadius: "22px"}}/>
-                    :<ArrowRightIcon onClick={ ()=>{setIsScrollOpen(false)}} style={{fontSize:"30px",background: "blue",color: "#fff",borderRadius: "22px"}}/>} */}
+                      
                     </IconButton>
                   </Tooltip>
                 ) : (
                   <></>
                 )}
-              </div>
+              </div> */}
               {/* {
                   isScrollOpen ?  */}
               <Popper
@@ -2990,14 +2989,14 @@ export default function Header(props) {
                             <img src={addUsers} alt="img" />
                             <p>Add Users</p>
                           </IconButton>
-                        </div>{" "}
+                        </div>
                       </>
                     ) : (
                       ""
                     )}
 
                     {decode.role === "ADMIN" ||
-                    decode.role === "CLIENTCOORDINATOR" ? (
+                      decode.role === "CLIENTCOORDINATOR" ? (
                       <div className={classes.quickAccessContainer}>
                         <IconButton
                           onClick={(e) => {
@@ -3209,17 +3208,14 @@ export default function Header(props) {
                           <ListItemText
                             primary={
                               <>
-                                {" "}
                                 <Typography>
-                                  {" "}
                                   {profile.recruiter?.firstName +
                                     " " +
-                                    profile.recruiter?.lastName}{" "}
+                                    profile.recruiter?.lastName}
                                 </Typography>
                                 <Typography>
-                                  {" "}
-                                  {profile.roleName}-
-                                  {profile.recruiter?.companyName}{" "}
+                                  {profile.roleName === "CLIENTCOORDINATOR" ? "Hiring Manager" : profile.roleName ==="SUBVENDOR" ? "Vendor" : profile.roleName }
+                                  {profile.recruiter?.companyName && " - "+profile.recruiter?.companyName}
                                 </Typography>
                                 <Typography> {profile.email} </Typography>
                               </>
@@ -3248,11 +3244,11 @@ export default function Header(props) {
                           <ListItemText
                             primary={
                               <>
-                                {" "}
+
                                 <Typography> SUPERADMIN </Typography>
                                 <Typography>
-                                  {" "}
-                                  {localStorage.getItem("email")}{" "}
+
+                                  {localStorage.getItem("email")}
                                 </Typography>
                               </>
                             }
@@ -3381,16 +3377,16 @@ export default function Header(props) {
           {view === "Settings" || view === "Profile" || view === "Change"
             ? list("right")
             : view === "User"
-            ? User("right")
-            : view === "Client"
-            ? Client("right")
-            : view === "Candidate"
-            ? Candidate("right")
-            : view === "Requirement"
-            ? Requirements("right")
-            : view === "Assign"
-            ? Assign("right")
-            : ""}
+              ? User("right")
+              : view === "Client"
+                ? Client("right")
+                : view === "Candidate"
+                  ? Candidate("right")
+                  : view === "Requirement"
+                    ? Requirements("right")
+                    : view === "Assign"
+                      ? Assign("right")
+                      : ""}
         </SwipeableDrawer>
       </AppBar>
 
@@ -3442,14 +3438,14 @@ export default function Header(props) {
                           <img src={addUsers} alt="img" />
                           <p>Add Users</p>
                         </IconButton>
-                      </div>{" "}
+                      </div>
                     </>
                   ) : (
                     ""
                   )}
 
                   {decode.role === "ADMIN" ||
-                  decode.role === "CLIENTCOORDINATOR" ? (
+                    decode.role === "CLIENTCOORDINATOR" ? (
                     <div className={classes.quickAccessContainer}>
                       <IconButton
                         onClick={(e) => {
@@ -3599,8 +3595,8 @@ export default function Header(props) {
                           {decode.role === "SUPERADMIN"
                             ? "SUPERADMIN"
                             : profile.recruiter?.firstName +
-                              " " +
-                              profile.recruiter?.lastName}
+                            " " +
+                            profile.recruiter?.lastName}
                         </span>
                       </Typography>
                     </>
@@ -3637,8 +3633,8 @@ export default function Header(props) {
                   onClick={(e) => {
                     window.open(
                       "https://api.whatsapp.com/send?phone=+91" +
-                        localStorage.getItem("mobile") +
-                        "&text=REFO is available in mobile browser so after candidate upload is super easy experience! \n Do every other task using your mobile browser. - https://refo.app/",
+                      localStorage.getItem("mobile") +
+                      "&text=REFO is available in mobile browser so after candidate upload is super easy experience! \n Do every other task using your mobile browser. - https://refo.app/",
                     );
                   }}
                 >
@@ -3668,8 +3664,8 @@ export default function Header(props) {
               variant="subtitle2"
               className={classes.digColor + " " + classes.digCenter}
             >
-              {" "}
-              Backup and Store{" "}
+
+              Backup and Store
             </Typography>
             <div className={classes.drawerClose}>
               <CloseIcon
@@ -3688,7 +3684,7 @@ export default function Header(props) {
                 startIcon={
                   <>
                     <SwapVertIcon />
-                    <CloudQueueIcon />{" "}
+                    <CloudQueueIcon />
                   </>
                 }
                 variant="contained"
@@ -3758,8 +3754,8 @@ export default function Header(props) {
             {view === "BackUpOnly"
               ? "Are you sure want to backup the data and store in local system?"
               : view === "BackUpDelete"
-              ? "Are you sure want to backup the data and remove in REFO cloud?"
-              : "The data has been loaded. Please click on the download button."}
+                ? "Are you sure want to backup the data and remove in REFO cloud?"
+                : "The data has been loaded. Please click on the download button."}
           </Typography>
 
           <div className={classes.sendWhatsapp}>
@@ -3774,8 +3770,8 @@ export default function Header(props) {
                       handleBackupOnly("Download");
                     }}
                   >
-                    {" "}
-                    Yes{" "}
+
+                    Yes
                   </Button>
                   <Button
                     variant="contained"
@@ -3783,8 +3779,8 @@ export default function Header(props) {
                     size="small"
                     onClick={handleconfirmClose}
                   >
-                    {" "}
-                    No{" "}
+
+                    No
                   </Button>
                 </>
               ) : view === "BackUpDelete" ? (
@@ -3797,8 +3793,8 @@ export default function Header(props) {
                       handleBackupOnly("Delete");
                     }}
                   >
-                    {" "}
-                    Yes{" "}
+
+                    Yes
                   </Button>
 
                   <Button
@@ -3807,8 +3803,8 @@ export default function Header(props) {
                     size="small"
                     onClick={handleconfirmClose}
                   >
-                    {" "}
-                    No{" "}
+
+                    No
                   </Button>
                 </>
               ) : (
@@ -3839,8 +3835,8 @@ export default function Header(props) {
                     color="secondary"
                     onClick={handleconfirmClose}
                   >
-                    {" "}
-                    Close{" "}
+
+                    Close
                   </Button>
                 </>
               ) : (
@@ -3858,7 +3854,7 @@ export default function Header(props) {
                         handleDeleteOpen();
                       }}
                     >
-                      {" "}
+
                       <CloudDownloadIcon /> Download
                     </a>
                   </Grid>
@@ -3868,8 +3864,8 @@ export default function Header(props) {
                     color="secondary"
                     onClick={handleconfirmClose}
                   >
-                    {" "}
-                    Close{" "}
+
+                    Close
                   </Button>
                 </>
               ) : (
@@ -3918,7 +3914,7 @@ export default function Header(props) {
             variant="body1"
             className={classes.center + " " + classes.colorRed}
           >
-            {" "}
+
             In order to permanently delete the data, please type 'DELETE' in
             capital letter. Then click on "CONFIRM" to proceed.
           </Typography>
@@ -3990,8 +3986,8 @@ export default function Header(props) {
         </DialogTitle>
         <DialogContent>
           <Typography variant="subtitle2" className={classes.center}>
-            {" "}
-            Restore the data that was downloaded earlier{" "}
+
+            Restore the data that was downloaded earlier
           </Typography>
 
           <div className={classes.root + " " + classes.center}>
@@ -4020,8 +4016,8 @@ export default function Header(props) {
           </div>
           <div className={classes.center + " " + classes.button}>
             <Typography variant="inherit" className={classes.lineBreak}>
-              {" "}
-              {file?.name}{" "}
+
+              {file?.name}
             </Typography>
 
             {file?.name ? (
@@ -4093,8 +4089,8 @@ export default function Header(props) {
         </DialogTitle>
         <DialogContent>
           <Typography variant="subtitle2" className={classes.center}>
-            {" "}
-            Are you sure?{" "}
+
+            Are you sure?
           </Typography>
 
           <Grid className={classes.sendWhatsapp}>
@@ -4149,9 +4145,9 @@ export default function Header(props) {
         <DialogContent>
           <Grid className={classes.center}>
             <a href={sample_candidates} className={classes.aLink} download>
-              {" "}
+
               Sample excel format to upload your data (Only then Vendor /
-              Freelancer can check duplicate){" "}
+              Freelancer can check duplicate)
             </a>
           </Grid>
 
@@ -4181,8 +4177,8 @@ export default function Header(props) {
           </Grid>
           <Grid className={classes.center + " " + classes.button}>
             <Typography variant="inherit" className={classes.lineBreak}>
-              {" "}
-              {file?.name}{" "}
+
+              {file?.name}
             </Typography>
           </Grid>
 
@@ -4240,8 +4236,8 @@ export default function Header(props) {
         </DialogTitle>
         <DialogContent>
           <Typography variant="subtitle2" className={classes.center}>
-            {" "}
-            Are you sure?{" "}
+
+            Are you sure?
           </Typography>
 
           <Grid className={classes.sendWhatsapp}>
@@ -4392,8 +4388,8 @@ export default function Header(props) {
               <Grid item xs={12} spacing={2}>
                 <FormControl className={classes.margin}>
                   <InputLabel shrink htmlFor="requirementId">
-                    {" "}
-                    Requirement Name{" "}
+
+                    Requirement Name
                   </InputLabel>
                   <Autocomplete
                     // className={classes.AutocompleteFullWidth}
