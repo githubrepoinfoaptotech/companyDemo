@@ -45,6 +45,10 @@ const recruiter=sequelize.define("recruiter",{
         type:Sequelize.STRING,
         allowNull:true,
     },
+    companyWebsite:{
+        type:Sequelize.STRING,
+        allowNull:true,
+    },
     headOfficeLocation:{
         type: Sequelize.STRING,
         allowNull: true,

@@ -308,7 +308,9 @@ exports.addFreeCandidate = async (req, res) => {
           reason: reason,
           isExternal:"YES",
           createdBy:req.recruiterId,
-          currentCompanyName:req.body.currentCompanyName
+          currentCompanyName:req.body.currentCompanyName,
+          panNumber:request.body.panNumber,
+          linkedInProfile:req.body.linkedInProfile
         };
 
         if (cnd_data) {
@@ -521,7 +523,9 @@ exports.addFreeCandidate = async (req, res) => {
             gender: req.body.gender,
             reason: reason,
             createdBy:req.recruiterId,
-            isExternal:"NO"
+            isExternal:"NO",
+            panNumber:req.body.panNumber,
+            linkedInProfile:req.body.linkedInProfile
           };
 
           if (cnd_data) {
@@ -1383,7 +1387,8 @@ exports.viewCandidateOpen = async (req, res) => {
               },
               {
                 model: recruiter,
-                attributes: ["firstName", "lastName"],
+                attributes: ["firstName", "lastName","companyName"],
+
               },
             ],
           },
@@ -1397,9 +1402,10 @@ exports.viewCandidateOpen = async (req, res) => {
           //     mainId: data.mainId,
           //   },
           // });
+          mycomp=await recruiter.findOne({where:{userId:data.mainId}});
           res
             .status(200)
-            .json({ data: data, status: true});
+            .json({ data: data, status: true,companyName:mycomp.conpanyName,companyWebsite:mycomp.companyWebsite});
         } else {
           res.status(200).json({ data: [], status: false });
         }

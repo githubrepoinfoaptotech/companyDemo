@@ -48,7 +48,7 @@ const Imageupload = multer({
 // superadmin control ---------------------------------------------------------------------------------------------------
 exports.addAdmin = async (req, res) => {
   try {
-    const {companyAddress, email, firstName, lastName, password, companyName, mobile, employeeId } =
+    const {companyAddress, email, firstName, lastName, password, companyName, mobile, employeeId,companyWebsite } =
       req.body;
     const checkuser_email = await user.findOne({ where: { [Op.or]: { email: email } } });
     const checkuser_mobile = await recruiter.findOne({ where: { [Op.or]: { mobile: mobile } } });
@@ -78,7 +78,8 @@ exports.addAdmin = async (req, res) => {
             mobile: mobile,
             lastName: lastName,
             employeeId: employeeId,
-            companyAddress:companyAddress
+            companyAddress:companyAddress,
+            companyWebsite:companyWebsite
           });
           await data.update({ mainId: data.id });
           // if(company_type=="COMPANY")
@@ -209,7 +210,7 @@ exports.addAdmin = async (req, res) => {
 };
 exports.editAdmin = async (req, res) => {
   console.log(req.body);
-  const { companyAddress,email, firstName, lastName, companyName, mobile, employeeId } = req.body;
+  const { companyAddress,email, firstName, lastName, companyName, mobile, employeeId,companyWebsite } = req.body;
   user
     .findOne({ where: { id: req.body.id } })
     .then(async (data) => {
@@ -222,7 +223,8 @@ exports.editAdmin = async (req, res) => {
             lastName: lastName,
             companyName: companyName,
             employeeId: employeeId,
-            companyAddress:companyAddress
+            companyAddress:companyAddress,
+            companyWebsite:companyWebsite
           },
           { where: { userId: data.id } }
         ).then(() => {
@@ -245,7 +247,8 @@ exports.editAdmin = async (req, res) => {
               mobile: mobile,
               lastName: lastName,
               companyName: companyName,
-              companyAddress:companyAddress
+              companyAddress:companyAddress,
+              companyWebsite:companyWebsite
             },
             { where: { userId: data.id } }
           );
