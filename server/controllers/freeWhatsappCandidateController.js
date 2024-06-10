@@ -1430,7 +1430,29 @@ exports.getAllCandidateStatusOpen = async (req, res) => {
     });
 };
 
-
+exports.reciveCandidateConformation=async(req,res)=>
+  {
+    try{
+    var cpv_data=await candidateCpv.findOne({where:{id:req.body.id}});
+      if(cpv_data)
+        {
+          await data.cpv_data({
+            candidateConformation:req.body.candidateConformation
+          });
+          res.status(200).json({ status: true, message: "Response Recorded" });
+        }
+        else
+        {
+          res.status(200).json({ status: false, message: "Invalid Action" });
+        }
+        
+    }
+    catch(e)
+    {
+      console.log(e);
+      res.status(500).json({ status: false, mesage: "Error" });
+    }
+  };
 
 
 ////

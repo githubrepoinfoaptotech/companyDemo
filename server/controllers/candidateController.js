@@ -3447,6 +3447,9 @@ exports.updateCandidateMindSetAssessment=async(req,res)=>{
       res.status(500).json({ status: false, mesage: "Error" });
     });
 }; 
+
+
+
 // exports.cadidateVerifiedCpv=(req,res)=>{
 //   candidate.findOne({where:{candidateId:req.body.cadidateId},include:[candidateCpv]}).then(async data=>{
 

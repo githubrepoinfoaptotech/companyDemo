@@ -29,5 +29,6 @@ route.post("/viewCandidateOpen",candidateYes.viewCandidateOpen);
 route.post("/getAllCandidateStatusOpen",candidateYes.getAllCandidateStatusOpen);
 route.post("/externalViewRequirementsCandidate",authController.externalViewRequirementsCandidate);
 route.post("/viewRequirementOpen",authController.viewRequirementOpen);
+route.post("/reciveCandidateConformation",candidateYes.reciveCandidateConformation);
 
 module.exports = route;
