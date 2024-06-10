@@ -21,6 +21,8 @@ require("dotenv").config();
 
 route.post('/addcandidateRequirement',check_auth,candidateController.addcandidateRequirement);
 route.post('/updateCandidateResume',check_auth,fileUploader.resumeUpload,candidateController.updateCandidateResume);
+route.post('/updateCandidateDocument',check_auth,fileUploader.documentUpload,candidateController.updateCandidateDocument);
+route.post('/updateCandidatePhoto',check_auth,fileUploader.photoUpload,candidateController.updateCandidatePhoto);
 route.post('/editCandidate',check_auth,candidateController.editCandidate);
 route.post('/addCandidate',check_auth,validation.addCandidateValidation,message.checkCredsAvailable,candidateController.addCandidate);
 // route.post('/allCanditates',check_auth,candidateController.viewAllCanditates);

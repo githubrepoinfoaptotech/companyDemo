@@ -37,6 +37,14 @@ const candidateDetail=sequelize.define("candidateDetail",{
         type:Sequelize.STRING,
         allowNull:true
     },
+    document:{
+        type:Sequelize.STRING,
+        allowNull:true
+    },
+    photo:{
+        type:Sequelize.STRING,
+        allowNull:true
+    },
     currentLocation:{
         type:Sequelize.STRING,
         allowNull:true

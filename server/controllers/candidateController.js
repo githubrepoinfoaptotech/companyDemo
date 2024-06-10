@@ -119,6 +119,43 @@ exports.updateCandidateResume = async (req, res) => {
       res.status(500).json({ status: false, mesage: "Error" });
     });
 };
+
+exports.updateCandidateDocument=async(req,res)=>{
+  candidateDetails
+  .findOne({ where: { id: req.body.id } })
+  .then(async (data) => {
+    if (req.file) {
+      await data.update({
+        document: "documents" + "/" + req.file.key,
+      });
+     res.status(200).json({ status: true, message: "Resume Added" });  
+    } else {
+      res.status(200).json({ status: true, message: "No Resume Submitted" });
+    }
+  })
+  .catch((e) => {
+    res.status(500).json({ status: false, mesage: "Error" });
+  });
+};
+
+exports.updateCandidatePhoto=async(req,res)=>{
+  candidateDetails
+  .findOne({ where: { id: req.body.id } })
+  .then(async (data) => {
+    if (req.file) {
+      await data.update({
+        photo: "photos" + "/" + req.file.key,
+      });
+     res.status(200).json({ status: true, message: "Resume Added" });  
+    } else {
+      res.status(200).json({ status: true, message: "No Resume Submitted" });
+    }
+  })
+  .catch((e) => {
+    res.status(500).json({ status: false, mesage: "Error" });
+  });
+};
+
 exports.checkCandidateDetailExist = async (req, res) => {
   const roleName=req.roleName;
   if(roleName=="FREELANCER"||roleName=="SUBVENDOR"){
@@ -1033,6 +1070,22 @@ exports.viewAllCanditates = async (req, res) => {
                   ),
                   "resume",
                 ],
+                [
+                  fn(
+                    "concat",
+                    process.env.liveUrl,
+                    col("candidateDetail.document")
+                  ),
+                  "document",
+                ],
+                [
+                  fn(
+                    "concat",
+                    process.env.liveUrl,
+                    col("candidateDetail.photo")
+                  ),
+                  "photo",
+                ]
               ],
             },
             {model:Source,attributes:['name','status']},
@@ -1162,6 +1215,8 @@ exports.viewCandidate = async (req, res) => {
               "reason",
               "isExternal",
               "currentCompanyName",
+              'panNumber',
+              'linkedInProfile',
               [
                 fn(
                   "concat",
@@ -1170,6 +1225,22 @@ exports.viewCandidate = async (req, res) => {
                 ),
                 "resume",
               ],
+              [
+                fn(
+                  "concat",
+                  process.env.liveUrl,
+                  col("candidateDetail.document")
+                ),
+                "document",
+              ],
+              [
+                fn(
+                  "concat",
+                  process.env.liveUrl,
+                  col("candidateDetail.photo")
+                ),
+                "photo",
+              ]
             ],
           },
           {
@@ -1283,6 +1354,8 @@ exports.myCandidates = async (req, res) => {
         "isExternal",
         'currentCompanyName',
         "currentCompanyName",
+        "linkedInProfile",
+        "panNumber",
                 [
                   fn(
                     "concat",
@@ -1291,6 +1364,22 @@ exports.myCandidates = async (req, res) => {
                   ),
                   "resume",
                 ],
+                [
+                  fn(
+                    "concat",
+                    process.env.liveUrl,
+                    col("candidateDetail.document")
+                  ),
+                  "document",
+                ],
+                [
+                  fn(
+                    "concat",
+                    process.env.liveUrl,
+                    col("candidateDetail.photo")
+                  ),
+                  "photo",
+                ]
       ],
       required: true,
     };
@@ -2680,6 +2769,7 @@ exports.DitchedReport = async (req, res) => {
 };
 
 exports.getReportCount = async (req, res) => {
+  try{
   var myMonthArr = await onloadInvoice(req.mainId);
   var Year = req.body.year;
   var myArr=[];
@@ -2732,18 +2822,46 @@ exports.getReportCount = async (req, res) => {
         },
       };
     }
- 
+    if(req.body.statusCode==312)
+    {
     await candidateStatus
-      .count({ include:[candidate],where: myquery })
-      .then((data) => {
-       myArr.push({count:data,month:myMonthArr[i]});
-      })
+  .findAll({
+    include: [{
+      model: candidate,
+      attributes: ['id', 'statusCode', 'invoiceValue', 'invoicedDate']
+    }],
+    where: myquery
+  })
+  .then((data) => {
+    const totalInvoiceValue = data.reduce((sum, current) => sum + current.candidate.invoiceValue, 0);
+    myArr.push({ count: data.length, month: myMonthArr[i], totalInvoiceValue: totalInvoiceValue });
+  });
+}
+else{
+  await candidateStatus
+  .count({
+    include: [{
+      model: candidate,
+    }],
+    where: myquery
+  })
+  .then((data) => {
+    
+    myArr.push({ count: data, month: myMonthArr[i] });
+  });
+}
       if (myMonthArr[i] == 12) {
         Year = Year + 1;
       }
   }
 
   res.status(200).json({data:myArr,status:true}); 
+}
+catch(e)
+{
+  console.log(e);
+  res.status(500).json({ message: "ERROR", status: false });
+}
 };
 
 exports.getAllReportCount = async (req, res) => {

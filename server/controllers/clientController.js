@@ -343,6 +343,10 @@ exports.viewAllClients = async (req, res) => {
   var limit = 50;
   const attributes=["id","mainId","statusCode","uniqueId","clientName","approved","clientWebsite","clientIndustry","aggStartDate","aggEndDate","createdAt"]
   var mywhere={ mainId: req.mainId };
+  if(req.roleName=="CLIENTCOORDINATOR")
+    {
+      mywhere.handlerId=req.recruiterId;
+    }
   if(req.body.clientId){
     mywhere.id=req.body.clientId;
   }
@@ -519,14 +523,19 @@ exports.addOrgRecruiter = async (req, res) => {
         .status(200)
         .json({ message: "Recruiter Already Exits", status: false });
     } else {
+      var adddata={
+        name:name,
+        email:email,
+        mobile:mobile,
+        mainId:req.mainId,
+        clientId:clientId,
+      };
+      if(req.body.recruiterId)
+        {
+          adddata.recruiterId=req.body.recruiterId
+        }
       await orgRecruiter
-        .create({
-          name:name,
-          email:email,
-          mobile:mobile,
-          mainId:req.mainId,
-          clientId:clientId,
-        });  
+        .create(adddata);  
         res.status(200).json({ message: "Successfully Created A Organization Recruiter",status:true});
      }   
   } catch (error) {
@@ -563,6 +572,7 @@ exports.editOrgRecruiter=async(req,res)=>{
       await data.update({
         name: name,
         mobile: mobile, 
+        recruiterId:req.body.recruiterId
       });
       if(req.companyType=="COMPANY")
         {
@@ -580,6 +590,7 @@ exports.editOrgRecruiter=async(req,res)=>{
           name: name,
           email: email,
           mobile: mobile,
+          recruiterId:req.body.recruiterId
         });
         if(req.companyType=="COMPANY")
           {
@@ -602,7 +613,13 @@ exports.editOrgRecruiter=async(req,res)=>{
 };
 
 exports.getClientList=async(req,res)=>{
-  client.findAll({where:{mainId:req.mainId,statusCode:101},attributes:['id','clientName','uniqueId']}).then(data=>{
+
+  var mywhere={mainId:req.mainId,statusCode:101};
+  if(req.roleName=="CLIENTCOORDINATOR")
+    {
+      mywhere.handlerId=req.recruiterId;
+    }
+  client.findAll({where:mywhere,attributes:['id','clientName','uniqueId']}).then(data=>{
     res.status(200).json({status:true,data:data});
   }).catch(e=>{
     res.status(500).json({ status: false, message: "Error" });
@@ -623,7 +640,7 @@ exports.getAllClientList=async(req,res)=>{
   });
 };
 exports.getOrganisationReciruterList=async(req,res)=>{
-  await orgRecruiter.findAll({where:{clientId:req.body.id,mainId:req.mainId,isActive:true},attributes:['id','name']}).then(async data=>{
+  await orgRecruiter.findAll({where:{clientId:req.body.id,mainId:req.mainId,isActive:true},attributes:['id','name','recruiterId']}).then(async data=>{
     lvlHrData=await levelOfHiring.findAll({where:{clientId:req.body.id,mainId:req.mainId},attributes:['id','name']});
     res.status(200).json({status:true,data:data,lvlHrData:lvlHrData});
   }).catch(e=>{
@@ -636,6 +653,17 @@ exports.getEditOrganisationReciruterList=async(req,res)=>{
   }).catch(e=>{
     res.status(500).json({ status: false, message: "Error" });
   });
+};
+
+exports.getMyProjects=async(req,res)=>{
+  try{
+  c_data=await client.findAll({where:{handlerId:req.recruiterId}});
+  res.status(200).json({status:true,data:c_data});
+  }
+  catch(e)
+  {
+    res.status(500).json({ status: false, message: "Error" });
+  }
 };
 exports.clientStatusCodeList=async(req,res)=>{
   statusCode.findAll({where:{statusType:"CLIENT"},attributes:['statusCode','id','statusname']}).then(data=>{

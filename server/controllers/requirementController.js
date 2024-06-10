@@ -35,7 +35,7 @@ exports.addRequirement = async (req, res) => {
         statusCode: 201,
         mainId: req.mainId,
         recruiterId: req.recruiterId,
-        orgRecruiterId: req.body.orgRecruiterId,
+        //orgRecruiterId: req.body.orgRecruiterId,
         experience:req.body.experience,
         jobLocation:req.body.jobLocation,
         hideFromInternal:req.body.hideFromInternal,
@@ -45,9 +45,9 @@ exports.addRequirement = async (req, res) => {
         levelOfHiringId:req.body.levelOfHiringId,
         createdBy:req.userId
       };
-      ord_data=await orgRecruiter.findOne({where:{id:req.body.orgRecruiterId,mainId:req.mainId}});
-      user_data=await user.findOne({where:{email:ord_data.email,mainId:req.mainId},include:[recruiter]});
-      console.log(user_data);
+      // ord_data=await orgRecruiter.findOne({where:{id:req.body.orgRecruiterId,mainId:req.mainId}});
+      // user_data=await user.findOne({where:{email:ord_data.email,mainId:req.mainId},include:[recruiter]});
+      // console.log(user_data);
       }
       
     else
@@ -82,16 +82,26 @@ exports.addRequirement = async (req, res) => {
     }
     myreq.uniqueId = `${myreq.requirementText}${myreq.requirementInt}`;
     await requirements.create(myreq).then(async (data) => {
-      var isAssigned=await assignedRequirements.findOne({where:{recruiterId:user_data.recruiter.id,requirementId:data.id,mainId:req.mainId}});
-      if(!isAssigned)
+      var recList=req.body.assignRecruitersList;
+      var rec;
+      if(recList.length>0)
         {
-          await assignedRequirements.create({
-            recruiterId:user_data.recruiter.id,//towho(req.body.)
-            assignedBy:req.recruiterId,//bywho(req.)
-            mainId:req.mainId,
-            requirementId:data.id
-          });
+          for(i=0;i<=recList.length;i++)
+            {
+              rec=recList[i];
+              var isAssigned=await assignedRequirements.findOne({where:{recruiterId:rec,requirementId:data.id,mainId:req.mainId}});
+              if(!isAssigned)
+                {
+                  await assignedRequirements.create({
+                    recruiterId:rec,//towho(req.body.)
+                    assignedBy:req.recruiterId,//bywho(req.)
+                    mainId:req.mainId,
+                    requirementId:data.id
+                  });
+                }
+            }
         }
+     
       res
         .status(200)
         .json({ status: true, message: "Requirement Added Successfully",requirementId:data.dataValues.id });
@@ -316,6 +326,11 @@ exports.viewRequirement = async (req, res) => {
       {
         model:levelOfHiring,
         attributes:["name","id"]
+      },
+      {
+        model:assignedRequirements,
+        attributes:["recruiterId","id"],
+        include:[{model:recruiter,attributes:["firstName","lastName","email"]}]
       }
     ],attributes:[
       'requirementName',
@@ -495,7 +510,7 @@ exports.assignRequirements=async(req,res)=>{
     mainId:req.mainId,
     requirementId:req.body.requirementId
   }).then(data=>{
-    res.status(200).json({status:true,message:"Requirement Assigend"});
+    res.status(200).json({status:true,message:"Requirement Assigend",addedData:{id:data.id,recruiterId:data.recruiterId}});
   }).catch(e=>{
     console.log(e);
     res.status(500).json({status:false,message:"ERROR"});
@@ -505,7 +520,20 @@ exports.assignRequirements=async(req,res)=>{
   res.status(200).json({status:false,message:"Requirement already assigned to user!"});
  }
 };
+
+exports.removeAssignedRequirements=async(req,res)=>{
+  try{
+    await assignedRequirements.destroy({where:{id:req.body.id}});
+    res.status(200).json({status:true,message:"Removed"});
+  }
+ catch(e)
+ {
+  console.log(e);
+  res.status(500).json({message:"Error",status:false});
+ } 
  
+};
+
 exports.getAssignedRequierments=async(req,res)=>{
   if(req.roleName=="ADMIN"){
     var mywhere={recruiterId:req.recruiterId,isActive:true};

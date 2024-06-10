@@ -32,9 +32,9 @@ route.post("/adminDashboard",check_auth_admin,adminDashboard);
 
 
 // -----
-route.post('/addOrgRecruiter',check_auth_admin,validation.addOrgRecValidation,clientController.addOrgRecruiter);
-route.post('/editOrgRecruiter',check_auth_admin,validation.editOrgRecValidation,clientController.editOrgRecruiter);
-route.post('/changeOrgRecruiterStatus',check_auth_admin,clientController.changeOrgRecruiterStatus);
+route.post('/addOrgRecruiter',check_auth_CC,validation.addOrgRecValidation,clientController.addOrgRecruiter);
+route.post('/editOrgRecruiter',check_auth_CC,validation.editOrgRecValidation,clientController.editOrgRecruiter);
+route.post('/changeOrgRecruiterStatus',check_auth_CC,clientController.changeOrgRecruiterStatus);
 // ------
 route.post('/changeUserRole',check_auth_admin,userController.changeUserRole);
 route.post('/changeUserState',check_auth_admin,userController.changeUserState);
@@ -131,7 +131,7 @@ route.post("/clientRestoreBackup",check_auth_admin,fileUploader.backupFile,backu
 route.post("/clientrestoreDataBase",check_auth_admin,backupController.clientrestoreDataBase);
 
 //external User
-route.post("/assignRequirements",check_auth_admin,requirementController.assignRequirements);
+route.post("/assignRequirements",check_auth_CC,requirementController.assignRequirements);
 route.post("/viewAllAssigendRequirements",check_auth_admin,requirementController.viewAllAssigendRequirements);
 
 route.post("/changeAssignedRequirementStatus",check_auth_admin,requirementController.changeAssignedRequirementStatus);
@@ -144,6 +144,6 @@ route.post("/msmeSearchCompany",check_auth_admin,authController.msmeSearchCompan
 route.post("/getAssignedCompanies",check_auth_admin,requirementController.getAssignedCompanies);
 route.post("/viewRequirementCandidates",check_auth_admin,requirementController.viewRequirementCandidates);
 route.post("/candidateCvLink",check_auth_admin,candidateController.candidateCvLink);
-route.post("/orgPocForCompany",check_auth_admin,userController.orgPocForCompany);
+route.post("/orgPocForCompany",check_auth_CC,userController.orgPocForCompany);
 
 module.exports = route;     

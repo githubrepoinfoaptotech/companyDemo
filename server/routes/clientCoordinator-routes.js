@@ -34,4 +34,6 @@ route.post("/addHiringLevel",check_auth_CC,validation.addHiringLevelValidation,C
 route.post("/editHiringLevel",check_auth_CC,validation.editHiringLevelValidation,ClientController.editHiringLevel);
 route.post("/approveNotes",check_auth_CC,candidateNotes.approveNotes);
 route.post("/resendOtp",check_auth_mail,ClientController.resendOtp);
+route.post("/getMyProjects",check_auth_CC,ClientController.getMyProjects);
+route.post("/removeAssignedRequirements",check_auth_CC,requirementController.removeAssignedRequirements);
 module.exports=route;
