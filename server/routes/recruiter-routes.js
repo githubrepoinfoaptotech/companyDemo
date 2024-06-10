@@ -75,7 +75,7 @@ route.post('/externalUserList',check_auth,userController.externalUserList);
 route.post('/inviteMsme',check_auth,authController.inviteMsme);
 route.post('/sendCPVLink',check_auth,candidateController.sendCPVLink);
 route.post('/candidateCpvForm',candidateController.candidateCpvForm);
-route.post('/viewCpv',check_auth,candidateController.viewCpv);
+route.post('/viewCpv',candidateController.viewCpv);
 route.post('/candiateCpvLink',check_auth,candidateController.candiateCpvLink);
 route.post('/updateCandidateMindSetAssessment',check_auth,fileUploader.candidateMindsetAssessmentUpload,candidateController.updateCandidateMindSetAssessment);
 route.post('/extractInfo',check_auth,extracttext.textExtract);

@@ -1405,7 +1405,7 @@ exports.viewCandidateOpen = async (req, res) => {
           mycomp=await recruiter.findOne({where:{userId:data.mainId}});
           res
             .status(200)
-            .json({ data: data, status: true,companyName:mycomp.conpanyName,companyWebsite:mycomp.companyWebsite});
+            .json({ data: data, status: true,companyName:mycomp.companyName,companyWebsite:mycomp.companyWebsite});
         } else {
           res.status(200).json({ data: [], status: false });
         }
