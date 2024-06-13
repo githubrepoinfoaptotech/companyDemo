@@ -24,7 +24,7 @@ import DescriptionIcon from '@material-ui/icons/Description';
 import axios from 'axios';
 import PersonPinIcon from '@material-ui/icons/PersonPin';
 import CloseIcon from '@material-ui/icons/Close';
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import red from '@material-ui/core/colors/red';
 
 
@@ -173,7 +173,7 @@ const Singlechat = (props) => {
 
   const token = localStorage.getItem("token");
 
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
 
 
 

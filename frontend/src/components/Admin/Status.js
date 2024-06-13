@@ -2,7 +2,7 @@ import { Button } from "@material-ui/core";
 import { Grid } from "@material-ui/core";
 import useStyles from "../../themes/style.js";
 import Tooltip from "@material-ui/core/Tooltip";
-import jwtDecode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 const Status = (props) => {
   const classes = useStyles();
@@ -62,7 +62,7 @@ const Status = (props) => {
           ""
         )}
 
-        {props.list.statusCode === 312 ? (
+        {decode.companyType !== "COMPANY" && props.list.statusCode === 312 && (
           <>
             <Button
               variant="contained"
@@ -96,10 +96,15 @@ const Status = (props) => {
               Invoiced
             </Button>
           </>
-        ) : (
-          ""
         )}
-
+        {decode.companyType === "COMPANY" && props.list.statusCode === 312 &&
+          <Button
+            variant="contained"
+            size="small"
+            className={classes.green}>
+            Joined
+          </Button>
+        }
         {props.list.statusCode !== 302 &&
         props.list.statusCode !== 308 &&
         props.list.statusCode !== 310 &&
@@ -149,7 +154,7 @@ const Status = (props) => {
               {props.list.statusCode === 301
                 ? "Pending Validation"
                 : props.list.statusCode === 303
-                ? (decode.companyType === "COMPANY" ? "Submitted to HM" :"Submitted to Client")
+                ? decode.companyType === "COMPANY" ? "Submitted to HM" :"Submitted to Client"
                 : props.list.statusCode === 3031
                 ? "Schedule Interview"
                 : props.list.statusCode === 304

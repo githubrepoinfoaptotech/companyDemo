@@ -13,15 +13,14 @@ import { Autocomplete } from "@material-ui/lab";
 import useStyles from "../../themes/style.js";
 import CloseIcon from "@material-ui/icons/Close";
 import TabView from "./TabView.js";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 const MatchJDDialog = (props) => {
   const classes = useStyles();
   const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
 
   const handleChange = (event, value) => {
-    console.log(value);
     if (value) {
       props.cvMatchingPercentage(props.candidMatchId, value.id);
     }

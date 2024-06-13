@@ -43,7 +43,7 @@ import io from "socket.io-client";
 import red from '@material-ui/core/colors/red';
 
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 
 function TabPanel(props) {
@@ -187,7 +187,7 @@ const Home = (props) => {
   const classes = useStyles();
   const [loader, setLoader] = useState(false);
   const token = localStorage.getItem('token');
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
 
 
   const [state, setState] = useState({

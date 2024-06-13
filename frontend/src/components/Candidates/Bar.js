@@ -5,7 +5,7 @@ import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 import LanguageIcon from "@material-ui/icons/Language";
 import moment from "moment";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -18,7 +18,7 @@ import useStyles from "../../themes/style.js";
 export default function Bar(props) {
   var classes = useStyles();
   const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
   const [New, setNew] = React.useState(null);
   const [STC, setSTC] = React.useState(null);
   const [Scheduled, setScheduled] = React.useState(null);
@@ -254,14 +254,14 @@ export default function Bar(props) {
                       className={
                         props.list.myCandidateStatuses?.length
                           ? props.list.myCandidateStatuses.filter(
-                              (item) => item.statusCode === 303,
-                            )[0]?.statusCode === 303
+                            (item) => item.statusCode === 303,
+                          )[0]?.statusCode === 303
                             ? classes.barItem + " " + classes.completed
                             : props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 302,
-                              )[0]?.statusCode === 302
-                            ? classes.barItem + " " + classes.cancel
-                            : classes.barItem
+                              (item) => item.statusCode === 302,
+                            )[0]?.statusCode === 302
+                              ? classes.barItem + " " + classes.cancel
+                              : classes.barItem
                           : classes.barItem
                       }
                     >
@@ -272,8 +272,8 @@ export default function Bar(props) {
                         onMouseEnter={(e) =>
                           props.list.myCandidateStatuses?.length
                             ? props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 303,
-                              )[0]?.statusCode === 303
+                              (item) => item.statusCode === 303,
+                            )[0]?.statusCode === 303
                               ? handleSTCOpen(e)
                               : ""
                             : ""
@@ -281,8 +281,8 @@ export default function Bar(props) {
                         onMouseLeave={(e) =>
                           props.list.myCandidateStatuses?.length
                             ? props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 303,
-                              )[0]?.statusCode === 303
+                              (item) => item.statusCode === 303,
+                            )[0]?.statusCode === 303
                               ? handleSTCClose(e)
                               : ""
                             : ""
@@ -294,8 +294,8 @@ export default function Bar(props) {
                           )[0]?.statusCode === 303 ? (
                             <CheckIcon className={classes.BarColor} />
                           ) : props.list.myCandidateStatuses.filter(
-                              (item) => item.statusCode === 302,
-                            )[0]?.statusCode === 302 ? (
+                            (item) => item.statusCode === 302,
+                          )[0]?.statusCode === 302 ? (
                             <CloseIcon className={classes.BarColor} />
                           ) : (
                             "2"
@@ -305,7 +305,7 @@ export default function Bar(props) {
                         )}
                       </div>
                       <div className={classes.barName}>
-                        Submitted to <br /> { decode.companyType === "COMPANY" ? "Hiring Manager" : "Client"  }
+                        Submitted to <br /> {decode.companyType === "COMPANY" ? "Hiring Manager" : "Client"}
                         <Popover
                           className={classes.BarPointer}
                           open={stcopen}
@@ -323,12 +323,12 @@ export default function Bar(props) {
                           <Typography sx={{ p: 1 }} className={classes.BarGap}>
                             {props.list.myCandidateStatuses?.length
                               ? props.list.myCandidateStatuses
-                                  .filter((item) => item.statusCode === 303)
-                                  .map((value) =>
-                                    moment(value.createdAt).format(
-                                      "DD-MM-YYYY",
-                                    ),
-                                  )
+                                .filter((item) => item.statusCode === 303)
+                                .map((value) =>
+                                  moment(value.createdAt).format(
+                                    "DD-MM-YYYY",
+                                  ),
+                                )
                               : ""}
                           </Typography>
                         </Popover>
@@ -338,14 +338,14 @@ export default function Bar(props) {
                       className={
                         props.list.myCandidateStatuses?.length
                           ? props.list.myCandidateStatuses.filter(
-                              (item) => item.statusCode === 304,
-                            )[0]?.statusCode === 304
+                            (item) => item.statusCode === 304,
+                          )[0]?.statusCode === 304
                             ? classes.barItem + " " + classes.completed
                             : props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 302,
-                              )[0]?.statusCode === 302
-                            ? classes.barItem + " " + classes.cancel
-                            : classes.barItem
+                              (item) => item.statusCode === 302,
+                            )[0]?.statusCode === 302
+                              ? classes.barItem + " " + classes.cancel
+                              : classes.barItem
                           : classes.barItem
                       }
                     >
@@ -358,8 +358,8 @@ export default function Bar(props) {
                         onMouseEnter={(e) =>
                           props.list.myCandidateStatuses?.length
                             ? props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 304,
-                              )[0]?.statusCode === 304
+                              (item) => item.statusCode === 304,
+                            )[0]?.statusCode === 304
                               ? handleScheduledOpen(e)
                               : ""
                             : ""
@@ -367,8 +367,8 @@ export default function Bar(props) {
                         onMouseLeave={(e) =>
                           props.list.myCandidateStatuses?.length
                             ? props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 304,
-                              )[0]?.statusCode === 304
+                              (item) => item.statusCode === 304,
+                            )[0]?.statusCode === 304
                               ? handleScheduledClose(e)
                               : ""
                             : ""
@@ -380,8 +380,8 @@ export default function Bar(props) {
                           )[0]?.statusCode === 304 ? (
                             <CheckIcon className={classes.BarColor} />
                           ) : props.list.myCandidateStatuses.filter(
-                              (item) => item.statusCode === 302,
-                            )[0]?.statusCode === 302 ? (
+                            (item) => item.statusCode === 302,
+                          )[0]?.statusCode === 302 ? (
                             <CloseIcon className={classes.BarColor} />
                           ) : (
                             "3"
@@ -409,12 +409,12 @@ export default function Bar(props) {
                           <Typography sx={{ p: 1 }} className={classes.BarGap}>
                             {props.list.myCandidateStatuses?.length
                               ? props.list.myCandidateStatuses
-                                  .filter((item) => item.statusCode === 304)
-                                  .map((value) =>
-                                    moment(value.createdAt).format(
-                                      "DD-MM-YYYY",
-                                    ),
-                                  )
+                                .filter((item) => item.statusCode === 304)
+                                .map((value) =>
+                                  moment(value.createdAt).format(
+                                    "DD-MM-YYYY",
+                                  ),
+                                )
                               : ""}
                           </Typography>
                         </Popover>
@@ -424,14 +424,14 @@ export default function Bar(props) {
                       className={
                         props.list.myCandidateStatuses?.length
                           ? props.list.myCandidateStatuses.filter(
-                              (item) => item.statusCode === 305,
-                            )[0]?.statusCode === 305
+                            (item) => item.statusCode === 305,
+                          )[0]?.statusCode === 305
                             ? classes.barItem + " " + classes.completed
                             : props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 302,
-                              )[0]?.statusCode === 302
-                            ? classes.barItem + " " + classes.cancel
-                            : classes.barItem
+                              (item) => item.statusCode === 302,
+                            )[0]?.statusCode === 302
+                              ? classes.barItem + " " + classes.cancel
+                              : classes.barItem
                           : classes.barItem
                       }
                     >
@@ -442,8 +442,8 @@ export default function Bar(props) {
                         onMouseEnter={(e) =>
                           props.list.myCandidateStatuses?.length
                             ? props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 305,
-                              )[0]?.statusCode === 305
+                              (item) => item.statusCode === 305,
+                            )[0]?.statusCode === 305
                               ? handleFICOpen(e)
                               : ""
                             : ""
@@ -451,8 +451,8 @@ export default function Bar(props) {
                         onMouseLeave={(e) =>
                           props.list.myCandidateStatuses?.length
                             ? props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 305,
-                              )[0]?.statusCode === 305
+                              (item) => item.statusCode === 305,
+                            )[0]?.statusCode === 305
                               ? handleFICClose(e)
                               : ""
                             : ""
@@ -464,8 +464,8 @@ export default function Bar(props) {
                           )[0]?.statusCode === 305 ? (
                             <CheckIcon className={classes.BarColor} />
                           ) : props.list.myCandidateStatuses.filter(
-                              (item) => item.statusCode === 302,
-                            )[0]?.statusCode === 302 ? (
+                            (item) => item.statusCode === 302,
+                          )[0]?.statusCode === 302 ? (
                             <CloseIcon className={classes.BarColor} />
                           ) : (
                             "4"
@@ -495,12 +495,12 @@ export default function Bar(props) {
                           <Typography sx={{ p: 1 }} className={classes.BarGap}>
                             {props.list.myCandidateStatuses?.length
                               ? props.list.myCandidateStatuses
-                                  .filter((item) => item.statusCode === 305)
-                                  .map((value) =>
-                                    moment(value.createdAt).format(
-                                      "DD-MM-YYYY",
-                                    ),
-                                  )
+                                .filter((item) => item.statusCode === 305)
+                                .map((value) =>
+                                  moment(value.createdAt).format(
+                                    "DD-MM-YYYY",
+                                  ),
+                                )
                               : ""}
                           </Typography>
                         </Popover>
@@ -511,14 +511,14 @@ export default function Bar(props) {
                       className={
                         props.list.myCandidateStatuses?.length
                           ? props.list.myCandidateStatuses.filter(
-                              (item) => item.statusCode === 306,
-                            )[0]?.statusCode === 306
+                            (item) => item.statusCode === 306,
+                          )[0]?.statusCode === 306
                             ? classes.barItem + " " + classes.completed
                             : props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 302,
-                              )[0]?.statusCode === 302
-                            ? classes.barItem + " " + classes.cancel
-                            : classes.barItem
+                              (item) => item.statusCode === 302,
+                            )[0]?.statusCode === 302
+                              ? classes.barItem + " " + classes.cancel
+                              : classes.barItem
                           : classes.barItem
                       }
                     >
@@ -531,8 +531,8 @@ export default function Bar(props) {
                         onMouseEnter={(e) =>
                           props.list.myCandidateStatuses?.length
                             ? props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 306,
-                              )[0]?.statusCode === 306
+                              (item) => item.statusCode === 306,
+                            )[0]?.statusCode === 306
                               ? handleDocumentOpen(e)
                               : ""
                             : ""
@@ -540,8 +540,8 @@ export default function Bar(props) {
                         onMouseLeave={(e) =>
                           props.list.myCandidateStatuses?.length
                             ? props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 306,
-                              )[0]?.statusCode === 306
+                              (item) => item.statusCode === 306,
+                            )[0]?.statusCode === 306
                               ? handleDocumentClose(e)
                               : ""
                             : ""
@@ -553,8 +553,8 @@ export default function Bar(props) {
                           )[0]?.statusCode === 306 ? (
                             <CheckIcon className={classes.BarColor} />
                           ) : props.list.myCandidateStatuses.filter(
-                              (item) => item.statusCode === 302,
-                            )[0]?.statusCode === 302 ? (
+                            (item) => item.statusCode === 302,
+                          )[0]?.statusCode === 302 ? (
                             <CloseIcon className={classes.BarColor} />
                           ) : (
                             "5"
@@ -583,12 +583,12 @@ export default function Bar(props) {
                           <Typography sx={{ p: 1 }} className={classes.BarGap}>
                             {props.list.myCandidateStatuses?.length
                               ? props.list.myCandidateStatuses
-                                  .filter((item) => item.statusCode === 306)
-                                  .map((value) =>
-                                    moment(value.createdAt).format(
-                                      "DD-MM-YYYY",
-                                    ),
-                                  )
+                                .filter((item) => item.statusCode === 306)
+                                .map((value) =>
+                                  moment(value.createdAt).format(
+                                    "DD-MM-YYYY",
+                                  ),
+                                )
                               : ""}
                           </Typography>
                         </Popover>
@@ -599,14 +599,14 @@ export default function Bar(props) {
                       className={
                         props.list.myCandidateStatuses?.length
                           ? props.list.myCandidateStatuses.filter(
-                              (item) => item.statusCode === 307,
-                            )[0]?.statusCode === 307
+                            (item) => item.statusCode === 307,
+                          )[0]?.statusCode === 307
                             ? classes.barItem + " " + classes.completed
                             : props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 302,
-                              )[0]?.statusCode === 302
-                            ? classes.barItem + " " + classes.cancel
-                            : classes.barItem
+                              (item) => item.statusCode === 302,
+                            )[0]?.statusCode === 302
+                              ? classes.barItem + " " + classes.cancel
+                              : classes.barItem
                           : classes.barItem
                       }
                     >
@@ -619,8 +619,8 @@ export default function Bar(props) {
                         onMouseEnter={(e) =>
                           props.list.myCandidateStatuses?.length
                             ? props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 307,
-                              )[0]?.statusCode === 307
+                              (item) => item.statusCode === 307,
+                            )[0]?.statusCode === 307
                               ? handleSalaryOpen(e)
                               : ""
                             : ""
@@ -628,8 +628,8 @@ export default function Bar(props) {
                         onMouseLeave={(e) =>
                           props.list.myCandidateStatuses?.length
                             ? props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 307,
-                              )[0]?.statusCode === 307
+                              (item) => item.statusCode === 307,
+                            )[0]?.statusCode === 307
                               ? handleSalaryClose(e)
                               : ""
                             : ""
@@ -641,8 +641,8 @@ export default function Bar(props) {
                           )[0]?.statusCode === 307 ? (
                             <CheckIcon className={classes.BarColor} />
                           ) : props.list.myCandidateStatuses.filter(
-                              (item) => item.statusCode === 302,
-                            )[0]?.statusCode === 302 ? (
+                            (item) => item.statusCode === 302,
+                          )[0]?.statusCode === 302 ? (
                             <CloseIcon className={classes.BarColor} />
                           ) : (
                             "6"
@@ -672,12 +672,12 @@ export default function Bar(props) {
                           <Typography sx={{ p: 1 }} className={classes.BarGap}>
                             {props.list.myCandidateStatuses?.length
                               ? props.list.myCandidateStatuses
-                                  .filter((item) => item.statusCode === 307)
-                                  .map((value) =>
-                                    moment(value.createdAt).format(
-                                      "DD-MM-YYYY",
-                                    ),
-                                  )
+                                .filter((item) => item.statusCode === 307)
+                                .map((value) =>
+                                  moment(value.createdAt).format(
+                                    "DD-MM-YYYY",
+                                  ),
+                                )
                               : ""}
                           </Typography>
                         </Popover>
@@ -688,14 +688,14 @@ export default function Bar(props) {
                       className={
                         props.list.myCandidateStatuses?.length
                           ? props.list.myCandidateStatuses.filter(
-                              (item) => item.statusCode === 308,
-                            )[0]?.statusCode === 308
+                            (item) => item.statusCode === 308,
+                          )[0]?.statusCode === 308
                             ? classes.barItem + " " + classes.completed
                             : props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 302,
-                              )[0]?.statusCode === 302
-                            ? classes.barItem + " " + classes.cancel
-                            : classes.barItem
+                              (item) => item.statusCode === 302,
+                            )[0]?.statusCode === 302
+                              ? classes.barItem + " " + classes.cancel
+                              : classes.barItem
                           : classes.barItem
                       }
                     >
@@ -708,8 +708,8 @@ export default function Bar(props) {
                         onMouseEnter={(e) =>
                           props.list.myCandidateStatuses?.length
                             ? props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 308,
-                              )[0]?.statusCode === 308
+                              (item) => item.statusCode === 308,
+                            )[0]?.statusCode === 308
                               ? handleOfferedOpen(e)
                               : ""
                             : ""
@@ -717,8 +717,8 @@ export default function Bar(props) {
                         onMouseLeave={(e) =>
                           props.list.myCandidateStatuses?.length
                             ? props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 308,
-                              )[0]?.statusCode === 308
+                              (item) => item.statusCode === 308,
+                            )[0]?.statusCode === 308
                               ? handleOfferedClose(e)
                               : ""
                             : ""
@@ -730,8 +730,8 @@ export default function Bar(props) {
                           )[0]?.statusCode === 308 ? (
                             <CheckIcon className={classes.BarColor} />
                           ) : props.list.myCandidateStatuses.filter(
-                              (item) => item.statusCode === 302,
-                            )[0]?.statusCode === 302 ? (
+                            (item) => item.statusCode === 302,
+                          )[0]?.statusCode === 302 ? (
                             <CloseIcon className={classes.BarColor} />
                           ) : (
                             "7"
@@ -759,12 +759,12 @@ export default function Bar(props) {
                           <Typography sx={{ p: 1 }} className={classes.BarGap}>
                             {props.list.myCandidateStatuses?.length
                               ? props.list.myCandidateStatuses
-                                  .filter((item) => item.statusCode === 308)
-                                  .map((value) =>
-                                    moment(value.createdAt).format(
-                                      "DD-MM-YYYY",
-                                    ),
-                                  )
+                                .filter((item) => item.statusCode === 308)
+                                .map((value) =>
+                                  moment(value.createdAt).format(
+                                    "DD-MM-YYYY",
+                                  ),
+                                )
                               : ""}
                           </Typography>
                         </Popover>
@@ -818,11 +818,9 @@ export default function Bar(props) {
 
                         <div className={classes.barItem}>
                           <div className={classes.barCounter}>8</div>
-                          <div className={classes.barName}> {decode?.companyType === "COMPANY"? "Hired" :"Joined"}</div>
+                          <div className={classes.barName}> {decode?.companyType === "COMPANY" ? "Hired" : "Joined"}</div>
                         </div>
-                        {decode?.companyType === "COMPANY"?
-                        <></>
-                        :
+                        {decode?.companyType !== "COMPANY" &&
                           <div className={classes.barItem}>
                             <div className={classes.barCounter}>9</div>
                             <div className={classes.barName}> Invoiced</div>
@@ -852,7 +850,7 @@ export default function Bar(props) {
                             <CloseIcon className={classes.BarColor} />
                           </div>
                           <div className={classes.barName}>
-                            {decode?.companyType === "COMPANY"? "Not Hired" :"Not Joined"}
+                            {decode?.companyType === "COMPANY" ? "Not Hired" : "Not Joined"}
                             <Popover
                               className={classes.BarPointer}
                               open={ditchopen}
@@ -876,13 +874,11 @@ export default function Bar(props) {
                             </Popover>
                           </div>
                         </div>
-                        {decode?.companyType === "COMPANY"?
-                        <></>
-                        :
-                        <div className={classes.barItem}>
-                          <div className={classes.barCounter}>9</div>
-                          <div className={classes.barName}> Invoiced</div>
-                        </div>
+                        {decode?.companyType !== "COMPANY" &&
+                          <div className={classes.barItem}>
+                            <div className={classes.barCounter}>9</div>
+                            <div className={classes.barName}> Invoiced</div>
+                          </div>
                         }
                       </>
                     ) : (
@@ -890,20 +886,20 @@ export default function Bar(props) {
                     )}
 
                     {props.list.statusCode !== 310 &&
-                    props.list.statusCode !== 311 ? (
+                      props.list.statusCode !== 311 ? (
                       <>
                         <div
                           className={
                             props.list.myCandidateStatuses?.length
                               ? props.list.myCandidateStatuses.filter(
-                                  (item) => item.statusCode === 309,
-                                )[0]?.statusCode === 309
+                                (item) => item.statusCode === 309,
+                              )[0]?.statusCode === 309
                                 ? classes.barItem + " " + classes.completed
                                 : props.list.myCandidateStatuses.filter(
-                                    (item) => item.statusCode === 302,
-                                  )[0]?.statusCode === 302
-                                ? classes.barItem + " " + classes.cancel
-                                : classes.barItem
+                                  (item) => item.statusCode === 302,
+                                )[0]?.statusCode === 302
+                                  ? classes.barItem + " " + classes.cancel
+                                  : classes.barItem
                               : classes.barItem
                           }
                         >
@@ -916,8 +912,8 @@ export default function Bar(props) {
                             onMouseEnter={(e) =>
                               props.list.myCandidateStatuses?.length
                                 ? props.list.myCandidateStatuses.filter(
-                                    (item) => item.statusCode === 309,
-                                  )[0]?.statusCode === 309
+                                  (item) => item.statusCode === 309,
+                                )[0]?.statusCode === 309
                                   ? handleJoinedOpen(e)
                                   : ""
                                 : ""
@@ -925,8 +921,8 @@ export default function Bar(props) {
                             onMouseLeave={(e) =>
                               props.list.myCandidateStatuses?.length
                                 ? props.list.myCandidateStatuses.filter(
-                                    (item) => item.statusCode === 309,
-                                  )[0]?.statusCode === 309
+                                  (item) => item.statusCode === 309,
+                                )[0]?.statusCode === 309
                                   ? handleJoinedClose(e)
                                   : ""
                                 : ""
@@ -938,8 +934,8 @@ export default function Bar(props) {
                               )[0]?.statusCode === 309 ? (
                                 <CheckIcon className={classes.BarColor} />
                               ) : props.list.myCandidateStatuses.filter(
-                                  (item) => item.statusCode === 302,
-                                )[0]?.statusCode === 302 ? (
+                                (item) => item.statusCode === 302,
+                              )[0]?.statusCode === 302 ? (
                                 <CloseIcon className={classes.BarColor} />
                               ) : (
                                 "8"
@@ -949,7 +945,7 @@ export default function Bar(props) {
                             )}
                           </div>
                           <div className={classes.barName}>
-                            {decode?.companyType === "COMPANY"? "Hired" :"Joined"}
+                            {decode?.companyType === "COMPANY" ? "Hired" : "Joined"}
                             <Popover
                               className={classes.BarPointer}
                               open={joinedopen}
@@ -971,126 +967,49 @@ export default function Bar(props) {
                                 {props.list.myCandidateStatuses?.length
                                   ? props.list.joinedDate !== null
                                     ? props.list.myCandidateStatuses
-                                        .filter(
-                                          (item) => item.statusCode === 309,
-                                        )
-                                        .map((value) =>
-                                          moment(props.list.joinedDate).format(
-                                            "DD-MM-YYYY",
-                                          ),
-                                        )
+                                      .filter(
+                                        (item) => item.statusCode === 309,
+                                      )
+                                      .map((value) =>
+                                        moment(props.list.joinedDate).format(
+                                          "DD-MM-YYYY",
+                                        ),
+                                      )
                                     : ""
                                   : ""}
                               </Typography>
                             </Popover>
                           </div>
                         </div>
-                        {decode?.companyType === "COMPANY"?
-                          <></>
-                          :
-                        <div
-                          className={
-                            props.list.myCandidateStatuses?.length
-                              ? props.list.myCandidateStatuses.filter(
-                                  (item) => item.statusCode === 312,
-                                )[0]?.statusCode === 312
-                                ? classes.barItem + " " + classes.completed
-                                : props.list.myCandidateStatuses.filter(
-                                    (item) => item.statusCode === 302,
-                                  )[0]?.statusCode === 302
-                                ? classes.barItem + " " + classes.cancel
-                                : classes.barItem
-                              : classes.barItem
-                          }
-                        >
-                          <div
-                            className={classes.barCounter}
-                            aria-owns={
-                              invoicedopen ? "mouse-over-popover" : undefined
-                            }
-                            aria-haspopup="true"
-                            onMouseEnter={(e) =>
-                              props.list.myCandidateStatuses?.length
-                                ? props.list.myCandidateStatuses.filter(
-                                    (item) => item.statusCode === 312,
-                                  )[0]?.statusCode === 312
-                                  ? handleInvoiceOpen(e)
-                                  : ""
-                                : ""
-                            }
-                            onMouseLeave={(e) =>
-                              props.list.myCandidateStatuses?.length
-                                ? props.list.myCandidateStatuses.filter(
-                                    (item) => item.statusCode === 312,
-                                  )[0]?.statusCode === 312
-                                  ? handleInvoiceClose(e)
-                                  : ""
-                                : ""
-                            }
-                          >
-                            {props.list.myCandidateStatuses?.length ? (
-                              props.list.myCandidateStatuses.filter(
-                                (item) => item.statusCode === 312,
-                              )[0]?.statusCode === 312 ? (
-                                <CheckIcon className={classes.BarColor} />
-                              ) : props.list.myCandidateStatuses.filter(
-                                  (item) => item.statusCode === 302,
-                                )[0]?.statusCode === 302 ? (
-                                <CloseIcon className={classes.BarColor} />
-                              ) : (
-                                "9"
-                              )
-                            ) : (
-                              "9"
-                            )}
-                          </div>
-                          
-                          <div className={classes.barName}>
-                            Invoiced <br />
-                            {decode?.role === "ADMIN"
-                              ? props.list.myCandidateStatuses?.length
-                                ? props.list.myCandidateStatuses.filter(
-                                    (item) => item.statusCode === 312,
-                                  )[0]?.statusCode === 312
-                                  ? props.list.invoiceValue
-                                  : ""
-                                : ""
-                              : ""}
-                            <Popover
-                              className={classes.BarPointer}
-                              open={invoicedopen}
-                              anchorEl={Invoice}
-                              anchorOrigin={{
-                                vertical: "top",
-                                horizontal: "center",
-                              }}
-                              transformOrigin={{
-                                vertical: "bottom",
-                                horizontal: "center",
-                              }}
-                              onClose={handleInvoiceClose}
-                            >
-                              <Typography
-                                sx={{ p: 1 }}
-                                className={classes.BarGap}
+
+                        {decode.role === "SUBVENDOR" &&
+                          <div className={props.list.myCandidateStatuses?.length ? props.list.myCandidateStatuses.filter(item => item.statusCode === 312)[0]?.statusCode === 312 ? classes.barItem + " " + classes.completed : props.list.myCandidateStatuses.filter(item => item.statusCode === 302)[0]?.statusCode === 302 ? classes.barItem + " " + classes.cancel : classes.barItem : classes.barItem} >
+                            <div className={classes.barCounter} aria-owns={invoicedopen ? 'mouse-over-popover' : undefined}
+                              aria-haspopup="true"
+                              onMouseEnter={(e) => props.list.myCandidateStatuses?.length ? props.list.myCandidateStatuses.filter(item => item.statusCode === 312)[0]?.statusCode === 312 ? handleInvoiceOpen(e) : "" : ""}
+                              onMouseLeave={(e) => props.list.myCandidateStatuses?.length ? props.list.myCandidateStatuses.filter(item => item.statusCode === 312)[0]?.statusCode === 312 ? handleInvoiceClose(e) : "" : ""}>{props.list.myCandidateStatuses?.length ? props.list.myCandidateStatuses.filter(item => item.statusCode === 312)[0]?.statusCode === 312 ? <CheckIcon className={classes.BarColor} /> : props.list.myCandidateStatuses.filter(item => item.statusCode === 302)[0]?.statusCode === 302 ? <CloseIcon className={classes.BarColor} /> : "9" : "9"}</div>
+                            <div className={classes.barName} > Invoiced <br />{
+                              decode?.role === "ADMIN" ? props.list.myCandidateStatuses?.length ? props.list.myCandidateStatuses.filter(item => item.statusCode === 312)[0]?.statusCode === 312 ? props.list.invoiceValue : "" : "" : ""}
+
+                              <Popover
+                                className={classes.BarPointer}
+                                open={invoicedopen}
+                                anchorEl={Invoice}
+                                anchorOrigin={{
+                                  vertical: 'top',
+                                  horizontal: 'center',
+                                }}
+                                transformOrigin={{
+                                  vertical: 'bottom',
+                                  horizontal: 'center',
+                                }}
+                                onClose={handleInvoiceClose}
                               >
-                                {props.list.myCandidateStatuses?.length
-                                  ? props.list.invoicedDate !== null
-                                    ? props.list.myCandidateStatuses
-                                        .filter(
-                                          (item) => item.statusCode === 312,
-                                        )
-                                        .map((value) =>
-                                          moment(
-                                            props.list.invoicedDate,
-                                          ).format("DD-MM-YYYY"),
-                                        )
-                                    : ""
-                                  : ""}
-                              </Typography>
-                            </Popover>
+                                <Typography sx={{ p: 1 }} className={classes.BarGap}> {props.list.myCandidateStatuses?.length ? props.list.invoicedDate !== null ? props.list.myCandidateStatuses.filter(item => item.statusCode === 312).map((value) => (moment(props.list.invoicedDate).format('DD-MM-YYYY'))) : "" : ""} </Typography>
+
+                              </Popover>
+                            </div>
                           </div>
-                        </div>
                         }
 
                         {props.list.statusCode === 313 ? (
@@ -1098,14 +1017,14 @@ export default function Bar(props) {
                             className={
                               props.list.myCandidateStatuses?.length
                                 ? props.list.myCandidateStatuses.filter(
-                                    (item) => item.statusCode === 313,
-                                  )[0]?.statusCode === 313
+                                  (item) => item.statusCode === 313,
+                                )[0]?.statusCode === 313
                                   ? classes.barItem + " " + classes.cancel
                                   : props.list.myCandidateStatuses.filter(
-                                      (item) => item.statusCode === 302,
-                                    )[0]?.statusCode === 302
-                                  ? classes.barItem + " " + classes.cancel
-                                  : classes.barItem
+                                    (item) => item.statusCode === 302,
+                                  )[0]?.statusCode === 302
+                                    ? classes.barItem + " " + classes.cancel
+                                    : classes.barItem
                                 : classes.barItem
                             }
                           >
@@ -1132,8 +1051,8 @@ export default function Bar(props) {
                                 )[0]?.statusCode === 312 ? (
                                   <CheckIcon className={classes.BarColor} />
                                 ) : props.list.myCandidateStatuses.filter(
-                                    (item) => item.statusCode === 302,
-                                  )[0]?.statusCode === 302 ? (
+                                  (item) => item.statusCode === 302,
+                                )[0]?.statusCode === 302 ? (
                                   <CloseIcon className={classes.BarColor} />
                                 ) : (
                                   "10"

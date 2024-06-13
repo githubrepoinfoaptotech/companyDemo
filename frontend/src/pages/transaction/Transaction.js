@@ -34,7 +34,7 @@ import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import Notification from "../../components/Notification";
 import moment from "moment";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import Tooltip from "@material-ui/core/Tooltip";
 import "react-toastify/dist/ReactToastify.css";
 import useStyles from "../../themes/style.js";
@@ -101,7 +101,7 @@ export default function Transaction(props) {
 
   const filterRef = useRef(null);
 
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
 
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -354,7 +354,7 @@ export default function Transaction(props) {
 
 
   useEffect(() => {
-    var decoded = jwt_decode(token);
+    var decoded = jwtDecode(token);
    
     if (decoded.role !== "SUPERADMIN") {
       const fetchData = async () => {
@@ -392,7 +392,7 @@ export default function Transaction(props) {
 
 
   useEffect(() => {
-    var decode = jwt_decode(token);
+    var decode = jwtDecode(token);
     setLoader(true);
     if (decode.role === "SUPERADMIN") {
       axios({
@@ -430,7 +430,7 @@ export default function Transaction(props) {
 
   useEffect(() => {
     setLoader(true);
-    var decode = jwt_decode(token);
+    var decode = jwtDecode(token);
     const fetchData = async () => {
       var url = "";
       if (decode.role === "SUPERADMIN") {

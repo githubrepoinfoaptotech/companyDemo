@@ -5,7 +5,7 @@ import { useTheme } from "@material-ui/styles";
 import classNames from "classnames";
 import React, { useEffect, useState } from "react";
 import { withRouter } from "react-router-dom";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 import dashboard from "../../images/dashboard.png";
 import users from "../../images/user.png";
@@ -40,7 +40,8 @@ function Sidebar({ location }) {
   var theme = useTheme();
 
   const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
+  const companyType = decode.companyType
   const role = decode.role;
 
   const superAdmin = [
@@ -175,7 +176,7 @@ function Sidebar({ location }) {
         <Tooltip title="Users" placement="right">
           <IconButton>
             <img
-              src={users}
+              src={candidates}
               alt="users"
               className={classNames(classes.Icon1)}
             />
@@ -185,15 +186,15 @@ function Sidebar({ location }) {
     },
     {
       id: 2,
-      label: decode.companyType === "COMPANY"? "Projects" :"Clients",
-      link: decode.companyType === "COMPANY"? "/app/projects" :"/app/clients",
+      label: companyType === "COMPANY"? "Projects" :"Clients",
+      link: companyType === "COMPANY"? "/app/projects" :"/app/clients",
       view: true,
       icon: (
-        <Tooltip title={decode.companyType === "COMPANY"? "Projects" :"Clients"} placement="right">
+        <Tooltip title={companyType === "COMPANY"? "Projects" :"Clients"} placement="right">
           <IconButton>
             <img
               src={clients}
-              alt={decode.companyType === "COMPANY"? "Projects" :"Clients"}
+              alt={companyType === "COMPANY"? "Projects" :"Clients"}
               className={classNames(classes.Icon1)}
             />
           </IconButton>
@@ -244,7 +245,7 @@ function Sidebar({ location }) {
         <Tooltip title="Candidates" placement="right">
           <IconButton>
             <img
-              src={candidates}
+              src={users}
               alt="candidates"
               className={classNames(classes.Icon3)}
             />
@@ -340,7 +341,7 @@ function Sidebar({ location }) {
       subMenu: [
         {
           id: 0,
-          label: decode.companyType === "COMPANY" ? "Submitted to Hiring Manager" : "Submitted to Client",
+          label: companyType === "COMPANY" ? "Submitted to Hiring Manager" : "Submitted to Client",
           link: "/app/reports/all_candidates_stc",
           icon: (
             <IconButton>
@@ -420,8 +421,8 @@ function Sidebar({ location }) {
         },
         {
           id: 8,
-          label: decode.companyType === "COMPANY" ? "Vendor On-boarded Candidates" :"Invoiced Candidates",
-          link: decode.companyType === "COMPANY" ? "/app/reports/vendor_onboarded_candidates" : "/app/reports/all_candidates_invoiced" ,
+          label: companyType === "COMPANY" ? "Vendor On-boarded Candidates" :"Invoiced Candidates",
+          link: companyType === "COMPANY" ? "/app/reports/vendor_onboarded_candidates" : "/app/reports/all_candidates_invoiced" ,
           icon: (
             <IconButton>
               <ArrowLeftIcon />
@@ -528,6 +529,23 @@ function Sidebar({ location }) {
       ),
     },
     {
+      id: 2,
+      label: companyType === "COMPANY"&&"Projects",
+      link: companyType === "COMPANY"&& "/app/projects",
+      view: true,
+      icon: (
+        <Tooltip title={companyType === "COMPANY"&& "Projects"} placement="right">
+          <IconButton>
+            <img
+              src={clients}
+              alt={companyType === "COMPANY"&& "Projects"}
+              className={classNames(classes.Icon1)}
+            />
+          </IconButton>
+        </Tooltip>
+      ),
+    },
+    {
       id: 1,
       label: "Requirements",
       link: "/app/requirements",
@@ -553,7 +571,7 @@ function Sidebar({ location }) {
         <Tooltip title="Candidates" placement="right">
           <IconButton>
             <img
-              src={candidates}
+              src={users}
               alt="candidates"
               className={classNames(classes.Icon3)}
             />
@@ -607,7 +625,7 @@ function Sidebar({ location }) {
         <Tooltip title="Candidates" placement="right">
           <IconButton>
             <img
-              src={candidates}
+              src={users}
               alt="candidates"
               className={classNames(classes.Icon3)}
             />
@@ -678,7 +696,7 @@ function Sidebar({ location }) {
         <Tooltip title="Candidates" placement="right">
           <IconButton>
             <img
-              src={candidates}
+              src={users}
               alt="candidates"
               className={classNames(classes.Icon3)}
             />
@@ -799,7 +817,7 @@ function Sidebar({ location }) {
                   ))
                 : role === "ADMIN"
                 ? admin
-                  .filter((link) => decode.companyType !== "COMPANY" || link.label !== "Refo Billing")
+                  .filter((link) => companyType !== "COMPANY" || link.label !== "Refo Billing" && link.label !== "Assign Requirements Candidates")
                   .map((link) => (
                     <SidebarLink
                       key={link.id}

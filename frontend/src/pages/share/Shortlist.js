@@ -558,7 +558,7 @@ export default function App(props) {
       //         setValidation(false);
 
       //            //   localStorage.setItem('token', response.data.token);
-      //   //   const decoded = jwt_decode(response.data.token);
+      //   //   const decoded = jwtDecode(response.data.token);
 
       //   // localStorage.setItem('firstName', decoded.firstName);
       //   // localStorage.setItem('email', decoded.email);
@@ -599,7 +599,7 @@ export default function App(props) {
     //       if (result.data.status === true) {
     //         setValidation(true);
     //            //   localStorage.setItem('token', response.data.token);
-    //   //   const decoded = jwt_decode(response.data.token);
+    //   //   const decoded = jwtDecode(response.data.token);
 
     //   // localStorage.setItem('firstName', decoded.firstName);
     //   // localStorage.setItem('email', decoded.email);
