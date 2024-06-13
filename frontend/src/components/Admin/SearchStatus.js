@@ -1,7 +1,7 @@
 import { Button } from "@material-ui/core";
 import { Grid } from "@material-ui/core";
 import useStyles from "../../themes/style.js";
-import jwtDecode from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 const Status = (props) => {
    
   const classes = useStyles();
@@ -23,7 +23,7 @@ const Status = (props) => {
           </>
         ) : ""}
 
-        {props.list.statusCode === 312 ? (
+        {decode.companyType !== "COMPANy" && props.list.statusCode === 312 ? (
           <>
             <Button
               variant="contained"
@@ -102,7 +102,8 @@ const Status = (props) => {
           ""
         )}
 
-        {props.list.statusCode === 309 || props.list.statusCode === 3081 ? (
+        {decode.companyType !== "COMPANY" &&
+         (props.list.statusCode === 309 || props.list.statusCode) === 3081 ? (
           <Button
             variant="contained"
             className={classes.red}

@@ -10,7 +10,7 @@ import {
   Divider,
 } from "@material-ui/core";
 import moment from "moment";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import useStyles from "../../themes/style.js";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import CloseIcon from "@material-ui/icons/Close";
@@ -20,7 +20,7 @@ import ScheduleInterview from '../../images/icon/ScheduleInterview.png';
  
 const Dialogs = (props) => { 
   const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
   const messageRef = useRef();
   const classes = useStyles(); 
   const maxDate = moment().format("YYYY-MM-DD"); 
@@ -54,7 +54,7 @@ const Dialogs = (props) => {
           </div>
           <Typography variant="subtitle2" className={classes.digColor+" "+classes.digCenter }  >
                 
-            { props.shortList.statusCode === 301 ? "Has the profile been processed for the client?"
+            { props.shortList.statusCode === 301 ? "Has the profile been processed"
             : props.shortList.statusCode === 3081 ? "Can you confirm if the candidate has indeed joined?"
               : props.shortList.statusCode === 309  ? "Invoice details"
               : props.shortList.statusCode === 312 ? "Are you certain you want to transfer this candidate to a credit note?"

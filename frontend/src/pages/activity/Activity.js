@@ -2,15 +2,15 @@ import React, { useState, useEffect, useReducer, useRef } from 'react';
 import MUIDataTable from "mui-datatables";
 import { Grid, Button, TablePagination, Backdrop, CircularProgress, TextField } from "@material-ui/core";
 import PageTitle from "../../components/PageTitle";
- import moment from 'moment';
+import moment from 'moment';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import useStyles from '../../themes/style.js';
- import useMediaQuery from '@material-ui/core/useMediaQuery';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 export default function Tables() {
   const classes = useStyles();
-  const mobileQuery = useMediaQuery('(max-width:600px)');  
+  const mobileQuery = useMediaQuery('(max-width:600px)');
 
   const [loader, setLoader] = useState(false);
   const token = localStorage.getItem('token');
@@ -93,13 +93,13 @@ export default function Tables() {
 
   const [mobile, setMobile] = useState("");
   const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState(""); 
+  const [toDate, setToDate] = useState("");
   const filterRef = useRef(null);
 
   const handleMobileChange = (event) => {
     setMobile(filterRef.current.mobile.value);
   };
- 
+
   const handleFromDateChange = (event) => {
     setFromDate(filterRef.current.fromDate.value);
   };
@@ -119,7 +119,7 @@ export default function Tables() {
     setCurrerntPage(1);
     setPage(0);
     const form = filterRef.current;
-    var data = JSON.stringify({ 
+    var data = JSON.stringify({
       "page": 1,
       "phoneNumber": `${form['mobile'].value}`,
       "fromDate": `${form['fromDate'].value}`,
@@ -162,10 +162,10 @@ export default function Tables() {
     <>
       <Grid container direction="row" spacing={2} className={classes.heading}>
 
-      <Grid item xs={9} sm={7} md={8} lg={6}  > <PageTitle title="Message Activity" />  </Grid>
+        <Grid item xs={9} sm={7} md={8} lg={6}  > <PageTitle title="Message Activity" />  </Grid>
 
-      <Grid item xs={3} sm={5} md={4} lg={6} className={classes.drawerClose} >
- 
+        <Grid item xs={3} sm={5} md={4} lg={6} className={classes.drawerClose} >
+
         </Grid>
       </Grid>
 
@@ -178,9 +178,9 @@ export default function Tables() {
 
         <Grid container spacing={2} className={classes.filterGap}>
 
-        <TextField
-          className={classes.filterWidth}
-           
+          <TextField
+            className={classes.filterWidth}
+
             name="mobile"
             label="Mobile Number"
             size="small"
@@ -192,10 +192,10 @@ export default function Tables() {
           />
 
           <TextField
-          className={classes.filterWidth}
-            
+            className={classes.filterWidth}
+
             name="fromDate"
-           label="From"
+            label="From"
             size="small"
             type="date"
             variant="standard"
@@ -205,10 +205,10 @@ export default function Tables() {
           />
 
           <TextField
-          className={classes.filterWidth}
-             
+            className={classes.filterWidth}
+
             name="toDate"
-           label="To"
+            label="To"
             size="small"
             type="date"
             variant="standard"
@@ -242,7 +242,7 @@ export default function Tables() {
               download: false,
               pagination: false,
               customToolbar: () => <HeaderElements />,
-              responsive: mobileQuery===true? 'vertical' : 'standard',
+              responsive: mobileQuery === true ? 'vertical' : 'standard',
               textLabels: {
                 body: {
                   noMatch: 'Oops! Matching record could not be found',
@@ -299,7 +299,7 @@ export default function Tables() {
         </Grid>
       </Grid>
 
-     
+
       <Backdrop className={classes.backdrop} open={loader}  >
         <CircularProgress color="inherit" />
       </Backdrop>

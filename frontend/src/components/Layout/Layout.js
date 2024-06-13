@@ -9,7 +9,7 @@ import { useTheme } from "@material-ui/styles";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
 import ParsedResume from "../Candidates/ParsedResume";
- // pages
+// pages
 import Dashboard from "../../pages/dashboard";
 import Clients from "../../pages/clients";
 import Projects from "../../pages/projects";
@@ -25,7 +25,7 @@ import Users from "../../pages/users";
 import Source from "../../pages/source";
 import Ticket from "../../pages/ticket";
 
-import Activity from "../../pages/activity/Activity"; 
+import Activity from "../../pages/activity/Activity";
 import FreeMessageActivity from "../../pages/activity/FreeMsgActivity";
 import CandidateActivity from "../../pages/activity/CandidateActivity";
 
@@ -40,8 +40,8 @@ import ResumeSearch from "../../pages/resumeSearch/ResumeSearch"
 import Price from "../../pages/price";
 import Transaction from "../../pages/transaction";
 import Plans from "../../pages/plans";
- import Company from "../../pages/company";  
-import Contact from "../../pages/contact";  
+import Company from "../../pages/company";
+import Contact from "../../pages/contact";
 
 import New from "../../pages/admin/dashboard/New";
 import STC from "../../pages/admin/dashboard/Stc";
@@ -49,7 +49,7 @@ import DocumentColleted from "../../pages/admin/dashboard/DocumentColleted";
 import FinalInterviewCompleted from "../../pages/admin/dashboard/FinalInterviewCompleted";
 import FinalInterviewScheduled from "../../pages/admin/dashboard/FinalInterviewScheduled";
 import InterviewScheduled from "../../pages/admin/dashboard/InterviewScheduled";
-import ScheduleInterview from "../../pages/admin/dashboard/ScheduleInterview"; 
+import ScheduleInterview from "../../pages/admin/dashboard/ScheduleInterview";
 import Joined from "../../pages/admin/dashboard/Joined";
 import Offered from "../../pages/admin/dashboard/Offered";
 import SalaryBreakup from "../../pages/admin/dashboard/SalaryBreakup";
@@ -82,7 +82,7 @@ import RECSalaryBreakup from "../../pages/recruiter/dashboard/SalaryBreakup";
 import RECYetToJoin from "../../pages/recruiter/dashboard/YetToJoin";
 
 import AllSTC from "../../pages/admin/reports/Stc";
-import AllScheduleInterview from "../../pages/admin/reports/ScheduleInterview"; 
+import AllScheduleInterview from "../../pages/admin/reports/ScheduleInterview";
 import AllDocumentColleted from "../../pages/admin/reports/DocumentColleted";
 import AllFinalInterviewCompleted from "../../pages/admin/reports/FinalInterviewCompleted";
 import AllJoined from "../../pages/admin/reports/Joined";
@@ -94,13 +94,13 @@ import AllDitched from "../../pages/admin/reports/Ditched";
 import AllCreditNotes from "../../pages/admin/reports/CreditNotes";
 import AllDrop from "../../pages/admin/reports/Drop";
 
- 
+
 import othersCandidates from "../../pages/others/Candidates";
-import othersRequirements from "../../pages/others/Requirements"; 
+import othersRequirements from "../../pages/others/Requirements";
 import othersNew from "../../pages/others/dashboard/New";
 import othersSTC from "../../pages/others/dashboard/Stc";
 import othersDocumentColleted from "../../pages/others/dashboard/DocumentColleted";
-import othersFinalInterviewScheduled from "../../pages/others/dashboard/FinalInterviewScheduled" ;
+import othersFinalInterviewScheduled from "../../pages/others/dashboard/FinalInterviewScheduled";
 import othersFinalInterviewCompleted from "../../pages/others/dashboard/FinalInterviewCompleted";
 import othersInterviewScheduled from "../../pages/others/dashboard/InterviewScheduled";
 import othersScheduleInterview from "../../pages/others/dashboard/ScheduleInterview";
@@ -111,10 +111,10 @@ import othersSalaryBreakup from "../../pages/others/dashboard/SalaryBreakup";
 import othersYetToJoin from "../../pages/others/dashboard/YetToJoin";
 import { useLayoutState } from "../../context/LayoutContext";
 
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import red from '@material-ui/core/colors/red';
 import CloseIcon from "@material-ui/icons/Close";
-import { ToastContainer } from "react-toastify"; 
+import { ToastContainer } from "react-toastify";
 import { createTheme, MuiThemeProvider } from "@material-ui/core/styles";
 // context
 
@@ -125,18 +125,20 @@ function Layout(props) {
   var layoutState = useLayoutState();
 
   const token = localStorage.getItem("token");
-  const decoded = jwt_decode(token);
+  const decoded = jwtDecode(token);
   const role = decoded.role;
+  const companyType = decoded.companyType || "";
+
   const getMuiTheme = () =>
     createTheme({
       overrides: {
-        MuiAvatar:{
-          root:{
+        MuiAvatar: {
+          root: {
             fontFamily: '"Satoshi"'
           }
         },
-        MuiMenuItem:{
-          root:{
+        MuiMenuItem: {
+          root: {
             fontFamily: '"Satoshi"'
           }
         },
@@ -146,87 +148,92 @@ function Layout(props) {
             alignItems: "center",
             justifyContent: "flex-end",
           },
-          icon:{
+          icon: {
             color: "#064be2",
-           "& svg":{
-            color: "white",
-            width: "25px",
-            cursor: "pointer",
-            height: "25px",
-            padding: "5px",
-            boxShadow: "0 3px 9px 0 rgba(0,0,0,0.3)",
-            borderRadius: "100%",
-            backgroundColor: "#064be2"
-           }
+            "& svg": {
+              color: "white",
+              width: "25px",
+              cursor: "pointer",
+              height: "25px",
+              padding: "5px",
+              boxShadow: "0 3px 9px 0 rgba(0,0,0,0.3)",
+              borderRadius: "100%",
+              backgroundColor: "#064be2"
+            }
           },
 
-          iconActive:{
+          iconActive: {
             color: "#064be2",
-            "& svg":{
-             color: "white",
-             width: "25px",
-             cursor: "pointer",
-             height: "25px",
-             padding: "5px",
-             boxShadow: "0 3px 9px 0 rgba(0,0,0,0.3)",
-             borderRadius: "100%",
-             backgroundColor: "#064be2"
+            "& svg": {
+              color: "white",
+              width: "25px",
+              cursor: "pointer",
+              height: "25px",
+              padding: "5px",
+              boxShadow: "0 3px 9px 0 rgba(0,0,0,0.3)",
+              borderRadius: "100%",
+              backgroundColor: "#064be2"
             }
           }
         },
-            MUIDataTableBody:{
-            
-            emptyTitle:{  "@media (max-width: 425px)": { display: "flex", justifyContent: "flex-end", alignItems:"center" 
+        MUIDataTableBody: {
+
+          emptyTitle: {
+            "@media (max-width: 425px)": {
+              display: "flex", justifyContent: "flex-end", alignItems: "center"
             },
             "@media (max-width: 959.95px)": {
-               marginLeft: "-100px",    
+              marginLeft: "-100px",
             }
           }
-            },
-        
-        MUIDataTableBodyCell: {  
-         
+        },
+
+        MUIDataTableBodyCell: {
+
           stackedCommon: {
-           
-            "@media (max-width:959.95px)": { fontSize: "13px !important",
-              "&:nth-last-child(2)":{ fontWeight: 700 }, "&:last-child":{ lineBreak:"anywhere" }
+
+            "@media (max-width:959.95px)": {
+              fontSize: "13px !important",
+              "&:nth-last-child(2)": { fontWeight: 700 }, "&:last-child": { lineBreak: "anywhere" }
             },
 
-             
+
           },
-          responsiveStackedSmallParent:{
-            "@media (max-width:425px)": { width:"93%"
+          responsiveStackedSmallParent: {
+            "@media (max-width:425px)": {
+              width: "93%"
             },
           }
         },
-        MuiTable:{
-          root:{
-            "& caption":{ fontFamily: '"Satoshi" !important',
+        MuiTable: {
+          root: {
+            "& caption": {
+              fontFamily: '"Satoshi" !important',
             }
           }
         },
-        MuiTab:{
-          root:{
+        MuiTab: {
+          root: {
             minWidth: "20% !important",
           },
-          wrapper:{
+          wrapper: {
             textTransform: "initial !important",
           }
         },
-        MuiTabs:{
-          scroller:{
+        MuiTabs: {
+          scroller: {
             overflowX: "auto !important",
           }
         },
-        MuiBadge:{
-          badge:{
-            height:"30px!important",
+        MuiBadge: {
+          badge: {
+            height: "30px!important",
             fontFamily: '"Satoshi" !important',
           },
-          colorSecondary:{
-            backgroundColor: red[500] +"!important",
+          colorSecondary: {
+            backgroundColor: red[500] + "!important",
           },
-          anchorOriginTopLeftCircular:{
+          anchorOriginTopLeftCircular: {
             top: "14%",
             left: "-21px",
             inlineSize: "max-content"
@@ -245,53 +252,58 @@ function Layout(props) {
             color: "#121224",
             fontFamily: '"Satoshi" !important',
             fontSize: "13.5px !important",
-            "&:last-child": { whiteSpace: "nowrap",
+            "&:last-child": {
+              whiteSpace: "nowrap",
             },
-            
+
           },
-          
+
           root: {
             padding: "14px",
             fontFamily: '"Satoshi" !important',
-           
+
           },
-          paddingCheckbox:{
-            "@media (max-width:959.95px)": { width:"10px",
+          paddingCheckbox: {
+            "@media (max-width:959.95px)": {
+              width: "10px",
             },
           }
         },
-        MuiList:{
-          padding:{
+        MuiList: {
+          padding: {
             paddingBottom: "0px !important"
           }
-         
+
         },
-        MuiListItem:{
-          secondaryAction:{
-            paddingRight:"45px !important"
+        MuiListItem: {
+          secondaryAction: {
+            paddingRight: "45px !important"
           }
         },
-        MuiSelect:{
-          select:{
-            "&:focus":{ backgroundColor:"none !important" 
+        MuiSelect: {
+          select: {
+            "&:focus": {
+              backgroundColor: "none !important"
             }
           }
         },
-        
+
         MuiTableRow: {
-         
-          root:{
-            '&:nth-of-type(odd)': { backgroundColor: "white",
+
+          root: {
+            '&:nth-of-type(odd)': {
+              backgroundColor: "white",
             },
-            '&:nth-of-type(even)': { backgroundColor: "#f0f5f9",
+            '&:nth-of-type(even)': {
+              backgroundColor: "#f0f5f9",
             },
           }
-         
+
         },
 
-        MuiIconButton:{
-          root:{
-            padding:"9px"
+        MuiIconButton: {
+          root: {
+            padding: "9px"
           }
         },
 
@@ -299,118 +311,129 @@ function Layout(props) {
           subtitle1: {
             fontSize: "1rem",
             fontWeight: "500",
-           fontFamily: '"Satoshi" !important',
-            "@media (max-width:959.95px)": { fontSize: "0.9rem !important",
+            fontFamily: '"Satoshi" !important',
+            "@media (max-width:959.95px)": {
+              fontSize: "0.9rem !important",
             },
           },
           subtitle2: {
             fontWeight: "500",
-           fontFamily: '"Satoshi" !important',
+            fontFamily: '"Satoshi" !important',
             textAlign: "center",
             padding: "10px",
             fontSize: "21px",
-            "@media (max-width:959.95px)": { fontSize: "calc(1.1rem) !important",
+            "@media (max-width:959.95px)": {
+              fontSize: "calc(1.1rem) !important",
             },
           },
           body1: {
-           fontFamily: '"Satoshi" !important',
+            fontFamily: '"Satoshi" !important',
             fontSize: "14px",
-            "@media (max-width:959.95px)": { fontSize: "13px !important",
+            "@media (max-width:959.95px)": {
+              fontSize: "13px !important",
             },
           },
           body2: {
             color: "#121224",
-           fontFamily: '"Satoshi" !important',
+            fontFamily: '"Satoshi" !important',
             fontSize: "14px",
-            "@media (max-width:959.95px)": { fontSize: "13px !important",
+            "@media (max-width:959.95px)": {
+              fontSize: "13px !important",
             },
           },
           h5: {
             color: "#121224",
-           fontFamily: '"Satoshi" !important',
+            fontFamily: '"Satoshi" !important',
             fontSize: "14px",
-            "@media (max-width:959.95px)": { fontSize: "calc(1.1rem) !important",
+            "@media (max-width:959.95px)": {
+              fontSize: "calc(1.1rem) !important",
             },
           },
           h6: {
             color: "#121224",
-           fontFamily: '"Satoshi" !important',
+            fontFamily: '"Satoshi" !important',
             fontSize: "14px",
-            "@media (max-width:959.95px)": { fontSize: "calc(1.1rem) !important",
+            "@media (max-width:959.95px)": {
+              fontSize: "calc(1.1rem) !important",
             },
           },
         },
         MuiPaper: {
           elevation4: {
-            boxShadow: "none", 
+            boxShadow: "none",
           },
         },
-        
-        MuiDialog:{ 
+
+        MuiDialog: {
           paper: {
             margin: "15px !important",
             border: "1px solid #000 !important",
           },
         },
 
-        
-        MuiFab:{
-        root:{
-          "&:hover":{
-          
-            backgroundColor: "064be2 !important"
-          }
-        }
-        },
-        MuiButton: { 
 
-          root:{  
-            fontFamily: '"Satoshi !important"', fontSize: "14px", fontWeight: 500, boxShadow: "0 3px 9px 0 rgba(0,0,0,0.3) !important", "@media (max-width:959.95px)": { fontSize: "10px !important", }, 
-            "& $Mui-disabled":{
-               color:"rgba(0, 0, 0, 0.26) !important",
-               backgroundColor: "rgba(0, 0, 0, 0.26) !important",
+        MuiFab: {
+          root: {
+            "&:hover": {
+
+              backgroundColor: "064be2 !important"
             }
-          
+          }
+        },
+        MuiButton: {
+
+          root: {
+            fontFamily: '"Satoshi !important"', fontSize: "14px", fontWeight: 500, boxShadow: "0 3px 9px 0 rgba(0,0,0,0.3) !important", "@media (max-width:959.95px)": { fontSize: "10px !important", },
+            "& $Mui-disabled": {
+              color: "rgba(0, 0, 0, 0.26) !important",
+              backgroundColor: "rgba(0, 0, 0, 0.26) !important",
+            }
+
           },
           label: {
-           fontFamily: '"Satoshi" !important',
+            fontFamily: '"Satoshi" !important',
             fontSize: "14px",
-            "@media (max-width:959.95px)": { fontSize: "10px !important",
+            "@media (max-width:959.95px)": {
+              fontSize: "10px !important",
             },
           },
-          containedPrimary:{ 
-            backgroundColor: "#064be2",   
-            textTransform:  "initial !important", 
-            '&:active':{ backgroundColor: "#064be2 !important", color:"#fff !important",
+          containedPrimary: {
+            backgroundColor: "#064be2",
+            textTransform: "initial !important",
+            '&:active': {
+              backgroundColor: "#064be2 !important", color: "#fff !important",
             },
-            '&:hover':{ backgroundColor: "#064be2 !important", color:"#fff !important",
+            '&:hover': {
+              backgroundColor: "#064be2 !important", color: "#fff !important",
             },
-            '&:disabled':{ backgroundColor: "#064be2c7 !important", color:"#fff !important",
+            '&:disabled': {
+              backgroundColor: "#064be2c7 !important", color: "#fff !important",
             }
-        },
-        containedSizeSmall:{
-          textTransform:  "initial !important", 
-          padding:  "4px 10px !important",
-          fontWeight: "300 !important",
-          height: "fit-content !important",
-        },
-        containedSecondary:{ 
-          backgroundColor: red[500] +"!important",
-          '&:active':{
-            backgroundColor: red[500] +"!important",
-            color:"#fff !important",
           },
-          '&:hover':{
-            backgroundColor: red[500] +"!important",
-            color:"#fff !important",
-          }
-        },
+          containedSizeSmall: {
+            textTransform: "initial !important",
+            padding: "4px 10px !important",
+            fontWeight: "300 !important",
+            height: "fit-content !important",
+          },
+          containedSecondary: {
+            backgroundColor: red[500] + "!important",
+            '&:active': {
+              backgroundColor: red[500] + "!important",
+              color: "#fff !important",
+            },
+            '&:hover': {
+              backgroundColor: red[500] + "!important",
+              color: "#fff !important",
+            }
+          },
         },
         MuiFormLabel: {
           root: {
-           fontFamily: '"Satoshi" !important',
+            fontFamily: '"Satoshi" !important',
             fontSize: "20px",
-            "@media (max-width:959.95px)": { fontSize: "15px !important",
+            "@media (max-width:959.95px)": {
+              fontSize: "15px !important",
             },
             color: "rgba(0, 0, 0, 0.87)",
           },
@@ -425,8 +448,8 @@ function Layout(props) {
             width: "100%",
           },
         },
-        MuiTooltip:{
-          tooltip:{
+        MuiTooltip: {
+          tooltip: {
             fontFamily: '"Satoshi" !important',
           },
           // popper:{
@@ -436,7 +459,7 @@ function Layout(props) {
         },
         MuiInputBase: {
           root: {
-           
+
             width: "100%",
           },
           input: {
@@ -445,17 +468,17 @@ function Layout(props) {
             fontSize: "13px",
             display: "block",
             padding: "10px 12px !important",
-            
+
             borderRadius: "4px",
           },
         },
-       
+
         MuiAutocomplete: {
           input: {
             width: "100% !important",
           },
         },
-         
+
         MuiFilledInput: {
           root: {
             width: "100%",
@@ -464,42 +487,47 @@ function Layout(props) {
             position: "relative",
             fontSize: "13px",
             marginTop: "24px",
-           
+
             backgroundColor: "white",
-            "&:hover": { backgroundColor: "unset !important",
+            "&:hover": {
+              backgroundColor: "unset !important",
             },
-            "&.Mui-focused": { backgroundColor: "unset !important",
+            "&.Mui-focused": {
+              backgroundColor: "unset !important",
             },
           },
 
           underline: {
-            "&&&:before": { borderBottom: "none",
+            "&&&:before": {
+              borderBottom: "none",
             },
-            "&&:after": { borderBottom: "none",
+            "&&:after": {
+              borderBottom: "none",
             },
           },
           inputAdornedEnd: {
             border: "1px solid #ced4da",
           },
         },
-       
+
         MuiOutlined: {
           MuiChip: {
-            avatar: { margin: "0px",
+            avatar: {
+              margin: "0px",
             },
           },
         },
 
-        MuiCardContent:{
-          root:{
-            "&:last-child":{ 
+        MuiCardContent: {
+          root: {
+            "&:last-child": {
               paddingBottom: "10px !important",
-             }
-           
+            }
+
           }
         },
-        MuiCardActions:{
-          root:{
+        MuiCardActions: {
+          root: {
             marginBottom: "1px !important"
             // padding: "0px",
             // marginBottom: "20px", 
@@ -509,33 +537,33 @@ function Layout(props) {
           }
         },
 
-      
-      
+
+
         MuiDrawer: {
           paperAnchorBottom: {
             width: "50%",
             left: "30%",
             bottom: "10%",
           },
-          paper:{
-            overflowY:"auto",
-            overflowX:"hidden",
+          paper: {
+            overflowY: "auto",
+            overflowX: "hidden",
           }
         },
-        MuiDialogTitle:{
-          root:{
-            padding:"0px 10px !important"
+        MuiDialogTitle: {
+          root: {
+            padding: "0px 10px !important"
           }
         },
 
-        MuiChip: {
-          avatar: {
-            width: "50px !important",
-            height: "50px !important",
-            fontSize: "1.5rem !important",
-            margin: "0px",
-          },
-        },
+        // MuiChip: {
+        //   avatar: {
+        //     width: "50px !important",
+        //     height: "50px !important",
+        //     fontSize: "1.5rem !important",
+        //     margin: "0px",
+        //   },
+        // },
         MuiInputLabel: {
           shrink: {
             width: "max-content",
@@ -548,31 +576,31 @@ function Layout(props) {
           marginTop: "10px !important",
         },
       },
-     
-      
+
+
     });
 
-    var [isPermanent, setPermanent] = useState(true);
+  var [isPermanent, setPermanent] = useState(true);
 
-    useEffect(function () {
-      window.addEventListener("resize", handleWindowWidthChange);
+  useEffect(function () {
+    window.addEventListener("resize", handleWindowWidthChange);
     handleWindowWidthChange();
     return function cleanup() {
       window.removeEventListener("resize", handleWindowWidthChange);
-};
-});
+    };
+  });
 
-    function handleWindowWidthChange() {
-      var windowWidth = window.innerWidth;
-      // var breakpointWidth = theme.breakpoints.values.md
-      var breakpointWidth = theme.breakpoints.values.sm 
-      var isSmallScreen = windowWidth < breakpointWidth
-       if (isSmallScreen && isPermanent) {
+  function handleWindowWidthChange() {
+    var windowWidth = window.innerWidth;
+    // var breakpointWidth = theme.breakpoints.values.md
+    var breakpointWidth = theme.breakpoints.values.sm
+    var isSmallScreen = windowWidth < breakpointWidth
+    if (isSmallScreen && isPermanent) {
       setPermanent(false);
-      } else if (!isSmallScreen && !isPermanent) {
+    } else if (!isSmallScreen && !isPermanent) {
       setPermanent(true);
-      }
-      }
+    }
+  }
 
   return (
     <div className={classes.root}>
@@ -581,125 +609,116 @@ function Layout(props) {
           <Sidebar />
           <div
             className={classnames(classes.content, {
-               [classes.contentShift]: isPermanent&&!layoutState.isSidebarOpened,
-               [classes.contentShift1]: layoutState.isSidebarOpened,
-             })}
+              [classes.contentShift]: isPermanent && !layoutState.isSidebarOpened,
+              [classes.contentShift1]: layoutState.isSidebarOpened,
+            })}
           >
             <div className={classes.fakeToolbar}> <Header history={props.history} />
             </div>
 
             <Switch>
-            
-              <AuthRoute  path="/app/dashboard" role={role} roles={[ "SUPERADMIN", "ADMIN", "RECRUITER", "CLIENTCOORDINATOR", "FREELANCER", "SUBVENDOR"]} component={Dashboard} /> <AuthRoute  path="/app/admin"  role={role}   roles={["SUPERADMIN"]} component={Admin}   /> <AuthRoute  path="/app/transaction" role={role} roles={["SUPERADMIN", "ADMIN"]} component={Transaction} /> <AuthRoute path="/app/price" role={role} roles={["SUPERADMIN"]} component={Price} />
-              <AuthRoute path="/app/search" role={role} roles={["ADMIN", "RECRUITER", "CLIENTCOORDINATOR", "FREELANCER", "SUBVENDOR"]} component={Search} /> 
-              <AuthRoute path="/app/pdf_view" role={role} roles={["SUPERADMIN"]} component={PDF} /> 
-               <AuthRoute path="/app/company" role={role} roles={["SUPERADMIN"]} component={Company} />  
-              <AuthRoute path="/app/contact" role={role} roles={["SUPERADMIN"]} component={Contact} /> 
-              <AuthRoute path="/app/ticket" role={role} roles={["SUPERADMIN","ADMIN"]} component={Ticket} />
-              <AuthRoute path="/app/singlechat" role={role} roles={[   "SUPERADMIN",   "ADMIN",   "RECRUITER",   "CLIENTCOORDINATOR", ]} component={Singlechat} />
+
+              <AuthRoute path="/app/dashboard" role={role} roles={["SUPERADMIN", "ADMIN", "RECRUITER", "CLIENTCOORDINATOR", "FREELANCER", "SUBVENDOR"]} component={Dashboard} />
+              <AuthRoute path="/app/admin" role={role} roles={["SUPERADMIN"]} component={Admin} />
+              <AuthRoute path="/app/transaction" role={role} roles={["SUPERADMIN", "ADMIN"]} component={Transaction} /> 
+              <AuthRoute path="/app/price" role={role} roles={["SUPERADMIN"]} component={Price} />
+              <AuthRoute path="/app/search" role={role} roles={["ADMIN", "RECRUITER", "CLIENTCOORDINATOR", "FREELANCER", "SUBVENDOR"]} component={Search} />
+              <AuthRoute path="/app/pdf_view" role={role} roles={["SUPERADMIN"]} component={PDF} />
+              <AuthRoute path="/app/company" role={role} roles={["SUPERADMIN"]} component={Company} />
+              <AuthRoute path="/app/contact" role={role} roles={["SUPERADMIN"]} component={Contact} />
+              <AuthRoute path="/app/ticket" role={role} roles={["SUPERADMIN", "ADMIN"]} component={Ticket} />
+              <AuthRoute path="/app/singlechat" role={role} roles={["SUPERADMIN", "ADMIN", "RECRUITER", "CLIENTCOORDINATOR",]} component={Singlechat} />
               <AuthRoute path="/app/assign_requirements" role={role} roles={["ADMIN"]} component={AssignRequirements} />
               <AuthRoute path="/app/assigned_candidates" role={role} roles={["ADMIN"]} component={AssignedCandidates} />
               <AuthRoute path="/app/requirements_Candidate" role={role} roles={["ADMIN"]} component={Share} />
               <AuthRoute path="/app/reports/all_candidates_stc" role={role} roles={["ADMIN"]} component={AllSTC} />
-              <AuthRoute path="/app/reports/all_candidates_schedule_interview" role={role} roles={["ADMIN"]} component={AllScheduleInterview} /> 
-              <AuthRoute path="/app/reports/all_candidates_fic" role={role} roles={["ADMIN"]} component={AllFinalInterviewCompleted} /> 
-              <AuthRoute path="/app/reports/all_candidates_document_collected" role={role} roles={["ADMIN"]} component={AllDocumentColleted} /> 
-              <AuthRoute path="/app/reports/all_candidates_salary_breakup_shared" role={role} roles={["ADMIN"]} component={AllSalaryBreakup} /> 
-              <AuthRoute path="/app/reports/all_candidates_offered" role={role} roles={["ADMIN"]} component={AllOffered} /> 
-              <AuthRoute path="/app/reports/all_candidates_joined" role={role} roles={["ADMIN"]} component={AllJoined} /> 
-              <AuthRoute path="/app/reports/all_candidates_ditched" role={role} roles={["ADMIN"]} component={AllDitched} /> 
-              <AuthRoute path="/app/reports/all_candidates_credit_note" role={role} roles={["ADMIN"]} component={AllCreditNotes} /> 
+              <AuthRoute path="/app/reports/all_candidates_schedule_interview" role={role} roles={["ADMIN"]} component={AllScheduleInterview} />
+              <AuthRoute path="/app/reports/all_candidates_fic" role={role} roles={["ADMIN"]} component={AllFinalInterviewCompleted} />
+              <AuthRoute path="/app/reports/all_candidates_document_collected" role={role} roles={["ADMIN"]} component={AllDocumentColleted} />
+              <AuthRoute path="/app/reports/all_candidates_salary_breakup_shared" role={role} roles={["ADMIN"]} component={AllSalaryBreakup} />
+              <AuthRoute path="/app/reports/all_candidates_offered" role={role} roles={["ADMIN"]} component={AllOffered} />
+              <AuthRoute path="/app/reports/all_candidates_joined" role={role} roles={["ADMIN"]} component={AllJoined} />
+              <AuthRoute path="/app/reports/all_candidates_ditched" role={role} roles={["ADMIN"]} component={AllDitched} />
+              <AuthRoute path="/app/reports/all_candidates_credit_note" role={role} roles={["ADMIN"]} component={AllCreditNotes} />
               <AuthRoute path="/app/reports/all_candidates_Offered_declined" role={role} roles={["ADMIN"]} component={AllOfferedDeclined} />
               <AuthRoute path="/app/reports/all_candidates_drop" role={role} roles={["ADMIN"]} component={AllDrop} />
-             
-              <AuthRoute path="/app/users" role={role} roles={["ADMIN"]} component={Users} /> 
+
+              <AuthRoute path="/app/users" role={role} roles={["ADMIN"]} component={Users} />
               {/* <AuthRoute path="/app/invoice" role={role} roles={["ADMIN"]} component={Invoice} />  */}
-              <AuthRoute path="/app/chat" role={role} roles={["ADMIN"]} component={Chat} /> 
-              <AuthRoute path="/app/settings/source" role={role} roles={["ADMIN", "CLIENTCOORDINATOR"]} component={Source} /> 
-              <AuthRoute path="/app/activity" role={role} roles={["ADMIN"]} component={Activity} /> 
-              <AuthRoute path="/app/settings/free_message_activity" role={role} roles={["ADMIN"]} component={FreeMessageActivity} /> 
-              <AuthRoute path="/app/candidate_activity" role={role} roles={["ADMIN"]} component={CandidateActivity} /> 
-              <AuthRoute path="/app/requirements" role={role} roles={["ADMIN", "CLIENTCOORDINATOR"]} component={Requirements} /> 
+              <AuthRoute path="/app/chat" role={role} roles={["ADMIN"]} component={Chat} />
+              <AuthRoute path="/app/settings/source" role={role} roles={["ADMIN", "CLIENTCOORDINATOR"]} component={Source} />
+              <AuthRoute path="/app/activity" role={role} roles={["ADMIN"]} component={Activity} />
+              <AuthRoute path="/app/settings/free_message_activity" role={role} roles={["ADMIN"]} component={FreeMessageActivity} />
+              <AuthRoute path="/app/candidate_activity" role={role} roles={["ADMIN"]} component={CandidateActivity} />
+              <AuthRoute path="/app/requirements" role={role} roles={["ADMIN", "CLIENTCOORDINATOR"]} component={Requirements} />
               <AuthRoute path="/app/admin_candidates" role={role} roles={["ADMIN"]} component={AdminCandidates} />
-              <AuthRoute path="/app/parsed_resume" role={role} roles={["ADMIN","RECRUITER","CLIENTCOORDINATOR","FREELANCER", "SUBVENDOR"]} component={ParsedResume} />
-              <AuthRoute path="/app/plans" role={role} roles={["ADMIN"]} component={Plans} />  
-              <AuthRoute path="/app/cc_candidates" role={role} roles={["CLIENTCOORDINATOR"]} component={CCCandidates} /> 
-              <AuthRoute path="/app/recruiter_candidates" role={role} roles={["RECRUITER"]} component={RecruiterCandidates} /> 
- 
-              <AuthRoute path="/app/admin_candidates_new" role={role} roles={["ADMIN"]} component={New} /> 
-              <AuthRoute path="/app/admin_candidates_stc" role={role} roles={["ADMIN"]} component={STC} /> 
+              <AuthRoute path="/app/parsed_resume" role={role} roles={["ADMIN", "RECRUITER", "CLIENTCOORDINATOR", "FREELANCER", "SUBVENDOR"]} component={ParsedResume} />
+              <AuthRoute path="/app/plans" role={role} roles={["ADMIN"]} component={Plans} />
+              <AuthRoute path="/app/cc_candidates" role={role} roles={["CLIENTCOORDINATOR"]} component={CCCandidates} />
+              <AuthRoute path="/app/recruiter_candidates" role={role} roles={["RECRUITER"]} component={RecruiterCandidates} />
+
+              <AuthRoute path="/app/admin_candidates_new" role={role} roles={["ADMIN"]} component={New} />
+              <AuthRoute path="/app/admin_candidates_stc" role={role} roles={["ADMIN"]} component={STC} />
               <AuthRoute path="/app/admin_candidates_schedule_interview" role={role} roles={["ADMIN"]} component={ScheduleInterview} />
-              <AuthRoute path="/app/admin_candidates_interview_scheduled" role={role} roles={["ADMIN"]} component={InterviewScheduled} /> 
+              <AuthRoute path="/app/admin_candidates_interview_scheduled" role={role} roles={["ADMIN"]} component={InterviewScheduled} />
               <AuthRoute path="/app/admin_candidates_final_interview_scheduled" role={role} roles={["ADMIN"]} component={FinalInterviewScheduled} />
-              <AuthRoute path="/app/admin_candidates_fic" role={role} roles={["ADMIN"]} component={FinalInterviewCompleted} /> 
-              <AuthRoute path="/app/admin_candidates_document_collected" role={role} roles={["ADMIN"]} component={DocumentColleted} /> 
-              <AuthRoute path="/app/admin_candidates_salary_breakup_shared" role={role} roles={["ADMIN"]} component={SalaryBreakup} /> 
-              <AuthRoute path="/app/admin_candidates_offered" role={role} roles={["ADMIN"]} component={Offered} /> 
-              <AuthRoute path="/app/admin_candidates_joined" role={role} roles={["ADMIN"]} component={Joined} /> 
+              <AuthRoute path="/app/admin_candidates_fic" role={role} roles={["ADMIN"]} component={FinalInterviewCompleted} />
+              <AuthRoute path="/app/admin_candidates_document_collected" role={role} roles={["ADMIN"]} component={DocumentColleted} />
+              <AuthRoute path="/app/admin_candidates_salary_breakup_shared" role={role} roles={["ADMIN"]} component={SalaryBreakup} />
+              <AuthRoute path="/app/admin_candidates_offered" role={role} roles={["ADMIN"]} component={Offered} />
+              <AuthRoute path="/app/admin_candidates_joined" role={role} roles={["ADMIN"]} component={Joined} />
               <AuthRoute path="/app/admin_candidates_yet_to_join" role={role} roles={["ADMIN"]} component={YetToJoin} />
 
-              <AuthRoute path="/app/cc_candidates_new" role={role} roles={["CLIENTCOORDINATOR"]} component={CCNew} /> 
-              <AuthRoute path="/app/cc_candidates_stc" role={role} roles={["CLIENTCOORDINATOR"]} component={CCSTC} /> 
-              <AuthRoute path="/app/cc_candidates_interview_scheduled" role={role} roles={["CLIENTCOORDINATOR"]} component={CCInterviewScheduled} /> 
+              <AuthRoute path="/app/cc_candidates_new" role={role} roles={["CLIENTCOORDINATOR"]} component={CCNew} />
+              <AuthRoute path="/app/cc_candidates_stc" role={role} roles={["CLIENTCOORDINATOR"]} component={CCSTC} />
+              <AuthRoute path="/app/cc_candidates_interview_scheduled" role={role} roles={["CLIENTCOORDINATOR"]} component={CCInterviewScheduled} />
               <AuthRoute path="/app/cc_candidates_schedule_interview" role={role} roles={["CLIENTCOORDINATOR"]} component={CCScheduleInterview} />
               <AuthRoute path="/app/cc_candidates_fis" role={role} roles={["CLIENTCOORDINATOR"]} component={CCFinalInterviewScheduled} />
-              <AuthRoute path="/app/cc_candidates_fic" role={role} roles={["CLIENTCOORDINATOR"]} component={CCFinalInterviewCompleted} /> 
+              <AuthRoute path="/app/cc_candidates_fic" role={role} roles={["CLIENTCOORDINATOR"]} component={CCFinalInterviewCompleted} />
               <AuthRoute path="/app/cc_candidates_document_collected" role={role} roles={["CLIENTCOORDINATOR"]} component={CCDocumentColleted} />
-              <AuthRoute path="/app/cc_candidates_salary_breakup_shared" role={role} roles={["CLIENTCOORDINATOR"]} component={CCSalaryBreakup} /> 
-              <AuthRoute path="/app/cc_candidates_offered" role={role} roles={["CLIENTCOORDINATOR"]} component={CCOffered} /> 
-              <AuthRoute path="/app/cc_candidates_joined" role={role} roles={["CLIENTCOORDINATOR"]} component={CCJoined} /> 
-              <AuthRoute path="/app/cc_candidates_offer_declined" role={role} roles={["CLIENTCOORDINATOR"]} component={CCOfferedDeclined} /> 
+              <AuthRoute path="/app/cc_candidates_salary_breakup_shared" role={role} roles={["CLIENTCOORDINATOR"]} component={CCSalaryBreakup} />
+              <AuthRoute path="/app/cc_candidates_offered" role={role} roles={["CLIENTCOORDINATOR"]} component={CCOffered} />
+              <AuthRoute path="/app/cc_candidates_joined" role={role} roles={["CLIENTCOORDINATOR"]} component={CCJoined} />
+              <AuthRoute path="/app/cc_candidates_offer_declined" role={role} roles={["CLIENTCOORDINATOR"]} component={CCOfferedDeclined} />
               <AuthRoute path="/app/cc_candidates_yet_to_join" role={role} roles={["CLIENTCOORDINATOR"]} component={CCYetToJoin} />
 
-              <AuthRoute path="/app/recruiter_candidates_new" role={role} roles={["RECRUITER"]} component={RECNew} /> 
-              <AuthRoute path="/app/recruiter_candidates_stc" role={role} roles={["RECRUITER"]} component={RECSTC} /> 
-              <AuthRoute path="/app/recruiter_candidates_schedule_interview" role={role} roles={["RECRUITER"]} component={RECScheduleInterview} /> 
+              <AuthRoute path="/app/recruiter_candidates_new" role={role} roles={["RECRUITER"]} component={RECNew} />
+              <AuthRoute path="/app/recruiter_candidates_stc" role={role} roles={["RECRUITER"]} component={RECSTC} />
+              <AuthRoute path="/app/recruiter_candidates_schedule_interview" role={role} roles={["RECRUITER"]} component={RECScheduleInterview} />
               <AuthRoute path="/app/recruiter_candidates_interview_scheduled" role={role} roles={["RECRUITER"]} component={RECInterviewScheduled} />
-              <AuthRoute path="/app/recruiter_candidates_fis" role={role} roles={["RECRUITER"]} component={RECFinalInterviewScheduled} /> 
-              <AuthRoute path="/app/recruiter_candidates_fic" role={role} roles={["RECRUITER"]} component={RECFinalInterviewCompleted} /> 
-              <AuthRoute path="/app/recruiter_candidates_document_collected" role={role} roles={["RECRUITER"]} component={RECDocumentColleted} /> 
-              <AuthRoute path="/app/recruiter_candidates_salary_breakup_shared" role={role} roles={["RECRUITER"]} component={RECSalaryBreakup} /> 
-              <AuthRoute path="/app/recruiter_candidates_offered" role={role} roles={["RECRUITER"]} component={RECOffered} /> 
-              <AuthRoute path="/app/recruiter_candidates_joined" role={role} roles={["RECRUITER"]} component={RECJoined} /> 
-              <AuthRoute path="/app/recruiter_candidates_offer_declined" role={role} roles={["RECRUITER"]} component={RECOfferedDeclined} /> 
+              <AuthRoute path="/app/recruiter_candidates_fis" role={role} roles={["RECRUITER"]} component={RECFinalInterviewScheduled} />
+              <AuthRoute path="/app/recruiter_candidates_fic" role={role} roles={["RECRUITER"]} component={RECFinalInterviewCompleted} />
+              <AuthRoute path="/app/recruiter_candidates_document_collected" role={role} roles={["RECRUITER"]} component={RECDocumentColleted} />
+              <AuthRoute path="/app/recruiter_candidates_salary_breakup_shared" role={role} roles={["RECRUITER"]} component={RECSalaryBreakup} />
+              <AuthRoute path="/app/recruiter_candidates_offered" role={role} roles={["RECRUITER"]} component={RECOffered} />
+              <AuthRoute path="/app/recruiter_candidates_joined" role={role} roles={["RECRUITER"]} component={RECJoined} />
+              <AuthRoute path="/app/recruiter_candidates_offer_declined" role={role} roles={["RECRUITER"]} component={RECOfferedDeclined} />
               <AuthRoute path="/app/recruiter_candidates_yet_to_join" role={role} roles={["RECRUITER"]} component={RECYetToJoin} />
 
-              <AuthRoute path="/app/others_candidates" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersCandidates} /> 
-              <AuthRoute path="/app/others_requirements" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersRequirements} /> 
-              <AuthRoute path="/app/others_candidates_new" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersNew} /> 
-              <AuthRoute path="/app/others_candidates_stc" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersSTC} /> 
-              <AuthRoute path="/app/others_candidates_schedule_interview" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersScheduleInterview} /> 
+              <AuthRoute path="/app/others_candidates" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersCandidates} />
+              <AuthRoute path="/app/others_requirements" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersRequirements} />
+              <AuthRoute path="/app/others_candidates_new" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersNew} />
+              <AuthRoute path="/app/others_candidates_stc" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersSTC} />
+              <AuthRoute path="/app/others_candidates_schedule_interview" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersScheduleInterview} />
               <AuthRoute path="/app/others_candidates_interview_scheduled" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersInterviewScheduled} />
-              <AuthRoute path="/app/others_candidates_fis" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersFinalInterviewScheduled} /> 
-              <AuthRoute path="/app/others_candidates_fic" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersFinalInterviewCompleted} /> 
-              <AuthRoute path="/app/others_candidates_document_collected" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersDocumentColleted} /> 
-              <AuthRoute path="/app/others_candidates_salary_breakup_shared" role={role} roles={["others"]} component={othersSalaryBreakup} /> 
-              <AuthRoute path="/app/others_candidates_offered" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersOffered} /> 
-              <AuthRoute path="/app/others_candidates_joined" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersJoined} /> 
-              <AuthRoute path="/app/others_candidates_offer_declined" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersOfferedDeclined} /> 
-               <AuthRoute path="/app/others_candidates_yet_to_join" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersYetToJoin} />
-
-               {decoded.companyType === "COMPANY" ?
-              (<>
-                <AuthRoute path="/app/projects" role={role} roles={["ADMIN"]} component={Projects} /> 
-                <AuthRoute path="/app/reports/vendor_onboarded_candidates" role={role} roles={["ADMIN"]} component={AllInvoiced} />
-              </>):
-              (<>
-                <AuthRoute path="/app/clients" role={role} roles={["ADMIN"]} component={Clients} /> 
-                <AuthRoute path="/app/resume_search" role={role} roles={["ADMIN"]} component={ResumeSearch} /> 
-                {/* Reports */}
-                <AuthRoute path="/app/reports/all_candidates_invoiced" role={role} roles={["ADMIN"]} component={AllInvoiced} />
-              </>)
-              }
-      </Switch>
+              <AuthRoute path="/app/others_candidates_fis" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersFinalInterviewScheduled} />
+              <AuthRoute path="/app/others_candidates_fic" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersFinalInterviewCompleted} />
+              <AuthRoute path="/app/others_candidates_document_collected" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersDocumentColleted} />
+              <AuthRoute path="/app/others_candidates_salary_breakup_shared" role={role} roles={["others"]} component={othersSalaryBreakup} />
+              <AuthRoute path="/app/others_candidates_offered" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersOffered} />
+              <AuthRoute path="/app/others_candidates_joined" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersJoined} />
+              <AuthRoute path="/app/others_candidates_offer_declined" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersOfferedDeclined} />
+              <AuthRoute path="/app/others_candidates_yet_to_join" role={role} roles={["FREELANCER", "SUBVENDOR"]} component={othersYetToJoin} />
+              {renderRoutesBasedOnCompanyType(companyType, role)}
+            </Switch>
           </div>
           <ToastContainer
-        closeButton={
-          <CloseButton className={classes.notificationCloseButton} />
-        }
-        closeOnClick={false}
-        hideProgressBar={true}
-      />
+            closeButton={
+              <CloseButton className={classes.notificationCloseButton} />
+            }
+            closeOnClick={false}
+            hideProgressBar={true}
+          />
         </MuiThemeProvider>
       </>
     </div>
@@ -721,11 +740,33 @@ function AuthRoute({ component, role, roles = [], ...rest }) {
           React.createElement(component, props)
         ) : (
           <Redirect
-            to={{ pathname: "/login", state: { from: props.location, },
+            to={{
+              pathname: "/login", state: { from: props.location, },
             }}
           />
         )
       }
     />
   );
+}
+
+function renderRoutesBasedOnCompanyType(companyType, role) {
+  if (companyType === "COMPANY") {
+    return (
+      <>
+        <AuthRoute path="/app/projects" role={role} roles={["ADMIN", "CLIENTCOORDINATOR"]} component={Projects} />
+        <AuthRoute path="/app/reports/vendor_onboarded_candidates" role={role} roles={["ADMIN"]} component={AllInvoiced} />
+      </>
+    );
+  }
+  else {
+    return (
+      <>
+        <AuthRoute path="/app/clients" role={role} roles={["ADMIN"]} component={Clients} />
+        <AuthRoute path="/app/resume_search" role={role} roles={["ADMIN"]} component={ResumeSearch} />
+        {/* Reports */}
+        <AuthRoute path="/app/reports/all_candidates_invoiced" role={role} roles={["ADMIN"]} component={AllInvoiced} />
+      </>
+    )
+  }
 }

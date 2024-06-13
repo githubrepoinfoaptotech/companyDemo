@@ -13,7 +13,7 @@ import PageTitle from "../../components/PageTitle";
 // import CardActions from "@material-ui/core/CardActions";
 
 import axios from "axios";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import useStyles from "../../themes/style.js";
 import { signOut, useUserDispatch } from "../../context/UserContext";
 
@@ -46,7 +46,7 @@ export default function Plans(props) {
     //   });
     // };
 
-    var decoded = jwt_decode(token);
+    var decoded = jwtDecode(token);
     if (decoded.role !== "SUPERADMIN") {
       const walletData = async () => {
         axios({
