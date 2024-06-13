@@ -32,7 +32,7 @@ import ViewIcon from "@material-ui/icons/Visibility";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import RemoveRedEyeIcon from "@material-ui/icons/RemoveRedEye";
 import { useHistory } from "react-router-dom";
-
+import "../../css/view-resume.css"
 import { toast } from "react-toastify";
 import PageTitle from "../../components/PageTitle";
 // data
@@ -58,17 +58,17 @@ import AddRequirements from "../../components/Candidates/AddRequirements";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import "react-toastify/dist/ReactToastify.css";
 import "jodit/build/jodit.min.css";
+import { getFileExtension } from "../../utils/getextension.js";
+import CustomPdfView from "../../components/pdfViewer/CustomPdfView.js";
 
 const positions = [toast.POSITION.TOP_RIGHT];
 
 export default function Tables() {
   const classes = useStyles();
   const history = useHistory();
-
   const mobileQuery = useMediaQuery("(max-width:600px)");
   const token = localStorage.getItem("token");
   const decode = jwtDecode(token);
-
   const [count, setCount] = useState(0);
   const [file, setFile] = useState([]);
   const [loader, setLoader] = useState(false);
@@ -90,6 +90,9 @@ export default function Tables() {
     specialHiring: "",
     hideFromInternal: "",
   });
+
+  const resumeUrl = requirementsEdit?.jd;
+  const fileExtension = resumeUrl ? getFileExtension(resumeUrl) : null;
 
   const [requirementsView, setRequirementsView] = useState({
     id: "",
@@ -126,6 +129,7 @@ export default function Tables() {
   const [reqOrgRecId, setReqOrgRecId] = useState([]);
   const [assignedRecruiters, setAssignedRecruiters] = useState([]);
   const [recUser, setRecUser] = useState([]);
+  const [levelHrData, setLevelHrData] = useState([]);
   const [reqLevelHrDataId, setReqLevelHrDataId] = useState("");
   const [clientId, setClientId] = useState("");
 
@@ -206,7 +210,7 @@ export default function Tables() {
       .nullable(true).transform(v => v === null ? [] : v),
     levelHrDataId: Yup.string().required("Level of Hire Name is required"),
     skills: Yup.string().required("Skill is required"),
-    gist: Yup.string(),
+    gist: Yup.string().required("Type your gist from requirement"),
     hideFromInternal: Yup.string(),
     work: Yup.string().required("Mode of work is required"),
     hiring: Yup.string(),
@@ -366,10 +370,9 @@ export default function Tables() {
       });
       setLoader(false);
       if (response.data.status === true) {
-        console.log(response.data.data)
         const newRecruiter = response.data.addedData;
 
-        const addNewData = recUser.filter(item=>item.recruiterId === newRecruiter.recruiterId)
+        const addNewData = recUser.filter(item => item.recruiterId === newRecruiter.recruiterId)
         const transformedRecruiters = transformRecruiterData(addNewData);
         setAssignedRecruiters(prevRecruiters => [...prevRecruiters, ...transformedRecruiters]);
       } else {
@@ -411,7 +414,7 @@ export default function Tables() {
   //   const addedIds = newSelectedIds.filter((id) => !oldSelectedIds.includes(id));
 
   //   addedIds.forEach(handleAddRecruiter);
-    
+
   //   setSelectedRecruiters(value);
   //   setEditValue('assignRecruitersList', newSelectedIds);
   // };
@@ -534,7 +537,6 @@ export default function Tables() {
   };
 
   function handleAdd(values) {
-    console.log(values, '90909')
     return new Promise((resolve, reject) => {
       try {
         setLoader(true);
@@ -572,7 +574,8 @@ export default function Tables() {
               if (file?.name) {
                 uploadJD(file, response.data.requirementId);
               }
-
+              setPage(0)
+              setCurrerntPage(1);
               handleNotificationCall("success", response.data.message);
               forceUpdate();
               setState({ ...state, right: false });
@@ -633,6 +636,8 @@ export default function Tables() {
             if (file?.name) {
               uploadJD(file, Id);
             }
+            setPage(0)
+            setCurrerntPage(1);
             forceUpdate();
 
             setState({ ...state, right: false });
@@ -766,11 +771,6 @@ export default function Tables() {
       });
   }
 
-
-  console.log(assignedRecruiters)
-  console.log(recUser)
-
-  const [levelHrData, setLevelHrData] = useState([]);
   const [state, setState] = useState({
     right: false,
   });
@@ -1014,42 +1014,42 @@ export default function Tables() {
                     </Grid>
 
                     <Grid item xs={12} sm={12} md={12} lg={12}>
-                    <div style={{display :'flex',gap:'10px'}}>
-                      {assignedRecruiters.map((item,index)=>{
-                        return(
-                          <div key={index}>
-                          <Chip
-                            avatar={<Avatar> {item.recruiter?.firstName.split("")[0]}</Avatar>}
-                            label={item.recruiter?.firstName+" "+item.recruiter?.lastName}
-                            className={classes.EditRecUserChip}
-                            clickable
-                            color="primary"
-                            onDelete={()=> handleRemoveRecruiter(item.id)}
-                            variant="outlined"
-                          />
-                          </div>
-                        ) 
-                      })}
-                    </div>
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        {assignedRecruiters.map((item, index) => {
+                          return (
+                            <div key={index}>
+                              <Chip
+                                avatar={<Avatar> {item.recruiter?.firstName.split("")[0]}</Avatar>}
+                                label={item.recruiter?.firstName + " " + item.recruiter?.lastName}
+                                className={classes.EditRecUserChip}
+                                clickable
+                                color="primary"
+                                onDelete={() => handleRemoveRecruiter(item.id)}
+                                variant="outlined"
+                              />
+                            </div>
+                          )
+                        })}
+                      </div>
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                       <FormControl className={classes.margin}>
-                      <InputLabel shrink htmlFor="assignRecruitersList">
-                        Select Recruiter
-                      </InputLabel>
+                        <InputLabel shrink htmlFor="assignRecruitersList">
+                          Select Recruiter
+                        </InputLabel>
                         <Autocomplete
-                            options={recUser}
-                            disableClearable
-                            error={editErrors.assignRecruitersList ? true : false}
-                            {...editRequirements("assignRecruitersList")}
-                            getOptionLabel={(option) => option.name}
-                            onChange={(event, value) => {
-                              handleAddRecruiter(value.recruiterId)
-                            }}
-                            renderInput={(params) => (
-                              <TextField {...params} variant="filled" />
-                            )}
-                          />
+                          options={recUser}
+                          disableClearable
+                          error={editErrors.assignRecruitersList ? true : false}
+                          {...editRequirements("assignRecruitersList")}
+                          getOptionLabel={(option) => option.name}
+                          onChange={(event, value) => {
+                            handleAddRecruiter(value.recruiterId)
+                          }}
+                          renderInput={(params) => (
+                            <TextField {...params} variant="filled" />
+                          )}
+                        />
                       </FormControl>
                       {/* <Autocomplete
                         multiple
@@ -1984,6 +1984,8 @@ export default function Tables() {
                 reset();
                 setDataList("ADD");
                 setFile([]);
+                setLevelHrData([])
+                setRecUser([])
                 setState({ ...state, right: true });
               }}
             >
@@ -2152,10 +2154,10 @@ export default function Tables() {
 
           <Grid container spacing={2} className={classes.pagination}>
             <TablePagination
-              rowsPerPageOptions={[50]}
+              rowsPerPageOptions={[10]}
               component="div"
               count={count}
-              rowsPerPage={50}
+              rowsPerPage={10}
               page={page}
               onPageChange={handleChangePage}
             />
@@ -2167,19 +2169,19 @@ export default function Tables() {
         aria-labelledby="dialog-title"
         onClose={handleModalClose}
         open={modalOpen}
-        width="lg"
-        maxWidth="lg"
+        fullWidth={true}
+        maxWidth="md"
         PaperProps={{
           style: {
             width: "100%",
           },
         }}
       >
-        <DialogContent className={classes.center}>
+        <DialogContent>
           <Grid container direction="row" spacing={2}>
-            <div className={classes.heading + " " + classes.inputRoot}>
+            <div className={classes.heading + " " + classes.inputRoot} style={{ position: "absolute", zIndex: 1, background: '#fff', top: 0, padding: "6px 30px" }}>
               <Typography variant="subtitle2" className={classes.inputRoot}>
-                JD
+                Job Description
               </Typography>
               <div className={classes.drawerClose}>
                 <CloseIcon
@@ -2188,20 +2190,24 @@ export default function Tables() {
                 />
               </div>
             </div>
-            <div className={classes.iframediv}>
-              <iframe
-                src={
-                  "https://docs.google.com/a/umd.edu/viewer?url=" +
-                  requirementsEdit?.jd +
-                  "&embedded=true"
-                }
-                title="File"
-                width="100%"
-                height="500"
-              ></iframe>
-
-              <div className={classes.iframeLogo}></div>
-            </div>
+            <Grid item xs={12}>
+              {fileExtension === "pdf" ?
+                <CustomPdfView resumeUrl={requirementsEdit?.jd} />
+                :
+                <div className={classes.iframediv} style={{ marginTop: "40px" }}>
+                  <iframe
+                    src={
+                      "https://docs.google.com/a/umd.edu/viewer?url=" +
+                      requirementsEdit?.jd +
+                      "&embedded=true"
+                    }
+                    title="File"
+                    width="100%" height="500" sandbox="allow-scripts allow-same-origin"
+                  ></iframe>
+                  <div className={classes.iframeLogo}></div>
+                </div>
+              }
+            </Grid>
 
             <div className={classes.sendWhatsapp + " " + classes.inputRoot}>
               <Button

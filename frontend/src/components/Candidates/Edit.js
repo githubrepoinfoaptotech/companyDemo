@@ -31,6 +31,8 @@ import Tooltip from "@material-ui/core/Tooltip";
 import DescriptionIcon from '@material-ui/icons/Description';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ImageIcon from '@material-ui/icons/Image';
+import CustomPdfView from "../pdfViewer/CustomPdfView.js";
+import { getFileExtension } from "../../utils/getextension.js";
 
 export default function Edit(props) {
 
@@ -42,7 +44,6 @@ export default function Edit(props) {
   const [display, setDisplay] = useState(false);
   const [fileName, setFileName] = useState();
   const [assessmentFile, setAssessmentFile] = useState();
-
   const [docFileName, setDocFileName] = useState();
   const [profileFileName, setProfileFileName] = useState();
 
@@ -60,7 +61,7 @@ export default function Edit(props) {
     setDocFileName(event.target.name);
     props.setDocFile(event.target.files[0]);
   }
- 
+
   function handleProfileChange(event) {
     setProfileFileName(event.target.name);
     props.setProfile(event.target.files[0]);
@@ -71,9 +72,12 @@ export default function Edit(props) {
     props.setAssessment(event.target.files[0]);
   }
 
-
-  const [modalOpen, setModalOpen] = React.useState(false);
   const [assessmentOpen, setAssessmentOpen] = React.useState(false);
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [modalContentType, setModalContentType] = React.useState(null);
+
+  const resumeExtension = props.candidatesEdit?.resume ? getFileExtension(props.candidatesEdit.resume) : null;
+  const documentExtension = props.candidatesEdit?.document ? getFileExtension(props.candidatesEdit.document) : null;
 
   const handleAssessmentClose = () => {
     setAssessmentOpen(false);
@@ -87,14 +91,12 @@ export default function Edit(props) {
     setModalOpen(false);
   };
 
-  const handleModalOpen = () => {
+  const handleModalOpen = (contentType, contentUrl) => {
+    setModalContentType(contentType);
     setModalOpen(true);
   };
 
-
-
   useEffect(() => {
-
     axios({
       method: "post",
       url: `${process.env.REACT_APP_SERVER}source/viewSourcesEditList`,
@@ -413,7 +415,7 @@ export default function Edit(props) {
                     </InputLabel>
                     <FormControl className={classes.margin}>
 
-                      <div className={classes.space + " " + classes.alignItemsEnd}  >
+                      <div className={classes.space + " " + classes.alignItemsEnd} style={{ flexWrap: 'wrap' }}>
 
                         <div className={classes.marginTop}>
                           <input
@@ -426,8 +428,6 @@ export default function Edit(props) {
                             onChange={handleChange}
                           />
                           <label htmlFor="icon-button-file">
-
-
                             <Button
                               variant="contained"
                               className={classes.button}
@@ -438,53 +438,51 @@ export default function Edit(props) {
                             >
                               Upload Resume
                             </Button>
-
                           </label>
                         </div>
-
-
-                        {props.candidatesEdit?.resume !== "https://liverefo.s3.amazonaws.com/" && props.candidatesEdit?.resume !== "" ? <>
-                          <Tooltip
-                            title="View Resume"
-                            placement="bottom"
-                            aria-label="view"
-                          >
-                            <DescriptionIcon
-                              className={classes.toolIcon}
-                              onClick={handleModalOpen}
-                            />
-                          </Tooltip>
-                          {props.file?.name || props.candidatesEdit?.resume ?
-                            <Tooltip title="Delete Resume" placement="bottom" aria-label="delete" >
-                              <DeleteIcon className={classes.toolIconDelete} onClick={(e) => {
-                                props.setFile([]); setFileName();
-                                props.setCandidatesEdit({
-                                  ...props.candidatesEdit,
-                                  resume: "",
-                                });
-                              }} />
+                        {props.candidatesEdit?.resume !== "https://liverefo.s3.amazonaws.com/" && props.candidatesEdit?.resume !== "" ?
+                          <div style={{ display: 'flex', gap: "5px" }}>
+                            <Tooltip
+                              title="View Resume"
+                              placement="bottom"
+                              aria-label="view"
+                            >
+                              <DescriptionIcon
+                                className={classes.toolIcon}
+                                onClick={() => handleModalOpen('resume', props.candidatesEdit?.resume)}
+                              />
                             </Tooltip>
+                            {props.file?.name || props.candidatesEdit?.resume ?
+                              <Tooltip title="Delete Resume" placement="bottom" aria-label="delete" >
+                                <DeleteIcon className={classes.toolIconDelete} onClick={(e) => {
+                                  props.setFile([]); setFileName();
+                                  props.setCandidatesEdit({
+                                    ...props.candidatesEdit,
+                                    resume: "",
+                                  });
+                                }} />
+                              </Tooltip>
+                              : ""}
 
-                            : ""}
-
-                        </> : ""}
+                          </div> : ""}
                       </div>
                     </FormControl>
                     <Grid container direction="row" className={classes.left + " " + classes.button} >
-                      <Typography variant="inherit" className={classes.lineBreak}>  {props.file?.name}   </Typography>
-
+                      {props.file?.name &&
+                        <Typography variant="inherit" className={classes.lineBreak}>  {props.file?.name?.substring(0, 15) + "..."}   </Typography>
+                      }
                     </Grid>
                   </Grid>
-                  
+
                   {decode.companyType === "COMPANY" ?
                     <>
                       <Grid item xs={6} sm={6} md={3} lg={3}>
-                        <InputLabel shrink htmlFor="resume">
+                        <InputLabel shrink htmlFor="document">
                           Upload Document
                         </InputLabel>
                         <FormControl className={classes.margin}>
 
-                          <div className={classes.space + " " + classes.alignItemsEnd}  >
+                          <div className={classes.space + " " + classes.alignItemsEnd} style={{ flexWrap: 'wrap' }}>
                             <div className={classes.marginTop}>
                               <input
                                 accept=".pdf,.doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -494,7 +492,6 @@ export default function Edit(props) {
                                 value={docFileName}
                                 style={{ display: "none" }}
                                 onChange={handleDocUploadChange}
-
                               />
                               <label htmlFor="icon-button-doc-file">
                                 <Button
@@ -510,24 +507,49 @@ export default function Edit(props) {
                                 </Button>
                               </label>
                             </div>
+                            {props.candidatesEdit?.document !== "https://liverefo.s3.amazonaws.com/" && props.candidatesEdit?.document !== "" ?
+                              <div style={{ display: 'flex', gap: "5px" }}>
+                                <Tooltip
+                                  title="View document"
+                                  placement="bottom"
+                                  aria-label="view"
+                                >
+                                  <DescriptionIcon
+                                    className={classes.toolIcon}
+                                    onClick={() => handleModalOpen('document', props.candidatesEdit?.document)}
+                                  />
+                                </Tooltip>
+                                {props.docFile?.name || props.candidatesEdit?.document ?
+                                  <Tooltip title="Delete document" placement="bottom" aria-label="delete" >
+                                    <DeleteIcon className={classes.toolIconDelete} onClick={(e) => {
+                                      props.setDocFile([]); setDocFileName();
+                                      props.setCandidatesEdit({
+                                        ...props.candidatesEdit,
+                                        document: "",
+                                      });
+                                    }} />
+                                  </Tooltip>
 
+                                  : ""}
+
+                              </div> : ""}
                           </div>
                         </FormControl>
                         <Grid container direction="row" className={classes.left + " " + classes.button} >
-                          <Typography variant="inherit" className={classes.lineBreak}   > {props.docFile?.name}  </Typography>
+                          {props.docFile?.name &&
+                            <Typography variant="inherit" className={classes.lineBreak}   > {props.docFile?.name.substring(0, 15) + "..."}  </Typography>
+                          }
                         </Grid>
                       </Grid>
                       <Grid item xs={6} sm={6} md={3} lg={3}>
-                        <InputLabel shrink htmlFor="resume">
-
+                        <InputLabel shrink htmlFor="photo">
                           Upload Photograph
                         </InputLabel>
                         <FormControl className={classes.margin}>
-
-                          <div className={classes.space + " " + classes.alignItemsEnd}  >
+                          <div className={classes.space + " " + classes.alignItemsEnd} style={{ flexWrap: 'wrap' }}>
                             <div className={classes.marginTop}>
                               <input
-                                accept=".pdf,.doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                accept=".jpg,.jpeg,.png"
                                 className={classes.input}
                                 id="icon-button-profile"
                                 type="file"
@@ -541,7 +563,7 @@ export default function Edit(props) {
                                   variant="contained"
                                   className={classes.button}
                                   color="primary"
-                                  startIcon={<DescriptionIcon />}
+                                  startIcon={<ImageIcon />}
                                   aria-label="upload picture"
                                   component="span"
                                 >
@@ -549,16 +571,42 @@ export default function Edit(props) {
                                 </Button>
                               </label>
                             </div>
+                            {props.candidatesEdit?.photo !== "https://liverefo.s3.amazonaws.com/" && props.candidatesEdit?.photo !== "" ?
+                              <div style={{ display: 'flex', gap: "5px" }}>
+                                <Tooltip
+                                  title="View Profile"
+                                  placement="bottom"
+                                  aria-label="view"
+                                >
+                                  <ImageIcon
+                                    className={classes.toolIcon}
+                                    onClick={() => handleModalOpen('photo', props.candidatesEdit?.photo)}
+                                  />
+                                </Tooltip>
+                                {props.profile?.name || props.candidatesEdit?.photo ?
+                                  <Tooltip title="Delete Profile" placement="bottom" aria-label="delete" >
+                                    <DeleteIcon className={classes.toolIconDelete} onClick={(e) => {
+                                      props.setProfile([]); setProfileFileName();
+                                      props.setCandidatesEdit({
+                                        ...props.candidatesEdit,
+                                        photo: "",
+                                      });
+                                    }} />
+                                  </Tooltip>
 
-                          
+                                  : ""}
+
+                              </div> : ""}
                           </div>
                         </FormControl>
-                        <Grid container direction="row" className={classes.left + " " + classes.button} >
-                          <Typography variant="inherit" className={classes.lineBreak}   > {props.profile?.name}  </Typography>
+                        <Grid container direction="row" className={classes.left + " " + classes.button}>
+                          {props.profile?.name &&
+                            <Typography variant="inherit" className={classes.lineBreak}   > {props.profile?.name.substring(0, 15) + "..."}  </Typography>
+                          }
                         </Grid>
                       </Grid>
                       <Grid item xs={12} sm={6} md={3} lg={3}>
-                      <InputLabel shrink htmlFor="currentCompanyName">
+                        <InputLabel shrink htmlFor="panNumber">
                           PAN Card
                         </InputLabel>
                         <FormControl className={classes.margin}>
@@ -567,20 +615,19 @@ export default function Edit(props) {
                             classes={{ root: classes.customTextField }}
                             size="small"
                             placeholder="Enter PAN Card Details"
-                            id="currentCompanyName"
-                            name="currentCompanyName"
-                            defaultValue={props.candidatesEdit.currentCompanyName}
-                            {...props.editCandidates("currentCompanyName")}
-                            error={props.editErrors.currentCompanyName ? true : false}
+                            id="panNumber"
+                            name="panNumber"
+                            defaultValue={props.candidatesEdit.panNumber}
+                            {...props.editCandidates("panNumber")}
+                            error={props.editErrors.panNumber ? true : false}
                           />
-
                           <Typography variant="inherit" color="error">
-                            {props.editErrors.currentCompanyName?.message}
+                            {props.editErrors.panNumber?.message}
                           </Typography>
                         </FormControl>
                       </Grid>
                       <Grid item xs={12} sm={6} md={3} lg={3}>
-                        <InputLabel shrink htmlFor="native">
+                        <InputLabel shrink htmlFor="linkedInProfile">
                           LinkedIn Profile URL
                         </InputLabel>
                         <FormControl className={classes.margin}>
@@ -589,44 +636,44 @@ export default function Edit(props) {
                             classes={{ root: classes.customTextField }}
                             size="small"
                             placeholder="Enter Your LinkedIn Profile URL"
-                            id="native"
-                            name="native"
-                            defaultValue={props.candidatesEdit.nativeLocation}
-                            {...props.editCandidates("native")}
-                            error={props.editErrors.native ? true : false}
+                            id="linkedInProfile"
+                            name="linkedInProfile"
+                            defaultValue={props.candidatesEdit.linkedInProfile}
+                            {...props.editCandidates("linkedInProfile")}
+                            error={props.editErrors.linkedInProfile ? true : false}
                           />
 
                           <Typography variant="inherit" color="error">
-                            {props.editErrors.native?.message}
+                            {props.editErrors.linkedInProfile?.message}
                           </Typography>
                         </FormControl>
                       </Grid>
                     </>
                     :
                     props.show === true ?
-                    <>
-                      <Grid item xs={6} sm={6} md={3} lg={3}>
-                        <InputLabel shrink htmlFor="skills">
-                          Hide Contact Detail
-                        </InputLabel>
-                        <FormControl className={classes.margin}>
+                      <>
+                        <Grid item xs={6} sm={6} md={3} lg={3}>
+                          <InputLabel shrink htmlFor="skills">
+                            Hide Contact Detail
+                          </InputLabel>
+                          <FormControl className={classes.margin}>
 
-                          <Switch
-                            checked={props.candidatesEdit.hideContactDetails}
-                            onChange={(e) => {
-                              props.setCandidatesEdit({
-                                ...props.candidatesEdit,
-                                hideContactDetails: e.target.checked,
-                              });
+                            <Switch
+                              checked={props.candidatesEdit.hideContactDetails}
+                              onChange={(e) => {
+                                props.setCandidatesEdit({
+                                  ...props.candidatesEdit,
+                                  hideContactDetails: e.target.checked,
+                                });
 
-                            }}
-                            color="primary"
-                            inputProps={{ "aria-label": "primary checkbox" }}
-                          />
+                              }}
+                              color="primary"
+                              inputProps={{ "aria-label": "primary checkbox" }}
+                            />
 
-                        </FormControl>
-                      </Grid>
-                    </> : ""
+                          </FormControl>
+                        </Grid>
+                      </> : ""
                   }
 
                   {props.candidatesEdit.joinedDate !== null && decode.role !== "SUBVENDOR" && decode.role !== "FREELANCER" ? (
@@ -762,7 +809,6 @@ export default function Edit(props) {
 
                   {display === true ? (
                     <>
-
                       <Grid item xs={12} sm={6} md={3} lg={3}>
                         <InputLabel shrink htmlFor="dob">
 
@@ -1037,105 +1083,105 @@ export default function Edit(props) {
                         </FormControl>
                       </Grid>
 
-                      {decode.companyType !=="COMPANY" &&
-                      <>
-                        <Grid item xs={12} sm={6} md={5} lg={5}>
-                          <InputLabel shrink htmlFor="candidateRecruiterDiscussionRecording">
+                      {decode.companyType !== "COMPANY" &&
+                        <>
+                          <Grid item xs={12} sm={6} md={5} lg={5}>
+                            <InputLabel shrink htmlFor="candidateRecruiterDiscussionRecording">
 
-                            Candidate Recruiter discussion recording
-                          </InputLabel>
-                          <FormControl className={classes.margin}>
-                            <TextField
+                              Candidate Recruiter discussion recording
+                            </InputLabel>
+                            <FormControl className={classes.margin}>
+                              <TextField
 
-                              InputProps={{ disableUnderline: true }}
-                              classes={{ root: classes.customTextField }}
-                              size="small"
-                              placeholder="Enter Candidate Recruiter discussion recording"
-                              id="candidateRecruiterDiscussionRecording"
-                              name="candidateRecruiterDiscussionRecording"
-                              defaultValue={props.candidatesEdit.candidateRecruiterDiscussionRecording}
-                              {...props.editCandidates("candidateRecruiterDiscussionRecording")}
-                              error={props.editErrors.candidateRecruiterDiscussionRecording ? true : false}
-                            />
+                                InputProps={{ disableUnderline: true }}
+                                classes={{ root: classes.customTextField }}
+                                size="small"
+                                placeholder="Enter Candidate Recruiter discussion recording"
+                                id="candidateRecruiterDiscussionRecording"
+                                name="candidateRecruiterDiscussionRecording"
+                                defaultValue={props.candidatesEdit.candidateRecruiterDiscussionRecording}
+                                {...props.editCandidates("candidateRecruiterDiscussionRecording")}
+                                error={props.editErrors.candidateRecruiterDiscussionRecording ? true : false}
+                              />
 
-                            <Typography variant="inherit" color="error">
-                              {props.editErrors.candidateRecruiterDiscussionRecording?.message}
-                            </Typography>
-                          </FormControl>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4} lg={4}>
-                          <InputLabel shrink htmlFor="candidateSkillExplanationRecording">
+                              <Typography variant="inherit" color="error">
+                                {props.editErrors.candidateRecruiterDiscussionRecording?.message}
+                              </Typography>
+                            </FormControl>
+                          </Grid>
+                          <Grid item xs={12} sm={6} md={4} lg={4}>
+                            <InputLabel shrink htmlFor="candidateSkillExplanationRecording">
 
-                            Candidate Skill Explanation Recording
-                          </InputLabel>
-                          <FormControl className={classes.margin}>
-                            <TextField
+                              Candidate Skill Explanation Recording
+                            </InputLabel>
+                            <FormControl className={classes.margin}>
+                              <TextField
 
-                              InputProps={{ disableUnderline: true }}
-                              classes={{ root: classes.customTextField }}
-                              size="small"
-                              placeholder="Enter Candidate Skill Explanation Recording"
-                              id="candidateSkillExplanationRecording"
-                              name="candidateSkillExplanationRecording"
-                              defaultValue={props.candidatesEdit.candidateSkillExplanationRecording}
-                              {...props.editCandidates("candidateSkillExplanationRecording")}
-                              error={props.editErrors.candidateSkillExplanationRecording ? true : false}
-                            />
+                                InputProps={{ disableUnderline: true }}
+                                classes={{ root: classes.customTextField }}
+                                size="small"
+                                placeholder="Enter Candidate Skill Explanation Recording"
+                                id="candidateSkillExplanationRecording"
+                                name="candidateSkillExplanationRecording"
+                                defaultValue={props.candidatesEdit.candidateSkillExplanationRecording}
+                                {...props.editCandidates("candidateSkillExplanationRecording")}
+                                error={props.editErrors.candidateSkillExplanationRecording ? true : false}
+                              />
 
-                            <Typography variant="inherit" color="error">
-                              {props.editErrors.candidateSkillExplanationRecording?.message}
-                            </Typography>
-                          </FormControl>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={6} lg={4}>
-                          <InputLabel shrink htmlFor="candidateMindsetAssessmentLink">
-                            Candidate MindSet Assessment
-                          </InputLabel>
-                          <FormControl className={classes.margin}>
+                              <Typography variant="inherit" color="error">
+                                {props.editErrors.candidateSkillExplanationRecording?.message}
+                              </Typography>
+                            </FormControl>
+                          </Grid>
+                          <Grid item xs={12} sm={6} md={6} lg={4}>
+                            <InputLabel shrink htmlFor="candidateMindsetAssessmentLink">
+                              Candidate MindSet Assessment
+                            </InputLabel>
+                            <FormControl className={classes.margin}>
 
-                            <div className={classes.space + " " + classes.alignItemsEnd}  >
+                              <div className={classes.space + " " + classes.alignItemsEnd}  >
 
-                              <div className={classes.marginTop}>
-                                <input
-                                  accept=".png,.jpg,.jpeg"
-                                  className={classes.input}
-                                  id="icon-button-assessment"
-                                  type="file"
-                                  value={assessmentFile}
-                                  style={{ display: "none" }}
-                                  onChange={handleAssesment}
+                                <div className={classes.marginTop}>
+                                  <input
+                                    accept=".png,.jpg,.jpeg"
+                                    className={classes.input}
+                                    id="icon-button-assessment"
+                                    type="file"
+                                    value={assessmentFile}
+                                    style={{ display: "none" }}
+                                    onChange={handleAssesment}
 
-                                />
-                                <label htmlFor="icon-button-assessment">
-
-
-                                  <Button
-                                    variant="contained"
-                                    className={classes.button}
-                                    color="primary"
-                                    startIcon={<ImageIcon />}
-                                    aria-label="upload assessment"
-                                    component="span"
-                                  >
-                                    Candidate MindSet Assessment
-                                  </Button>
-
-                                </label>
-                              </div>
-
-
-                              {props.candidatesEdit?.candidateMindsetAssessmentLink !== "https://liverefo.s3.amazonaws.com/" && props.candidatesEdit?.candidateMindsetAssessmentLink !== "" ? <>
-                                <Tooltip
-                                  title="View Candidate MindSet Assessment"
-                                  placement="bottom"
-                                  aria-label="view"
-                                >
-                                  <ImageIcon
-                                    className={classes.toolIcon}
-                                    onClick={handleAssessmentOpen}
                                   />
-                                </Tooltip>
-                                {/* <Tooltip
+                                  <label htmlFor="icon-button-assessment">
+
+
+                                    <Button
+                                      variant="contained"
+                                      className={classes.button}
+                                      color="primary"
+                                      startIcon={<ImageIcon />}
+                                      aria-label="upload assessment"
+                                      component="span"
+                                    >
+                                      Candidate MindSet Assessment
+                                    </Button>
+
+                                  </label>
+                                </div>
+
+
+                                {props.candidatesEdit?.candidateMindsetAssessmentLink !== "https://liverefo.s3.amazonaws.com/" && props.candidatesEdit?.candidateMindsetAssessmentLink !== "" ? <>
+                                  <Tooltip
+                                    title="View Candidate MindSet Assessment"
+                                    placement="bottom"
+                                    aria-label="view"
+                                  >
+                                    <ImageIcon
+                                      className={classes.toolIcon}
+                                      onClick={handleAssessmentOpen}
+                                    />
+                                  </Tooltip>
+                                  {/* <Tooltip
                                 title="Downlaod Resume"
                                 placement="bottom"
                                 aria-label="downlaod"
@@ -1146,51 +1192,51 @@ export default function Edit(props) {
                                 </a>
                               </Tooltip> */}
 
-                                {props.assessment?.name || props.candidatesEdit?.candidateMindsetAssessmentLink ?
-                                  <Tooltip title="Delete Resume" placement="bottom" aria-label="delete" >
-                                    <DeleteIcon className={classes.toolIconDelete} onClick={(e) => {
-                                      props.setAssessment([]); setAssessmentFile();
-                                      props.setCandidatesEdit({
-                                        ...props.candidatesEdit,
-                                        candidateMindsetAssessmentLink: "",
-                                      });
-                                    }} />
-                                  </Tooltip>
+                                  {props.assessment?.name || props.candidatesEdit?.candidateMindsetAssessmentLink ?
+                                    <Tooltip title="Delete Resume" placement="bottom" aria-label="delete" >
+                                      <DeleteIcon className={classes.toolIconDelete} onClick={(e) => {
+                                        props.setAssessment([]); setAssessmentFile();
+                                        props.setCandidatesEdit({
+                                          ...props.candidatesEdit,
+                                          candidateMindsetAssessmentLink: "",
+                                        });
+                                      }} />
+                                    </Tooltip>
 
-                                  : ""}
+                                    : ""}
 
-                              </> : ""}
-                            </div>
-                          </FormControl>
-                          <Grid container direction="row" className={classes.left + " " + classes.button} >
-                            <Typography variant="inherit" className={classes.lineBreak}   > {props.assessment?.name}  </Typography>
+                                </> : ""}
+                              </div>
+                            </FormControl>
+                            <Grid container direction="row" className={classes.left + " " + classes.button} >
+                              <Typography variant="inherit" className={classes.lineBreak}   > {props.assessment?.name}  </Typography>
+                            </Grid>
                           </Grid>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={6} lg={8}>
-                          <InputLabel shrink htmlFor="candidateAndTechPannelDiscussionRecording">
+                          <Grid item xs={12} sm={6} md={6} lg={8}>
+                            <InputLabel shrink htmlFor="candidateAndTechPannelDiscussionRecording">
 
-                            Candidate & Tech Panel discussion recording
-                          </InputLabel>
-                          <FormControl className={classes.margin}>
-                            <TextField
+                              Candidate & Tech Panel discussion recording
+                            </InputLabel>
+                            <FormControl className={classes.margin}>
+                              <TextField
 
-                              InputProps={{ disableUnderline: true }}
-                              classes={{ root: classes.customTextField }}
-                              size="small"
-                              placeholder="Enter Candidate & Tech Panel discussion recording"
-                              id="candidateAndTechPannelDiscussionRecording"
-                              name="candidateAndTechPannelDiscussionRecording"
-                              defaultValue={props.candidatesEdit.candidateAndTechPannelDiscussionRecording}
-                              {...props.editCandidates("candidateAndTechPannelDiscussionRecording")}
-                              error={props.editErrors.candidateAndTechPannelDiscussionRecording ? true : false}
-                            />
+                                InputProps={{ disableUnderline: true }}
+                                classes={{ root: classes.customTextField }}
+                                size="small"
+                                placeholder="Enter Candidate & Tech Panel discussion recording"
+                                id="candidateAndTechPannelDiscussionRecording"
+                                name="candidateAndTechPannelDiscussionRecording"
+                                defaultValue={props.candidatesEdit.candidateAndTechPannelDiscussionRecording}
+                                {...props.editCandidates("candidateAndTechPannelDiscussionRecording")}
+                                error={props.editErrors.candidateAndTechPannelDiscussionRecording ? true : false}
+                              />
 
-                            <Typography variant="inherit" color="error">
-                              {props.editErrors.candidateAndTechPannelDiscussionRecording?.message}
-                            </Typography>
-                          </FormControl>
-                        </Grid>
-                      </>
+                              <Typography variant="inherit" color="error">
+                                {props.editErrors.candidateAndTechPannelDiscussionRecording?.message}
+                              </Typography>
+                            </FormControl>
+                          </Grid>
+                        </>
                       }
 
                       <Grid item xs={12} sm={6} md={3} lg={3}>
@@ -1413,41 +1459,71 @@ export default function Edit(props) {
             aria-labelledby="dialog-title"
             onClose={handleModalClose}
             open={modalOpen}
-            width="lg"
-            maxWidth="lg"
+            fullWidth={true}
+            maxWidth="md"
             PaperProps={{
               style: {
                 width: "100%",
               },
             }}
           >
-            <DialogContent className={classes.center}>
+            <DialogContent>
               <Grid container direction="row" spacing={2}>
-                <div className={classes.heading + " " + classes.inputRoot}>
+                <div className={classes.heading + " " + classes.inputRoot} style={{ position: "absolute", zIndex: 1, background: '#fff', top: 0, padding: "6px 30px" }}>
                   <Typography variant="subtitle2" className={classes.inputRoot}>
-
-                    Resume
+                    {modalContentType === "resume" ? "Resume" : modalContentType === "document" ? "Document" : modalContentType === "photo" ? "Photograph" : ""}
                   </Typography>
                   <div className={classes.drawerClose}>
                     <CloseIcon className={classes.closeBtn} onClick={handleModalClose} />
                   </div>
                 </div>
-                <div className={classes.iframediv}>
-                  <iframe
-                    src={
-                      "https://docs.google.com/a/umd.edu/viewer?url=" +
-                      props.candidatesEdit?.resume +
-                      "&embedded=true"
-                    }
-                    title="File"
-                    width="100%"
-                    height="500"
-                  >
-
-                  </iframe>
-                  <div className={classes.iframeLogo} >
-                  </div>
-                </div>
+                <Grid item xs={12}>
+                  {modalContentType === "resume" ?
+                    (resumeExtension === "pdf" ?
+                      <CustomPdfView resumeUrl={props.candidatesEdit?.resume} />
+                      :
+                      <div className={classes.iframediv}>
+                        <iframe
+                          src={
+                            "https://docs.google.com/a/umd.edu/viewer?url=" +
+                            props.candidatesEdit?.resume +
+                            "&embedded=true"
+                          }
+                          title="File"
+                          width="100%" height="500" sandbox="allow-scripts allow-same-origin"
+                        >
+                        </iframe>
+                        <div className={classes.iframeLogo} >
+                        </div>
+                      </div>
+                    )
+                    : modalContentType === "document" ?
+                      (documentExtension === "pdf" ?
+                        <CustomPdfView resumeUrl={props.candidatesEdit?.document} />
+                        :
+                        <div className={classes.iframediv}>
+                          <iframe
+                            src={
+                              "https://docs.google.com/a/umd.edu/viewer?url=" +
+                              props.candidatesEdit?.document +
+                              "&embedded=true"
+                            }
+                            title="File"
+                            width="100%" height="500" sandbox="allow-scripts allow-same-origin"
+                          >
+                          </iframe>
+                          <div className={classes.iframeLogo} >
+                          </div>
+                        </div>
+                      )
+                      : modalContentType === "photo" ?
+                        <div className={classes.iframediv}>
+                          <img style={{ width: "100%", height: "70vh", objectFit: "contain" }} src={props.candidatesEdit?.photo} width="100%" alt="photo-profile-url" />
+                        </div>
+                        :
+                        <></>
+                  }
+                </Grid>
                 <div className={classes.sendWhatsapp + " " + classes.inputRoot}>
                   <Button variant="contained" size="small" color="secondary" onClick={handleModalClose}>
                     Close

@@ -48,6 +48,8 @@ export default function Search(props) {
   });
   const [source, setSource] = useState([]);
   const [file, setFile] = useState([]);
+  const [docFile, setDocFile] = useState([]);
+  const [profile, setProfile] = useState([]);
   const [assessment, setAssessment] = useState([]);
 
   const [addList, setAddList] = useState([]);
@@ -130,7 +132,8 @@ export default function Search(props) {
     reason: "",
     dob: "",
     freeValue: decode.isEnableFree === true ? "YES" : decode.isEnablePaid === true ? "NO" : "YES",
-
+    panNumber: "",
+    linkedInProfile: "",
   });
 
   const [listCanditate, setListCanditate] = useState([]);
@@ -175,6 +178,8 @@ export default function Search(props) {
     mainId: "",
     isCandidateCpv: "",
     currentCompanyName: "",
+    panNumber: "",
+    linkedInProfile: "",
   });
 
 
@@ -276,9 +281,6 @@ export default function Search(props) {
     currentCompanyName: Yup.string().nullable().notRequired(),
   });
 
-
-
-
   const {
     register,
     reset,
@@ -319,7 +321,8 @@ export default function Search(props) {
       candidateMindsetAssessmentLink: "",
       candidateAndTechPannelDiscussionRecording: "",
       freeValue: decode.isEnableFree === true ? "YES" : decode.isEnablePaid === true ? "NO" : "YES",
-
+      panNumber: "",
+      linkedInProfile: "",
     });
 
     setPhoneValidation(false);
@@ -327,6 +330,8 @@ export default function Search(props) {
     setState({ ...state, right: true });
     setValidation(false);
     setFile([]);
+    setDocFile([]);
+    setProfile([]);
     setAssessment([]);
     setDataList("ADD");
 
@@ -391,6 +396,8 @@ export default function Search(props) {
           reason: response.data.data?.reason,
           currentCompanyName: response.data.data?.currentCompanyName,
           freeValue: decode.isEnableFree === true ? "YES" : decode.isEnablePaid === true ? "NO" : "YES",
+          panNumber: response.data.data?.panNumber,
+          linkedInProfile: response.data.data?.linkedInProfile,
         });
       }
     });
@@ -554,6 +561,8 @@ export default function Search(props) {
             mainId: response.data.data.mainId,
             isCandidateCpv: response.data.data.isCandidateCpv,
             currentCompanyName: response.data.data.candidateDetail?.currentCompanyName,
+            panNumber: response.data.data.candidateDetail?.panNumber,
+            linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
           });
           setDataList("VIEW");
           setState({ ...state, right: true });
@@ -806,9 +815,6 @@ export default function Search(props) {
   }
 
   function handleAddList(send) {
-
-
-
     setLoader(true);
     var url = "";
     var data = {};
@@ -848,6 +854,8 @@ export default function Search(props) {
         candidateMindsetAssessmentLink: addList.candidateMindsetAssessmentLink,
         candidateAndTechPannelDiscussionRecording: addList.candidateAndTechPannelDiscussionRecording,
         currentCompanyName: addList.currentCompanyName,
+        panNumber: addList.panNumber,
+        linkedInProfile: addList.linkedInProfile,
       }
     } else {
       url = props.CandidateUrl;
@@ -882,6 +890,8 @@ export default function Search(props) {
         candidateMindsetAssessmentLink: addList.candidateMindsetAssessmentLink,
         candidateAndTechPannelDiscussionRecording: addList.candidateAndTechPannelDiscussionRecording,
         currentCompanyName: addList.currentCompanyName,
+        panNumber: addList.panNumber,
+        linkedInProfile: addList.linkedInProfile,
       }
     }
 
@@ -894,24 +904,21 @@ export default function Search(props) {
         Authorization: token,
       },
     }).then(function (response) {
-
-
       if (response.data.status === true) {
         handleClose();
-
         var message = "";
+        const fileUploadTasks = [
+          { file: file, uploadFunction: uploadResume },
+          { file: docFile, uploadFunction: updateCandidateDocument },
+          { file: profile, uploadFunction: updateCandidatePhoto },
+          { file: assessment, uploadFunction: uploadAssessment }
+        ];
 
-        if (file !== undefined) {
-          if (file?.length !== 0) {
-            uploadResume(file, response.data.candidateDetailsId);
+        fileUploadTasks.forEach(({ file, uploadFunction }) => {
+          if (file !== undefined && file.length !== 0) {
+            uploadFunction(file, response.data.candidateDetailsId);
           }
-        }
-
-        if (assessment !== undefined) {
-          if (assessment?.length !== 0) {
-            uploadAssessment(assessment, response.data.candidateId);
-          }
-        }
+        });
 
         if (send === true) {
           if (candidate.freeValue === "YES") {
@@ -994,9 +1001,9 @@ export default function Search(props) {
       candidateSkillExplanationRecording: addList.candidateSkillExplanationRecording,
       candidateMindsetAssessmentLink: addList.candidateMindsetAssessmentLink,
       candidateAndTechPannelDiscussionRecording: addList.candidateAndTechPannelDiscussionRecording,
-
+      panNumber: addList?.panNumber,
+      linkedInProfile: addList?.linkedInProfile,
     }
-
 
     axios({
       method: "post",
@@ -1011,19 +1018,18 @@ export default function Search(props) {
 
       if (response.data.status === true) {
         handleClose();
+        const fileUploadTasks = [
+          { file: file, uploadFunction: uploadResume },
+          { file: docFile, uploadFunction: updateCandidateDocument },
+          { file: profile, uploadFunction: updateCandidatePhoto },
+          { file: assessment, uploadFunction: uploadAssessment }
+        ];
 
-
-        if (file !== undefined) {
-          if (file?.length !== 0) {
-            uploadResume(file, response.data.candidateDetailsId);
+        fileUploadTasks.forEach(({ file, uploadFunction }) => {
+          if (file !== undefined && file.length !== 0) {
+            uploadFunction(file, response.data.candidateDetailsId);
           }
-        }
-
-        if (assessment !== undefined) {
-          if (assessment?.length !== 0) {
-            uploadAssessment(assessment, response.data.candidateId);
-          }
-        }
+        });
 
         handleNotificationCall("success", response.data.message);
 
@@ -1058,7 +1064,6 @@ export default function Search(props) {
     });
   }
 
-
   function uploadResume(File, Id) {
     var FormData = require("form-data");
     var data = new FormData();
@@ -1076,6 +1081,58 @@ export default function Search(props) {
 
       if (response.data.status === true) {
         // aiResumeUpload(data)
+      } else {
+        handleNotificationCall("error", response.data.message);
+      }
+    });
+  }
+
+  function updateCandidateDocument(File, Id) {
+    if (File && File?.size >= 25000000) {
+      handleNotificationCall("error", "Maximum File Size Limit 25mb");
+      return;
+    }
+
+    var FormData = require("form-data");
+    var data = new FormData();
+    data.append("document", File);
+    data.append("id", Id);
+    axios({
+      method: "post",
+      url: `${process.env.REACT_APP_SERVER}recruiter/updateCandidateDocument`,
+      data: data,
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: token,
+      },
+    }).then(function (response) {
+      if (response.data.status === true) {
+      } else {
+        handleNotificationCall("error", response.data.message);
+      }
+    });
+  }
+
+  function updateCandidatePhoto(File, Id) {
+    if (File && File?.size >= 10485760) {
+      handleNotificationCall("error", "Maximum File Size Limit 10mb");
+      return;
+    }
+
+    var FormData = require("form-data");
+    var data = new FormData();
+    data.append("image", File);
+    data.append("id", Id);
+    axios({
+      method: "post",
+      url: `${process.env.REACT_APP_SERVER}recruiter/updateCandidatePhoto`,
+      data: data,
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: token,
+      },
+    }).then(function (response) {
+      if (response.data.status === true) {
       } else {
         handleNotificationCall("error", response.data.message);
       }
@@ -1266,7 +1323,11 @@ export default function Search(props) {
         setCandidate={setCandidate}
         candidate={candidate}
         setFile={setFile}
+        setDocFile={setDocFile}
+        setProfile={setProfile}
         file={file}
+        docFile={docFile}
+        profile={profile}
         assessment={assessment}
         setAssessment={setAssessment}
         setRecruitmentId={setRecruitmentId}
@@ -1439,9 +1500,9 @@ export default function Search(props) {
                     <Tooltip title="SUBVENDOR" placement="bottom" aria-label="title">
                       <Avatar alt="Profile" src={external} className={classes.externalIcon} />
                     </Tooltip> : ""}
-                    <div>
-                      {item.candidateDetail?.firstName + " " + item.candidateDetail?.lastName}    <br />  {"(" + item.uniqueId + ")"}
-                    </div>
+                  <div>
+                    {item.candidateDetail?.firstName + " " + item.candidateDetail?.lastName}    <br />  {"(" + item.uniqueId + ")"}
+                  </div>
 
                 </Grid>,
                 item.mainId === decode.mainId ?

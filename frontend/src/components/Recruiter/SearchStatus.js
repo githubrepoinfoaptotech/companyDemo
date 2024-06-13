@@ -12,7 +12,6 @@ const Status = (props) => {
     <>
 
       <Grid className={classes.button}>
-
         {decode.role === "SUBVENDOR" && props.list.statusCode === 309 ?
           <>
             <Button variant="contained" size="small" className={props.list.statusCode === 309 ? classes.blue : props.list.statusCode === 312 ? classes.green : classes.red} onClick={()=>props?.handleStatusOpen(CandidateAllDetails.id)}  >

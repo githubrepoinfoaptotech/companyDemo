@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useState } from "react";
 import {
   Grid,
@@ -13,7 +13,9 @@ import {
   Dialog,
   DialogContent,
   List,
-  Divider
+  Divider,
+  Checkbox,
+  FormControlLabel
 } from "@material-ui/core";
 import { createTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import {
@@ -25,7 +27,8 @@ import {
 } from "@material-ui/core";
 import { ToastContainer } from "react-toastify";
 import Tooltip from "@material-ui/core/Tooltip";
-
+import Lottie from 'lottie-react'
+import handshakelottie from '../../images/handshake.json'
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
@@ -40,31 +43,20 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Notification from "../../components/Notification";
 import useStyles from "../../themes/style";
-import DrawerComp from "./DrawerComp";
-import icon1 from "../../images/dashboard/home.png";
 import { useHistory } from "react-router-dom";
 import CloseIcon from "@material-ui/icons/Close";
 import RemoveRedEyeIcon from "@material-ui/icons/RemoveRedEye";
-
-import DescriptionIcon from '@material-ui/icons/Description';
-
 import JoditEditor from 'jodit-react';
-
-
 import red from "@material-ui/core/colors/red";
 import "react-toastify/dist/ReactToastify.css";
 const positions = [toast.POSITION.TOP_RIGHT];
 
 function CompanyRegister(props) {
   const search = props.location.search;
-  const ContentRef = React.useRef();
-
+  const ContentRef = useRef();
   const candidateId = new URLSearchParams(search).get('candidateId');
-
-
   const [modalOpen, setModalOpen] = React.useState(false);
   const [candidateView, setCandidateView] = useState({});
-
 
   const handleModalClose = () => {
     setModalOpen(false);
@@ -494,7 +486,6 @@ function CompanyRegister(props) {
 
   function handleNotificationCall(notificationType, message) {
     var componentProps;
-
     if (errorToastId && notificationType === "error") return;
 
     switch (notificationType) {
@@ -534,12 +525,12 @@ function CompanyRegister(props) {
     if (notificationType === "error") setErrorToastId(toastId);
   }
 
-
-
   const validationSchema = Yup.object().shape({
     companyName: Yup.string().nullable().required("Parent or Group Companies Name is required"),
     webSiteUrl: Yup.string().nullable().required("WebSite Url is required"),
     jobDescription: Yup.string().nullable(),
+    acknowledgement: Yup.bool().oneOf([true], 'Read and agree to the Job Description').required('Read and agree to the Job Description'),
+    companyNameConfirmation: Yup.bool().oneOf([true], 'Give the confirmation').required('Give the confirmation'),
     jobTitle: Yup.string().nullable().required("Job Role Title is required"),
     currentLocation: Yup.string().nullable().required("Residing Location is required"),
     inProjectOrBench: Yup.string().required("In Project or Bench is required"),
@@ -548,16 +539,15 @@ function CompanyRegister(props) {
     shiftTimings: Yup.string().nullable().required("Acceptance for Shifts is required"),
     noticePeriod: Yup.string().nullable().required("Can Join Within Days is required"),
     payrollOrContract: Yup.string().nullable().required("Direct Payroll or Contract is required"),
-    currentCtcAndTakeHome: Yup.number().nullable(true).transform((_, val) => val ? Number(val) : null).required("Your Current CTC is required"),
-    expectedCtcAndTakeHome: Yup.number().nullable(true).transform((_, val) => val ? Number(val) : null).required("Expected CTC is required"),
-    currentTakeHome: Yup.number().nullable(true).transform((_, val) => val ? Number(val) : null).required("Your Current Take Home is required"),
-    expectedTakeHome: Yup.number().nullable(true).transform((_, val) => val ? Number(val) : null).required("Expected Take Home is required"),
+    currentCtcAndTakeHome: Yup.string().nullable().required("Your Current CTC is required"),
+    expectedCtcAndTakeHome: Yup.string().nullable().required("Expected CTC is required"),
+    currentTakeHome: Yup.string().nullable().required("Your Current Take Home is required"),
+    expectedTakeHome: Yup.string().nullable().required("Expected Take Home is required"),
     modeOfWork: Yup.string().nullable().required("WFH/WFO/Hybrid is required"),
     existingOfferDetails: Yup.string().nullable().required("Existing Offer Details is required"),
     jobChangeReason: Yup.string().nullable().required("Reason for Job Change is required"),
     documentsAvailabilty: Yup.string().nullable().required("Confirm that on selection for Offer that you have all relevant documents in order to submit for Offer release and onboarding is required"),
   });
-
 
   const {
     register,
@@ -570,12 +560,27 @@ function CompanyRegister(props) {
 
 
   const [loader, setLoader] = useState(false);
+  // const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
+  // const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
 
+  // const handleScroll = () => {
+  //   const editor = ContentRef.current;
+  //   if (editor) {
+  //     const { scrollTop, scrollHeight, clientHeight } = editor.editor;
+  //     console.log(scrollTop, scrollHeight, clientHeight)
+  //     if (scrollHeight - scrollTop === clientHeight) {
+  //       setIsScrolledToBottom(true);
+  //       alert("yes")
+  //     }
+  //   }
+  // };
+
+  // const handleCheckboxChange = (event) => {
+  //   setIsCheckboxChecked(event.target.checked);
+  // };
 
   function handleAdd(values) {
-
     if (ContentRef.current.value !== "") {
-
       return new Promise((resolve) => {
         setLoader(true);
 
@@ -595,10 +600,8 @@ function CompanyRegister(props) {
             shiftTimings: values.shiftTimings,
             noticePeriod: values.noticePeriod,
             payrollOrContract: values.payrollOrContract,
-            currentCtcAndTakeHome: values.currentCtcAndTakeHome,
-            expectedCtcAndTakeHome: values.expectedCtcAndTakeHome,
-            currentTakeHome: values.currentTakeHome,
-            expectedTakeHome: values.expectedTakeHome,
+            currentCtcAndTakeHome: `${values.currentCtcAndTakeHome}, ${values.currentTakeHome}`,
+            expectedCtcAndTakeHome: `${values.expectedCtcAndTakeHome}, ${values.expectedTakeHome}`,
             modeOfWork: values.modeOfWork,
             existingOfferDetails: values.existingOfferDetails,
             jobChangeReason: values.jobChangeReason,
@@ -657,54 +660,6 @@ function CompanyRegister(props) {
     createdAt: "",
   });
 
-  function viewRequirement(id) {
-    axios({
-      method: "post",
-      url: `${process.env.REACT_APP_SERVER}auth/viewRequirementOpen`,
-      data: {
-        id: id,
-      },
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then(function (response) {
-        if (response.data.status === true) {
-
-          setRequirementsView({
-            ...requirementsView,
-            id: response.data.data.id,
-            requirementName: response.data.data.requirementName,
-            clientId: response.data.data.clientId,
-            skills: response.data.data.skills,
-            // orgRecruiterId: response.data.data.orgRecruiter.id,
-            // orgRecruiterName: response.data.data.orgRecruiter.name,
-            jobLocation: response.data.data.jobLocation,
-            experience: response.data.data.experience,
-            uniqueId: response.data.data.uniqueId,
-            clientUniqueId: response.data.data.client.uniqueId,
-            clientName: response.data.data.client.clientName,
-            status: response.data.data.statusList,
-            gist: response.data.data.gist,
-            jd: response.data.data.requirementJd,
-            modeOfWork: response.data.data.modeOfWork,
-            specialHiring: response.data.data.specialHiring,
-            hideFromInternal: response.data.data.hideFromInternal,
-            createdAt: response.data.data.createdAt,
-          });
-
-          setState({ ...state, right: true });
-          
-
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-
-  }
-
-
   useEffect(() => {
     setLoader(true);
     axios({
@@ -719,14 +674,11 @@ function CompanyRegister(props) {
     })
       .then(function (response) {
         if (response.data.status === true) {
-
           setCandidateView(response.data.data);
-
           setLoader(false);
-
           reset({
-            companyName: response.data.data.requirement?.client?.clientName,
-            webSiteUrl: response.data.data.requirement?.client?.clientWebsite,
+            companyName: response.data?.companyName,
+            webSiteUrl: response.data?.companyWebsite,
             //  jobDescription: response.data.data.requirement?.gist,
             jobTitle: response.data.data.requirement?.requirementName,
             currentLocation: response.data.data.candidateDetail?.currentLocation,
@@ -742,7 +694,6 @@ function CompanyRegister(props) {
             existingOfferDetails: "",
             jobChangeReason: response.data.data.candidateDetail?.reasonForJobChange,
             documentsAvailabilty: "",
-
           })
 
         }
@@ -753,12 +704,14 @@ function CompanyRegister(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps  
   }, []);
 
-
   const joditConfig = useMemo((placeholder) => ({
-    readonly: true, 
+    readonly: true,
+    spellcheck: true,
+    minHeight: 200,
+    maxHeight: 300,
   }),
-  []
-);
+    []
+  );
 
   const list = (anchor) =>
   (
@@ -792,9 +745,7 @@ function CompanyRegister(props) {
             <CardContent className={classes.drawerViewContent}>
               <Grid container direction="row" spacing={2}>
                 <Grid item xs={12} sm={6} md={6} lg={6}>
-
                   <Typography className={classes.boldtext}>
-
                     Requirement Name:
                   </Typography>
                 </Grid>
@@ -951,18 +902,10 @@ function CompanyRegister(props) {
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6} md={6} lg={6}>
-
-
-                  <div dangerouslySetInnerHTML={{ __html: requirementsView.gist }}></div>
-
+                  <div dangerouslySetInnerHTML={{ __html: requirementsView.gist }} style={{ height: "100px", overflowY: "scroll" }}></div>
                 </Grid>
-
-
-
                 <Grid item xs={12} sm={6} md={6} lg={6}>
-
                   <Typography className={classes.boldtext}>
-
                     Status:
                   </Typography>
                 </Grid>
@@ -1044,61 +987,21 @@ function CompanyRegister(props) {
                   <div className={classes.refoTitleMobile}>
                     <p className="refo-name">refo</p>
                   </div>
-                  <DrawerComp />
+                  <div className={classes.flexCenter} style={{ width: '100%' }}>
+                    <div class="refo-full-name">
+                      <h1>refo<span>recruiter essentials & faster outcomes</span></h1>
+                    </div>
+                  </div>
+                  {/* <DrawerComp /> */}
                 </>
               ) : (
                 <Grid className={classes.gridCenter} container spacing={2}>
                   <Grid item xs={1} md={1} className={classes.refoTitle}>
                     <p className="refo-name">refo</p>
                   </Grid>
-                  <Grid item xs={9} md={7} className={classes.flexCenter}>
-                    <nav>
-                      <ul>
-                        <li className="list">
-
-                          <a href={`${process.env.REACT_APP_SITE}`}>
-                            <img src={icon1} alt="Home" /> Home
-                          </a>
-                        </li>
-                        <li className="list">
-                          <a href={`${process.env.REACT_APP_SITE}`}>
-                            Why refo
-                          </a>
-                        </li>
-                        <li className="list">
-                          <a href={`${process.env.REACT_APP_SITE}`}>
-                            Customer Experience
-                          </a>
-                        </li>
-                      </ul>
-                    </nav>
-                  </Grid>
-
-                  <Grid item xs={2} md={4} className={classes.loginContainer}>
-                    <Box className="registration_firm">
-                      <a
-                        href={`${process.env.REACT_APP_SITE}/v1/#/register`}
-                        className="iconBlink"
-                      >
-                        List your consultancy
-                      </a>
-                    </Box>
-                    <div
-                      className={classes.regLoginContainer}
-                    >
-                      <p
-                        className={classes.beta}
-                      >
-                        Beta
-                      </p>
-                      <Box>
-                        <a
-                          href={`${process.env.REACT_APP_SITE}/v1/#/login`}
-                          className={classes.btnLogin}
-                        >
-                          Login
-                        </a>
-                      </Box>
+                  <Grid item xs={11} md={11} className={classes.flexCenter}>
+                    <div class="refo-full-name">
+                      <h1>refo<span>recruiter essentials & faster outcomes</span></h1>
                     </div>
                   </Grid>
                 </Grid>
@@ -1107,149 +1010,163 @@ function CompanyRegister(props) {
           </AppBar>
 
           <Grid container direction="row" justifyContent={"center"}>
-
-            <Grid item xs={12} sm={8} md={8} lg={8}>
-              <form
-                onSubmit={handleSubmit(handleAdd)}
-                className={classes.formFields}
-              >
-                <Grid
-                  container
-                  direction="row"
-                  spacing={4}
-                  className={classes.formBox}
+            {candidateView?.isCandidateCpv === true ?
+              <Grid item xs={12} sm={8} md={8} lg={8}>
+                <div style={{ background: '#F6F7FF' }}>
+                  <Lottie loop={false} animationData={handshakelottie} style={{ width: '270px', position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, margin: 'auto' }} />
+                  <p style={{ fontSize: "30px", textAlign: "center", fontFamily: '"IBM Plex Sans Condensed", sans-serif', fontWeight: '600', lineHeight: "36px", position: 'absolute', left: "50%", top: "65%", transform: 'translate(-50%, -50%)', color: '#10670e' }}>Thank you for your response</p>
+                </div>
+              </Grid>
+              :
+              <Grid item xs={12} sm={8} md={8} lg={8}>
+                <form
+                  onSubmit={handleSubmit(handleAdd)}
+                  className={classes.formFields}
                 >
-                  <Grid item xs={12} >
-                    <Typography className={classes.CPVHeading}>
-                      Role Interest Confirmation for  {candidateView?.candidateDetail?.firstName + " " + candidateView?.candidateDetail?.lastName}
-                    </Typography>
-                    <Divider className={classes.mT10} />
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography>  Intersted for Job Opening</Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="companyName">
-                      Parent or Group Companies Name
-                    </InputLabel>
-
-                    <FormControl className={classes.margin}>
-                      <TextField
-                        size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="Enter company name"
-                        id="companyName"
-                        name="companyName"
-                        {...register("companyName")}
-                        error={errors.companyName ? true : false}
-                      />
-
-                      <Typography variant="inherit" color="error">
-                        {errors.companyName?.message}
+                  <Grid
+                    container
+                    direction="row"
+                    spacing={4}
+                    className={classes.formBox}
+                  >
+                    <Grid item xs={12} >
+                      <Typography className={classes.CPVHeading}>
+                        Role Interest Confirmation given by {candidateView?.candidateDetail?.firstName + " " + candidateView?.candidateDetail?.lastName}
                       </Typography>
-                    </FormControl>
+                      <Divider className={classes.mT10} />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography>  Intersted for Job Opening</Typography>
+                    </Grid>
 
-                  </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="companyName">
+                        Company Name
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          size="small"
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true, readOnly: true }}
+                          placeholder="Enter company name"
+                          id="companyName"
+                          name="companyName"
+                          {...register("companyName")}
+                          error={errors.companyName ? true : false}
+                        />
 
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Confirmation on seeing Company Website</Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="webSiteUrl">
-                      Website
-                    </InputLabel>
-                    <FormControl className={classes.margin}>
-                      <TextField
-                        size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="Enter website url"
-                        id="webSiteUrl"
-                        name="webSiteUrl"
-                        {...register("webSiteUrl")}
-                        error={errors.webSiteUrl ? true : false}
+                        <Typography variant="inherit" color="error">
+                          {errors.companyName?.message}
+                        </Typography>
+                      </FormControl>
+                      <FormControlLabel
+                        className={classes.acknowledgementCheckBox}
+                        control={
+                          <Checkbox
+                            name="companyNameConfirmation"
+                            color="primary"
+                            {...register("companyNameConfirmation")}
+                            // onChange={handleCheckboxChange}
+                            style={{ marginBottom: "5px" }}
+                          />
+                        }
+                        label="I am interested."
                       />
-
                       <Typography variant="inherit" color="error">
-                        {errors.webSiteUrl?.message}
+                        {errors.companyNameConfirmation?.message}
                       </Typography>
-                    </FormControl>
-                  </Grid>
+                    </Grid>
 
 
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Confirmation on seeing Company Website</Typography>
+                    </Grid>
 
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="webSiteUrl">
+                        Website
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          size="small"
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true, readOnly: true }}
+                          placeholder="Enter website url"
+                          id="webSiteUrl"
+                          name="webSiteUrl"
+                          {...register("webSiteUrl")}
+                          error={errors.webSiteUrl ? true : false}
+                        />
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Confirmation on reading Job Discription fully</Typography>
-                  </Grid>
+                        <Typography variant="inherit" color="error">
+                          {errors.webSiteUrl?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="jobDescription">
-                      Job Description
-                    </InputLabel>
-                    <FormControl className={classes.margin}>
-                      {/* <TextField
-                        size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="View Job Description"
-                        id="jobDescription"
-                        name="jobDescription"
-                        {...register("jobDescription")}
-                        error={errors.jobDescription ? true : false}
-                      /> */}
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Confirmation on reading Job Discription fully</Typography>
+                    </Grid>
 
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="jobDescription">
+                        Job Description
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <JoditEditor
+                          value={candidateView?.requirement?.gist}
+                          tabIndex={1} // tabIndex of textarea
+                          ref={ContentRef}
+                          config={joditConfig}
+                          className="job_description_cpv"
+                        // onScroll={handleScroll}
+                        />
+                        <FormControlLabel
+                          className={classes.acknowledgementCheckBox}
+                          control={
+                            <Checkbox
+                              {...register("acknowledgement")}
+                              name="acknowledgement"
+                              color="primary"
+                              // onChange={handleCheckboxChange}
+                              style={{ marginBottom: "5px" }}
+                            />
+                          }
+                          label="I have read, understand, and agree to the job role details mentioned above."
+                        />
+                        <Typography variant="inherit" color="error">
+                          {errors.acknowledgement?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
 
-                      <JoditEditor
-                        value={candidateView?.requirement?.gist}
-                        tabIndex={1} // tabIndex of textarea
-                        ref={ContentRef}
-                        config={joditConfig}
-                      />
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Interested for Job Role title</Typography>
+                    </Grid>
 
-                      <Typography variant="inherit" color="error">
-                        {errors.jobDescription?.message}
-                      </Typography>
-                    </FormControl>
-                  </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="jobTitle">
+                        Job Role Title
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          size="small"
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true, readOnly: true }}
+                          placeholder="Enter job title"
+                          id="jobTitle"
+                          name="jobTitle"
+                          {...register("jobTitle")}
+                          error={errors.jobTitle ? true : false}
+                        />
 
+                        <Typography variant="inherit" color="error">
+                          {errors.jobTitle?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
 
-
-
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Interested for Job Role title</Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="jobTitle">
-                      Job Role Title
-                    </InputLabel>
-                    <FormControl className={classes.margin}>
-                      <TextField
-                        size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="Enter job title"
-                        id="jobTitle"
-                        name="jobTitle"
-                        {...register("jobTitle")}
-                        error={errors.jobTitle ? true : false}
-                      />
-
-                      <Typography variant="inherit" color="error">
-                        {errors.jobTitle?.message}
-                      </Typography>
-                    </FormControl>
-                  </Grid>
-
-
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    {/* <Grid item xs={12} sm={6} md={6} lg={6}>
                     <Typography> Interested for Job Role Responsibilities</Typography>
                   </Grid>
 
@@ -1258,10 +1175,7 @@ function CompanyRegister(props) {
                       Job Responsibilities
                     </InputLabel>
                     <FormControl className={classes.margin}>
-
-
                       <Grid item xs={3} >
-
                         <Button
                           variant="contained"
                           className={classes.button}
@@ -1279,449 +1193,431 @@ function CompanyRegister(props) {
                       </Grid>
 
                     </FormControl>
-                  </Grid>
+                  </Grid> */}
 
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Confirmation that you are residing in Location</Typography>
+                    </Grid>
 
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="currentLocation">
+                        Mention Residing Location
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          size="small"
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true }}
+                          placeholder="Enter candidate residing location"
+                          id="currentLocation"
+                          name="currentLocation"
+                          {...register("currentLocation")}
+                          error={errors.currentLocation ? true : false}
+                        />
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Confirmation that you are residing in Location</Typography>
-                  </Grid>
+                        <Typography variant="inherit" color="error">
+                          {errors.currentLocation?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="currentLocation">
-                      Residing Location
-                    </InputLabel>
-                    <FormControl className={classes.margin}>
-                      <TextField
-                        size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="Enter candidate residing location"
-                        id="currentLocation"
-                        name="currentLocation"
-                        {...register("currentLocation")}
-                        error={errors.currentLocation ? true : false}
-                      />
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Interested for Job Role location and willing to relocate if not in same location</Typography>
+                    </Grid>
 
-                      <Typography variant="inherit" color="error">
-                        {errors.currentLocation?.message}
-                      </Typography>
-                    </FormControl>
-                  </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="jobLocation">
+                        Job Role Location
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          size="small"
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true, readOnly: true }}
+                          placeholder="Enter job location"
+                          id="jobLocation"
+                          name="jobLocation"
+                          {...register("jobLocation")}
+                          error={errors.jobLocation ? true : false}
+                        />
 
+                        <Typography variant="inherit" color="error">
+                          {errors.jobLocation?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
 
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Confirmation on your employment with current Company or not working now</Typography>
+                    </Grid>
 
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="currentCompanyName">
+                        Current Company Name
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          size="small"
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true }}
+                          placeholder="Enter candidate current company or enter inbetween jobs"
+                          id="currentCompanyName"
+                          name="currentCompanyName"
+                          {...register("currentCompanyName")}
+                          error={errors.currentCompanyName ? true : false}
+                        />
 
+                        <Typography variant="inherit" color="error">
+                          {errors.currentCompanyName?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Interested for Job Role location and willing to relocate if not in same location</Typography>
-                  </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Confirmation that you are in Project and not in Bench in current Role</Typography>
+                    </Grid>
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="jobLocation">
-                      Job Role Location
-                    </InputLabel>
-                    <FormControl className={classes.margin}>
-                      <TextField
-                        size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="Enter job location"
-                        id="jobLocation"
-                        name="jobLocation"
-                        {...register("jobLocation")}
-                        error={errors.jobLocation ? true : false}
-                      />
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="inProjectOrBench">
+                        In Project or Bench
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          size="small"
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true }}
+                          placeholder="Enter in project or bench"
+                          id="inProjectOrBench"
+                          name="inProjectOrBench"
+                          {...register("inProjectOrBench")}
+                          error={errors.inProjectOrBench ? true : false}
+                        />
 
-                      <Typography variant="inherit" color="error">
-                        {errors.jobLocation?.message}
-                      </Typography>
-                    </FormControl>
-                  </Grid>
+                        <Typography variant="inherit" color="error">
+                          {errors.inProjectOrBench?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
 
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Confirmation to work on Shifts as per the Job Role</Typography>
+                    </Grid>
 
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="shiftTimings">
+                        Acceptance for Shifts
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          size="small"
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true }}
+                          placeholder="Enter shift timings or normal shift"
+                          id="shiftTimings"
+                          name="shiftTimings"
+                          {...register("shiftTimings")}
+                          error={errors.shiftTimings ? true : false}
+                        />
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Confirmation on your employment with current Company or inbetween jobs if not working now</Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="currentCompanyName">
-                      Current Company Name
-                    </InputLabel>
-                    <FormControl className={classes.margin}>
-                      <TextField
-                        size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="Enter candidate current company or enter inbetween jobs"
-                        id="currentCompanyName"
-                        name="currentCompanyName"
-                        {...register("currentCompanyName")}
-                        error={errors.currentCompanyName ? true : false}
-                      />
-
-                      <Typography variant="inherit" color="error">
-                        {errors.currentCompanyName?.message}
-                      </Typography>
-                    </FormControl>
-                  </Grid>
-
-
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Confirmation that you are in Project and not in Bench in current Role</Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="inProjectOrBench">
-                      In Project or Bench
-                    </InputLabel>
-                    <FormControl className={classes.margin}>
-                      <TextField
-                        size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="Enter in project or bench"
-                        id="inProjectOrBench"
-                        name="inProjectOrBench"
-                        {...register("inProjectOrBench")}
-                        error={errors.inProjectOrBench ? true : false}
-                      />
-
-                      <Typography variant="inherit" color="error">
-                        {errors.inProjectOrBench?.message}
-                      </Typography>
-                    </FormControl>
-                  </Grid>
-
-
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Confirmation to work on Shifts as per the Job Role</Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="shiftTimings">
-                      Acceptance for Shifts
-                    </InputLabel>
-                    <FormControl className={classes.margin}>
-                      <TextField
-                        size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="Enter shift timings"
-                        id="shiftTimings"
-                        name="shiftTimings"
-                        {...register("shiftTimings")}
-                        error={errors.shiftTimings ? true : false}
-                      />
-
-                      <Typography variant="inherit" color="error">
-                        {errors.shiftTimings?.message}
-                      </Typography>
-                    </FormControl>
-                  </Grid>
-
-
-
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Confirmation to Join within days and last working day if in notice period</Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="noticePeriod">
-                      Can Join Within Days
-                    </InputLabel>
-                    <FormControl className={classes.margin}>
-                      <TextField
-                        size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="Enter notice period or last working date"
-                        id="noticePeriod"
-                        name="noticePeriod"
-                        {...register("noticePeriod")}
-                        error={errors.noticePeriod ? true : false}
-                      />
-
-                      <Typography variant="inherit" color="error">
-                        {errors.noticePeriod?.message}
-                      </Typography>
-                    </FormControl>
-                  </Grid>
-
-
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Confirmation on Direct Payroll or on Contract with 3rd Party Vendor</Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="payrollOrContract">
-                      Direct Payroll or Contract
-                    </InputLabel>
-                    <FormControl className={classes.margin}>
-                      <TextField
-                        size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="Enter direct payroll or contract"
-                        id="payrollOrContract"
-                        name="payrollOrContract"
-                        {...register("payrollOrContract")}
-                        error={errors.payrollOrContract ? true : false}
-                      />
-
-                      <Typography variant="inherit" color="error">
-                        {errors.payrollOrContract?.message}
-                      </Typography>
-                    </FormControl>
-                  </Grid>
-
-
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Confirmation on your Current CTC and Take Home Salary</Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="currentCtcAndTakeHome">
-                      Your Current CTC & Take Home
-                    </InputLabel>
-
-                    <Grid container direction="row" spacing={2}    >
-                      <Grid item xs={6} >
-                        <FormControl className={classes.margin}>
-
-
-                          <TextField
-                            type="number"
-                            size="small"
-                            classes={{ root: classes.customTextField }}
-                            InputProps={{ disableUnderline: true }}
-                            placeholder="Enter current ctc"
-                            id="currentCtcAndTakeHome"
-                            name="currentCtcAndTakeHome"
-                            {...register("currentCtcAndTakeHome")}
-                            error={errors.currentCtcAndTakeHome ? true : false}
-                          />
-
-                          <Typography variant="inherit" color="error">
-                            {errors.currentCtcAndTakeHome?.message}
-                          </Typography>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={6} >
-                        <FormControl className={classes.margin}>
-
-
-                          <TextField
-                            type="number"
-                            size="small"
-                            classes={{ root: classes.customTextField }}
-                            InputProps={{ disableUnderline: true }}
-                            placeholder="Enter current take home"
-                            id="currentTakeHome"
-                            name="currentTakeHome"
-                            {...register("currentTakeHome")}
-                            error={errors.currentTakeHome ? true : false}
-                          />
-
-                          <Typography variant="inherit" color="error">
-                            {errors.currentTakeHome?.message}
-                          </Typography>
-                        </FormControl>
-                      </Grid>
+                        <Typography variant="inherit" color="error">
+                          {errors.shiftTimings?.message}
+                        </Typography>
+                      </FormControl>
                     </Grid>
 
 
-                  </Grid>
 
 
-
-
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Confirmation on your Expected CTC and Take Home Salary</Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="expectedCtcAndTakeHome">
-                      Expected CTC & Take Home
-                    </InputLabel>
-
-                    <Grid container direction="row" spacing={2}      >
-                      <Grid item xs={6} >
-                        <FormControl className={classes.margin}>
-                          <TextField
-                            type="number"
-                            size="small"
-                            classes={{ root: classes.customTextField }}
-                            InputProps={{ disableUnderline: true }}
-                            placeholder="Enter expected ctc"
-                            id="expectedCtcAndTakeHome"
-                            name="expectedCtcAndTakeHome"
-                            {...register("expectedCtcAndTakeHome")}
-                            error={errors.expectedCtcAndTakeHome ? true : false}
-                          />
-
-                          <Typography variant="inherit" color="error">
-                            {errors.expectedCtcAndTakeHome?.message}
-                          </Typography>
-                        </FormControl>
-                      </Grid>
-
-                      <Grid item xs={6} >
-                        <FormControl className={classes.margin}>
-                          <TextField
-                            type="number"
-                            size="small"
-                            classes={{ root: classes.customTextField }}
-                            InputProps={{ disableUnderline: true }}
-                            placeholder="Enter expected take home"
-                            id="expectedTakeHome"
-                            name="expectedTakeHome"
-                            {...register("expectedTakeHome")}
-                            error={errors.expectedTakeHome ? true : false}
-                          />
-
-                          <Typography variant="inherit" color="error">
-                            {errors.expectedTakeHome?.message}
-                          </Typography>
-                        </FormControl>
-                      </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Confirmation to Join within days and last working day if in notice period</Typography>
                     </Grid>
 
-                  </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="noticePeriod">
+                        Can Join Within Days
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          size="small"
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true }}
+                          placeholder="Enter notice period or last working date"
+                          id="noticePeriod"
+                          name="noticePeriod"
+                          {...register("noticePeriod")}
+                          error={errors.noticePeriod ? true : false}
+                        />
+
+                        <Typography variant="inherit" color="error">
+                          {errors.noticePeriod?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
 
 
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Confirmation on Work from Home, Work from Office, Hybrid</Typography>
-                  </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Confirmation on Direct Payroll or on Contract with 3rd Party Vendor</Typography>
+                    </Grid>
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="modeOfWork">
-                      WFH/WFO/Hybrid
-                    </InputLabel>
-                    <FormControl className={classes.margin}>
-                      <TextField
-                        size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="Enter WFH/WFO/Hybrid"
-                        id="modeOfWork"
-                        name="modeOfWork"
-                        {...register("modeOfWork")}
-                        error={errors.modeOfWork ? true : false}
-                      />
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="payrollOrContract">
+                        Direct Payroll or Contract
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          size="small"
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true }}
+                          placeholder="Enter direct payroll or contract"
+                          id="payrollOrContract"
+                          name="payrollOrContract"
+                          {...register("payrollOrContract")}
+                          error={errors.payrollOrContract ? true : false}
+                        />
 
-                      <Typography variant="inherit" color="error">
-                        {errors.modeOfWork?.message}
-                      </Typography>
-                    </FormControl>
-                  </Grid>
-
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Confirmation on your Existing Offer details</Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="existingOfferDetails">
-                      Existing Offer Details
-                    </InputLabel>
-                    <FormControl className={classes.margin}>
-                      <TextField
-                        size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="Enter existing offer details"
-                        id="existingOfferDetails"
-                        name="existingOfferDetails"
-                        {...register("existingOfferDetails")}
-                        error={errors.existingOfferDetails ? true : false}
-                      />
-
-                      <Typography variant="inherit" color="error">
-                        {errors.existingOfferDetails?.message}
-                      </Typography>
-                    </FormControl>
-                  </Grid>
+                        <Typography variant="inherit" color="error">
+                          {errors.payrollOrContract?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
 
 
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Confirmation on reason for Job Change</Typography>
-                  </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Confirmation on your Current CTC and Take Home Salary</Typography>
+                    </Grid>
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <InputLabel shrink htmlFor="jobChangeReason">
-                      Reason for Job Change
-                    </InputLabel>
-                    <FormControl className={classes.margin}>
-                      <TextField
-                        size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="Enter reason for job change"
-                        id="jobChangeReason"
-                        name="jobChangeReason"
-                        {...register("jobChangeReason")}
-                        error={errors.jobChangeReason ? true : false}
-                      />
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="currentCtcAndTakeHome">
+                        Your Current CTC & Take Home
+                      </InputLabel>
 
-                      <Typography variant="inherit" color="error">
-                        {errors.jobChangeReason?.message}
-                      </Typography>
-                    </FormControl>
-                  </Grid>
+                      <Grid container direction="row" spacing={2}    >
+                        <Grid item xs={6} >
+                          <FormControl className={classes.margin}>
+                            <TextField
+                              size="small"
+                              classes={{ root: classes.customTextField }}
+                              InputProps={{ disableUnderline: true }}
+                              placeholder="Enter current ctc"
+                              id="currentCtcAndTakeHome"
+                              name="currentCtcAndTakeHome"
+                              {...register("currentCtcAndTakeHome")}
+                              error={errors.currentCtcAndTakeHome ? true : false}
+                            />
+
+                            <Typography variant="inherit" color="error">
+                              {errors.currentCtcAndTakeHome?.message}
+                            </Typography>
+                          </FormControl>
+                        </Grid>
+                        <Grid item xs={6} >
+                          <FormControl className={classes.margin}>
+                            <TextField
+                              size="small"
+                              classes={{ root: classes.customTextField }}
+                              InputProps={{ disableUnderline: true }}
+                              placeholder="Enter current take home"
+                              id="currentTakeHome"
+                              name="currentTakeHome"
+                              {...register("currentTakeHome")}
+                              error={errors.currentTakeHome ? true : false}
+                            />
+                            <Typography variant="inherit" color="error">
+                              {errors.currentTakeHome?.message}
+                            </Typography>
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+
+
+                    </Grid>
 
 
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography> Confirm that on selection for Offer that you have all relevant documents in order to submit for Offer release and onboarding</Typography>
-                  </Grid>
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    {/* <InputLabel shrink htmlFor="documentsAvailabilty">
+
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Confirmation on your Expected CTC and Take Home Salary</Typography>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="expectedCtcAndTakeHome">
+                        Expected CTC & Take Home
+                      </InputLabel>
+
+                      <Grid container direction="row" spacing={2}      >
+                        <Grid item xs={6} >
+                          <FormControl className={classes.margin}>
+                            <TextField
+                              size="small"
+                              classes={{ root: classes.customTextField }}
+                              InputProps={{ disableUnderline: true }}
+                              placeholder="Enter expected ctc"
+                              id="expectedCtcAndTakeHome"
+                              name="expectedCtcAndTakeHome"
+                              {...register("expectedCtcAndTakeHome")}
+                              error={errors.expectedCtcAndTakeHome ? true : false}
+                            />
+
+                            <Typography variant="inherit" color="error">
+                              {errors.expectedCtcAndTakeHome?.message}
+                            </Typography>
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item xs={6} >
+                          <FormControl className={classes.margin}>
+                            <TextField
+                              size="small"
+                              classes={{ root: classes.customTextField }}
+                              InputProps={{ disableUnderline: true }}
+                              placeholder="Enter expected take home"
+                              id="expectedTakeHome"
+                              name="expectedTakeHome"
+                              {...register("expectedTakeHome")}
+                              error={errors.expectedTakeHome ? true : false}
+                            />
+
+                            <Typography variant="inherit" color="error">
+                              {errors.expectedTakeHome?.message}
+                            </Typography>
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+
+                    </Grid>
+
+
+
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Confirmation on Work from Home, Work from Office, Hybrid</Typography>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="modeOfWork">
+                        WFH/WFO/Hybrid
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          size="small"
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true }}
+                          placeholder="Enter WFH/WFO/Hybrid"
+                          id="modeOfWork"
+                          name="modeOfWork"
+                          {...register("modeOfWork")}
+                          error={errors.modeOfWork ? true : false}
+                        />
+
+                        <Typography variant="inherit" color="error">
+                          {errors.modeOfWork?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
+
+
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Confirmation on your Existing Offer details</Typography>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="existingOfferDetails">
+                        Existing Offer Details
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          size="small"
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true }}
+                          placeholder="Enter existing offer details"
+                          id="existingOfferDetails"
+                          name="existingOfferDetails"
+                          {...register("existingOfferDetails")}
+                          error={errors.existingOfferDetails ? true : false}
+                        />
+
+                        <Typography variant="inherit" color="error">
+                          {errors.existingOfferDetails?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
+
+
+
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Confirmation on reason for Job Change</Typography>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <InputLabel shrink htmlFor="jobChangeReason">
+                        Reason for Job Change
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          size="small"
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true }}
+                          placeholder="Enter reason for job change"
+                          id="jobChangeReason"
+                          name="jobChangeReason"
+                          {...register("jobChangeReason")}
+                          error={errors.jobChangeReason ? true : false}
+                        />
+
+                        <Typography variant="inherit" color="error">
+                          {errors.jobChangeReason?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
+
+
+
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      <Typography> Confirm that on selection for Offer that you have all relevant documents in-order to submit for Offer release and onboarding</Typography>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                      {/* <InputLabel shrink htmlFor="documentsAvailabilty">
                     Reason for Job Change
                     </InputLabel> */}
-                    <FormControl className={classes.margin}>
-                      <TextField
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          size="small"
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true }}
+                          placeholder="Yes, I have"
+                          id="documentsAvailabilty"
+                          name="documentsAvailabilty"
+                          {...register("documentsAvailabilty")}
+                          error={errors.documentsAvailabilty ? true : false}
+                        />
+
+                        <Typography variant="inherit" color="error">
+                          {errors.documentsAvailabilty?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
+
+
+                    <Grid item xs={12} className={classes.regBtn}>
+                      <Typography>I Confirm all above details</Typography>
+                      <Button
+                        variant="contained"
+                        color="primary"
                         size="small"
-                        classes={{ root: classes.customTextField }}
-                        InputProps={{ disableUnderline: true }}
-                        placeholder="Yes, I have"
-                        id="documentsAvailabilty"
-                        name="documentsAvailabilty"
-                        {...register("documentsAvailabilty")}
-                        error={errors.documentsAvailabilty ? true : false}
-                      />
-
-                      <Typography variant="inherit" color="error">
-                        {errors.documentsAvailabilty?.message}
-                      </Typography>
-                    </FormControl>
+                        type="submit"
+                        disabled={isSubmitting}
+                        style={{ marginTop: '10px' }}
+                      >
+                        Save
+                      </Button>
+                    </Grid>
                   </Grid>
-
-
-                  <Grid item xs={12} className={classes.regBtn}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                      type="submit"
-                      disabled={isSubmitting}
-                    >
-                      Save
-                    </Button>
-                  </Grid>
-                </Grid>
-              </form>
-            </Grid>
+                </form>
+              </Grid>
+            }
           </Grid>
 
 

@@ -3,13 +3,13 @@ import {
   Backdrop,
   Box,
   Button,
-  CircularProgress, 
-  Grid, 
+  CircularProgress,
+  Grid,
   List,
-  SwipeableDrawer, 
+  SwipeableDrawer,
   TablePagination,
   TextField,
-  Typography, 
+  Typography,
   Dialog,
   DialogContent,
 } from "@material-ui/core";
@@ -24,27 +24,29 @@ import CloseIcon from "@material-ui/icons/Close";
 import ViewIcon from "@material-ui/icons/Visibility";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import RemoveRedEyeIcon from "@material-ui/icons/RemoveRedEye";
-import { useHistory } from "react-router-dom"; 
+import { useHistory } from "react-router-dom";
 import PeopleIcon from '@material-ui/icons/People';
 import { toast } from "react-toastify";
 import PageTitle from "../../components/PageTitle";
 // data
 import { yupResolver } from "@hookform/resolvers/yup";
 import Tooltip from "@material-ui/core/Tooltip";
- import axios from "axios";
-import {jwtDecode} from "jwt-decode";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 import { useForm } from "react-hook-form";
- 
+
 import * as Yup from "yup";
 import Notification from "../../components/Notification";
 import { Autocomplete } from "@material-ui/lab";
 import useStyles from "../../themes/style.js";
- import PublishIcon from '@material-ui/icons/Publish';
+import PublishIcon from '@material-ui/icons/Publish';
 import Add from "../../components/Candidates/Add";
 
- import useMediaQuery from '@material-ui/core/useMediaQuery';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import "react-toastify/dist/ReactToastify.css";
 import "jodit/build/jodit.min.css";
+import CustomPdfView from "../../components/pdfViewer/CustomPdfView.js";
+import { getFileExtension } from "../../utils/getextension.js";
 
 const positions = [toast.POSITION.TOP_RIGHT];
 
@@ -52,19 +54,19 @@ export default function Tables() {
   const classes = useStyles();
   const history = useHistory();
 
-  const mobileQuery = useMediaQuery('(max-width:600px)'); 
+  const mobileQuery = useMediaQuery('(max-width:600px)');
   const token = localStorage.getItem("token");
   const decode = jwtDecode(token);
 
-  const [count, setCount] = useState(0); 
-  const [file, setFile] = useState([]); 
-  const [assessment,setAssessment] = useState([]);
-  const [hideContactDetails,setHideContactDetails] = useState(false);
+  const [count, setCount] = useState(0);
+  const [file, setFile] = useState([]);
+  const [assessment, setAssessment] = useState([]);
+  const [hideContactDetails, setHideContactDetails] = useState(false);
 
   const [loader, setLoader] = useState(false);
- 
+
   const [requirementsData, setRequirementsData] = useState([]);
- 
+
 
   const [requirementsView, setRequirementsView] = useState({
     id: "",
@@ -78,25 +80,27 @@ export default function Tables() {
     uniqueId: "",
     clientUniqueId: "",
     clientName: "",
-    gist:"",
-    jd:"",
-    hideFromInternal:"",
-    modeOfWork:"",
-    specialHiring:"",
+    gist: "",
+    jd: "",
+    hideFromInternal: "",
+    modeOfWork: "",
+    specialHiring: "",
     status: "",
-    candidateCount:"",
+    candidateCount: "",
     createdAt: "",
   });
+
+  const resumeUrl = requirementsView?.jd;
+  const fileExtension = resumeUrl ? getFileExtension(resumeUrl) : null;
 
   const [page, setPage] = useState(0);
   const [currerntPage, setCurrerntPage] = useState(1);
 
   const [reducerValue, forceUpdate] = useReducer((x) => x + 1, 0);
+  const [dataList, setDataList] = useState("View");
+  var [errorToastId, setErrorToastId] = useState(null);
 
-  const [dataList, setDataList] = useState("View"); 
-  var [errorToastId, setErrorToastId] = useState(null); 
-  
-  const [modalOpen, setModalOpen] = React.useState(false); 
+  const [modalOpen, setModalOpen] = React.useState(false);
 
   const handleModalClose = () => {
     setModalOpen(false);
@@ -158,50 +162,50 @@ export default function Tables() {
 
     if (notificationType === "error") setErrorToastId(toastId);
   }
- 
- 
+
+
   useEffect(() => {
 
-    if(decode.role !== "SUPERADMIN"){
- 
-   
-    const getRequirementName = async () => {
+    if (decode.role !== "SUPERADMIN") {
 
-      axios({
-        method: "post",
-        url:  `${process.env.REACT_APP_SERVER}recruiter/getAssignedRequierments`,
-        data: {},
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-      })
-        .then(function (response) {
-          if (response.data.status === true) {
-            setLoader(false);
-            setRequirementName(response.data.data);
-          }
+
+      const getRequirementName = async () => {
+
+        axios({
+          method: "post",
+          url: `${process.env.REACT_APP_SERVER}recruiter/getAssignedRequierments`,
+          data: {},
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
         })
-        .catch(function (error) {
-          console.log(error);
-        });
-    };
-   
-    getRequirementName();
-   }
-  // eslint-disable-next-line react-hooks/exhaustive-deps  
-}, [token]);
+          .then(function (response) {
+            if (response.data.status === true) {
+              setLoader(false);
+              setRequirementName(response.data.data);
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      };
+
+      getRequirementName();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps  
+  }, [token]);
 
 
- 
 
- 
+
+
   useEffect(() => {
- 
+
     const fetchData = async () => {
       setLoader(true);
 
-  
+
 
       axios({
         method: "post",
@@ -228,7 +232,7 @@ export default function Tables() {
         method: "post",
         url: `${process.env.REACT_APP_SERVER}admin/getAllRequirementList`,
         data: {
-          page:1,
+          page: 1,
         },
         headers: {
           "Content-Type": "application/json",
@@ -253,12 +257,12 @@ export default function Tables() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [requirementName, setRequirementName] = useState([]);
-   const [requirementId, setRequirementId] = useState(null);
+  const [requirementId, setRequirementId] = useState(null);
   const [recruiterId, setRecruiterId] = useState(null);
 
   const filterRef = useRef(null);
 
- 
+
 
   const handleFromDateChange = (event) => {
     setFromDate(filterRef.current.fromDate.value);
@@ -280,7 +284,7 @@ export default function Tables() {
     setCurrerntPage(1);
     setPage(0);
     const form = filterRef.current;
- 
+
     axios({
       method: "post",
       url: `${process.env.REACT_APP_SERVER}recruiter/myAssignedRequirements`,
@@ -315,7 +319,7 @@ export default function Tables() {
     setLoader(true);
 
     const form = filterRef.current;
-  
+
 
     axios({
       method: "post",
@@ -335,17 +339,17 @@ export default function Tables() {
       if (response.data.status === true) {
         setRequirementsData(response.data.data);
         setCount(response.data.count);
-       
+
       }
       setLoader(false);
     });
   };
- 
+
   function handleShow(values, name) {
- 
+
     setLoader(true);
     setDataList(name);
-   
+
     axios({
       method: "post",
       url: `${process.env.REACT_APP_SERVER}CC/getRequirement`,
@@ -358,10 +362,10 @@ export default function Tables() {
       },
     })
       .then(function (response) {
-        
-         if (response.data.status === true) {  
-        
-         
+
+        if (response.data.status === true) {
+
+
           setRequirementsView({
             ...requirementsView,
             id: response.data.data.id,
@@ -376,18 +380,18 @@ export default function Tables() {
             clientUniqueId: response.data.data.client.uniqueId,
             clientName: response.data.data.client.clientName,
             status: response.data.data.statusList,
-            gist:  response.data.data.gist,
+            gist: response.data.data.gist,
             jd: response.data.data.requirementJd,
-            modeOfWork:response.data.data.modeOfWork,
+            modeOfWork: response.data.data.modeOfWork,
             specialHiring: response.data.data.specialHiring,
             hideFromInternal: response.data.data.hideFromInternal,
             candidateCount: response.data.candidateCount,
             createdAt: response.data.data.createdAt,
           });
-          setState({ ...state, right: true });  
-          
+          setState({ ...state, right: true });
+
           setLoader(false);
-        }  else{
+        } else {
           setLoader(false);
         }
       })
@@ -396,43 +400,43 @@ export default function Tables() {
       });
   }
 
-   const [state, setState] = useState({
+  const [state, setState] = useState({
     right: false,
   });
   const toggleDrawer = (anchor, open) => (event) => {
     setState({ ...state, [anchor]: open });
   };
 
- 
 
-  
+
+
   const HeaderElements = () => (
     <>
       <Grid className={classes.HeaderElements}>
 
-      
+
         Total : {count}
       </Grid>
     </>
   );
 
- 
- 
 
-   /** Start Candidate*/
-   const [source, setSource] = useState([]); 
-   const messageRef=useRef(); 
-  const [recruitmentId, setRecruitmentId]  = useState(""); 
-  const [addList, setAddList] = useState([]); 
-  const [phoneValidation, setPhoneValidation] = useState(false); 
-  const [recruitmentList, setRecruitmentList] = useState([]); 
+
+
+  /** Start Candidate*/
+  const [source, setSource] = useState([]);
+  const messageRef = useRef();
+  const [recruitmentId, setRecruitmentId] = useState("");
+  const [addList, setAddList] = useState([]);
+  const [phoneValidation, setPhoneValidation] = useState(false);
+  const [recruitmentList, setRecruitmentList] = useState([]);
   const [validation, setValidation] = useState(false);
   const [open, setOpen] = React.useState(false);
 
 
-  const [ setDay] = useState("");
-  const [ setMonth] = useState("");
-  const [ setYear] = useState("");
+  const [setDay] = useState("");
+  const [setMonth] = useState("");
+  const [setYear] = useState("");
 
   const months = [
     "01",
@@ -450,8 +454,8 @@ export default function Tables() {
   ];
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const years = Array.from({ length: 60 }, (_, i) => moment(new Date()).format("YYYY") - i);
-   
-      
+
+
   const candidateSchema = Yup.object().shape({
     email: Yup.string().email("Email must be a Valid Email Address").required('Email is required'),
     firstName: Yup.string().required('First Name is required')
@@ -460,30 +464,30 @@ export default function Tables() {
         message: "First Name be Alphanumeric",
       }),
     lastName: Yup.string().max(255).required('Last Name is required')
-    .max(255)
-    .matches(/^[^!@#$%^&*+=<>:;|~]*$/, {
-      message: "Last Name be Alphanumeric",
-    }),
+      .max(255)
+      .matches(/^[^!@#$%^&*+=<>:;|~]*$/, {
+        message: "Last Name be Alphanumeric",
+      }),
     mobile: Yup.string().required('Contact Number is required').min(10, "Must be exactly 10 digits").max(10, "Must be exactly 10 digits"),
     requirementId: Yup.string(),
     skills: Yup.string().required('Skill is required'),
     source: Yup.string().required("Source is required"),
     free: Yup.string().nullable().notRequired(),
     experience: Yup.number().nullable(true).transform((_, val) => val ? Number(val) : null),
-    location: Yup.string().nullable().notRequired(),  
-    alternateMobile: phoneValidation === true? Yup.string().required('Alternate Contact Number is required').min(10, "Must be exactly 10 digits").max(10, "Must be exactly 10 digits"): Yup.string(),
+    location: Yup.string().nullable().notRequired(),
+    alternateMobile: phoneValidation === true ? Yup.string().required('Alternate Contact Number is required').min(10, "Must be exactly 10 digits").max(10, "Must be exactly 10 digits") : Yup.string(),
     day: Yup.string().nullable().notRequired(),
-     month: Yup.string().nullable().notRequired(),
-     year: Yup.string().nullable().notRequired(),
+    month: Yup.string().nullable().notRequired(),
+    year: Yup.string().nullable().notRequired(),
     gender: Yup.string().nullable().required('Gender is required'),
-    educationalQualification: Yup.string().nullable().notRequired(), 
+    educationalQualification: Yup.string().nullable().notRequired(),
     differentlyAbled: Yup.string().nullable().notRequired(),
     currentCtc: Yup.number().nullable(true).transform((_, val) => val ? Number(val) : null),
     expectedCtc: Yup.number().nullable(true).transform((_, val) => val ? Number(val) : null),
     noticePeriod: Yup.string().nullable().notRequired(),
     reasonForJobChange: Yup.string().nullable().notRequired(),
     candidateProcessed: Yup.string().nullable().notRequired(),
-    reason: Yup.string().nullable().notRequired(), 
+    reason: Yup.string().nullable().notRequired(),
     native: Yup.string().nullable().notRequired(),
     preferredLocation: Yup.string().nullable().notRequired(),
     relevantExperience: Yup.number().nullable(true).transform((_, val) => val ? Number(val) : null),
@@ -491,55 +495,55 @@ export default function Tables() {
   });
 
   const {
-    register:  candidateRegister,
-    formState: { errors:   candidateErrors, isSubmitting:  candidateIsSubmitting },
-    handleSubmit:  candidateSubmit,
-    reset:  candidateReset,
+    register: candidateRegister,
+    formState: { errors: candidateErrors, isSubmitting: candidateIsSubmitting },
+    handleSubmit: candidateSubmit,
+    reset: candidateReset,
   } = useForm({
     mode: "onBlur",
     resolver: yupResolver(candidateSchema),
   });
 
-  const ExistCheck=(e)=>{
+  const ExistCheck = (e) => {
 
 
-  //   if ( decode.role === "SUBVENDOR" || decode.role ===  "FREELANCER") {
-  //     CheckExitAlready(recruitmentId, e);
+    //   if ( decode.role === "SUBVENDOR" || decode.role ===  "FREELANCER") {
+    //     CheckExitAlready(recruitmentId, e);
 
-  //   } else{ 
-   
-  //     if(recruitmentId!==""){
+    //   } else{ 
 
-    
-  //       CheckExitAlready(recruitmentId, e);
-  //   } else{
-  //     handleNotificationCall("error", "Select Requirement");
-  //   }
+    //     if(recruitmentId!==""){
 
-  // }
 
-  CheckExitAlready(recruitmentId, e);
+    //       CheckExitAlready(recruitmentId, e);
+    //   } else{
+    //     handleNotificationCall("error", "Select Requirement");
+    //   }
+
+    // }
+
+    CheckExitAlready(recruitmentId, e);
 
   };
 
 
   function CheckExitAlready(recruitmentId, e) {
-  var data = {}; 
-  var url="";
+    var data = {};
+    var url = "";
 
-  if(e.target.name === "email"){
-    data =  { 
-      requirementId: recruitmentId,
-      email: e.target.value
-    } 
-    url = `${process.env.REACT_APP_SERVER}recruiter/checkEmailExist`
-  } else {
-    data =  { 
-      requirementId: recruitmentId,
-      mobile: e.target.value
-    }  
-    url = `${process.env.REACT_APP_SERVER}recruiter/checkMobileExist`
-  }
+    if (e.target.name === "email") {
+      data = {
+        requirementId: recruitmentId,
+        email: e.target.value
+      }
+      url = `${process.env.REACT_APP_SERVER}recruiter/checkEmailExist`
+    } else {
+      data = {
+        requirementId: recruitmentId,
+        mobile: e.target.value
+      }
+      url = `${process.env.REACT_APP_SERVER}recruiter/checkMobileExist`
+    }
 
     axios({
       method: "post",
@@ -550,10 +554,10 @@ export default function Tables() {
         Authorization: token,
       },
     }).then(function (response) {
-       if (response.data.status === true) {
+      if (response.data.status === true) {
         handleNotificationCall("error", response.data.message);
-      }  
-  
+      }
+
     })
   }
 
@@ -565,33 +569,33 @@ export default function Tables() {
   const handleClose = () => {
     setOpen(false);
   };
-  
-  
-  const [candidate, setCandidate] = useState({
-    requirementId:"",
-    source:"",
-    email:"", 
-    firstName:"",
-    lastName:"",
-    skills:"",  
-    location:"", 
-    experience:null,    
-     candidateProcessed:"",
-    native:"",
-    preferredLocation:"",
-    relevantExperience:null,
-    educationalQualification:"",
-    gender:"",
-    differentlyAbled:"",
-    currentCtc:null,
-    expectedCtc:null,
-    noticePeriod:"",
-    reasonForJobChange:"",
-    reason:"",
-    dob:"", 
-    freeValue:  decode.isEnableFree === true? "YES" : decode.isEnablePaid === true? "NO": "YES",
 
-}); 
+
+  const [candidate, setCandidate] = useState({
+    requirementId: "",
+    source: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+    skills: "",
+    location: "",
+    experience: null,
+    candidateProcessed: "",
+    native: "",
+    preferredLocation: "",
+    relevantExperience: null,
+    educationalQualification: "",
+    gender: "",
+    differentlyAbled: "",
+    currentCtc: null,
+    expectedCtc: null,
+    noticePeriod: "",
+    reasonForJobChange: "",
+    reason: "",
+    dob: "",
+    freeValue: decode.isEnableFree === true ? "YES" : decode.isEnablePaid === true ? "NO" : "YES",
+
+  });
 
   const [requirementList, setRequirementList] = useState({
     cand1_name: "",
@@ -606,10 +610,10 @@ export default function Tables() {
   });
 
 
- 
 
-  function handleAddCandidate(values) { 
- 
+
+  function handleAddCandidate(values) {
+
     return new Promise((resolve) => {
       if (validation === true) {
 
@@ -617,7 +621,7 @@ export default function Tables() {
       } else {
         setAddList(values);
 
- 
+
         axios({
           method: "post",
           url: `${process.env.REACT_APP_SERVER}CC/getRequirement`,
@@ -630,7 +634,7 @@ export default function Tables() {
           },
         }).then(function (response) {
           if (response.data.status === true) {
-          
+
             setRequirementList({
               ...requirementList,
               cand1_name: values.firstName + " " + values.lastName,
@@ -643,8 +647,8 @@ export default function Tables() {
               rec_mobile_no: localStorage.getItem('mobile'),
               req_id: response.data.data.uniqueId,
             });
- 
-            CheckAlreadyExit(values); 
+
+            CheckAlreadyExit(values);
           }
           resolve();
         });
@@ -652,63 +656,63 @@ export default function Tables() {
     });
   }
 
-function CheckAlreadyExit(addList){
- 
-  var dob = addList.day+"-"+addList.month+"-"+addList.year;
+  function CheckAlreadyExit(addList) {
 
-  axios({
-    method: "post",
-    url: `${process.env.REACT_APP_SERVER}recruiter/candidateExist`,
-    data: {
-      email: addList.email,
-      firstName: addList.firstName,
-      lastName: addList.lastName,
-      mobile: addList.mobile,
-      requirementId: recruitmentId,
-      skills: addList.skills,
-      sourceId: addList.source,
-      isAnswered: candidate.freeValue,
-      message: "",
-      experience:addList.experience,
-      currentLocation: addList.location,
-      alternateMobile:addList.alternateMobile,
-      preferredLocation:addList.preferredLocation,
-      nativeLocation:addList.native,
-       relevantExperience:addList.relevantExperience,
-      currentCtc:addList.currentCtc,
-      expectedCtc:addList.expectedCtc,
-      dob: addList.day===undefined? "" : dob!== "--"?  addList.day+"-"+addList.month+"-"+addList.year:"",
-      noticePeriod:addList.noticePeriod,
-      reasonForJobChange:addList.reasonForJobChange,
-      candidateProcessed:addList.candidateProcessed,
-      differentlyAbled:addList.differentlyAbled,
-      educationalQualification:addList.educationalQualification,
-      gender:addList.gender,
-      reason: addList.reason, 
-      sendMessage: ""  
-    },
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token,
-    },
-  }).then(function (response) {
-    
-    if (response.data.status === true) { 
-  
-      handleClickOpen();
+    var dob = addList.day + "-" + addList.month + "-" + addList.year;
 
-} else{
-  handleNotificationCall("error", response.data.message);
+    axios({
+      method: "post",
+      url: `${process.env.REACT_APP_SERVER}recruiter/candidateExist`,
+      data: {
+        email: addList.email,
+        firstName: addList.firstName,
+        lastName: addList.lastName,
+        mobile: addList.mobile,
+        requirementId: recruitmentId,
+        skills: addList.skills,
+        sourceId: addList.source,
+        isAnswered: candidate.freeValue,
+        message: "",
+        experience: addList.experience,
+        currentLocation: addList.location,
+        alternateMobile: addList.alternateMobile,
+        preferredLocation: addList.preferredLocation,
+        nativeLocation: addList.native,
+        relevantExperience: addList.relevantExperience,
+        currentCtc: addList.currentCtc,
+        expectedCtc: addList.expectedCtc,
+        dob: addList.day === undefined ? "" : dob !== "--" ? addList.day + "-" + addList.month + "-" + addList.year : "",
+        noticePeriod: addList.noticePeriod,
+        reasonForJobChange: addList.reasonForJobChange,
+        candidateProcessed: addList.candidateProcessed,
+        differentlyAbled: addList.differentlyAbled,
+        educationalQualification: addList.educationalQualification,
+        gender: addList.gender,
+        reason: addList.reason,
+        sendMessage: ""
+      },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+    }).then(function (response) {
 
-}
-});
-}
+      if (response.data.status === true) {
+
+        handleClickOpen();
+
+      } else {
+        handleNotificationCall("error", response.data.message);
+
+      }
+    });
+  }
 
   function handleAddList(send) {
     setLoader(true);
     var url = "";
     var data = {};
-    var dob = addList.day+"-"+addList.month+"-"+addList.year;
+    var dob = addList.day + "-" + addList.month + "-" + addList.year;
 
     if (candidate.freeValue === "YES") {
       url = `${process.env.REACT_APP_SERVER}recruiter/addFreeCandidate`;
@@ -722,29 +726,29 @@ function CheckAlreadyExit(addList){
         sourceId: addList.source,
         isAnswered: candidate.freeValue,
         message: messageRef.current.value,
-        experience:addList.experience,
+        experience: addList.experience,
         currentLocation: addList.location,
-        alternateMobile:addList.alternateMobile,
-        preferredLocation:addList.preferredLocation,
-        nativeLocation:addList.native,
-         relevantExperience:addList.relevantExperience,
-        currentCtc:addList.currentCtc,
-        expectedCtc:addList.expectedCtc,
-        dob: addList.day===undefined? "" : dob!== "--"?  addList.day+"-"+addList.month+"-"+addList.year:"",
-        noticePeriod:addList.noticePeriod,
-        reasonForJobChange:addList.reasonForJobChange,
-        candidateProcessed:addList.candidateProcessed,
-        differentlyAbled:addList.differentlyAbled,
-        educationalQualification:addList.educationalQualification,
-        gender:addList.gender,
-        reason: addList.reason, 
-        candidateRecruiterDiscussionRecording:addList.candidateRecruiterDiscussionRecording, 
-        candidateSkillExplanationRecording:addList.candidateSkillExplanationRecording,
-        candidateMindsetAssessmentLink:addList.candidateMindsetAssessmentLink,
-        candidateAndTechPannelDiscussionRecording:addList.candidateAndTechPannelDiscussionRecording,  
+        alternateMobile: addList.alternateMobile,
+        preferredLocation: addList.preferredLocation,
+        nativeLocation: addList.native,
+        relevantExperience: addList.relevantExperience,
+        currentCtc: addList.currentCtc,
+        expectedCtc: addList.expectedCtc,
+        dob: addList.day === undefined ? "" : dob !== "--" ? addList.day + "-" + addList.month + "-" + addList.year : "",
+        noticePeriod: addList.noticePeriod,
+        reasonForJobChange: addList.reasonForJobChange,
+        candidateProcessed: addList.candidateProcessed,
+        differentlyAbled: addList.differentlyAbled,
+        educationalQualification: addList.educationalQualification,
+        gender: addList.gender,
+        reason: addList.reason,
+        candidateRecruiterDiscussionRecording: addList.candidateRecruiterDiscussionRecording,
+        candidateSkillExplanationRecording: addList.candidateSkillExplanationRecording,
+        candidateMindsetAssessmentLink: addList.candidateMindsetAssessmentLink,
+        candidateAndTechPannelDiscussionRecording: addList.candidateAndTechPannelDiscussionRecording,
         sendMessage: send,
-        currentCompanyName:addList.currentCompanyName,  
-        
+        currentCompanyName: addList.currentCompanyName,
+
       }
     } else {
       url = `${process.env.REACT_APP_SERVER}recruiter/addCandidate`;
@@ -757,29 +761,29 @@ function CheckAlreadyExit(addList){
         skills: addList.skills,
         sourceId: addList.source,
         isAnswered: candidate.freeValue,
-        experience:addList.experience,
-         currentLocation: addList.location,
-         alternateMobile:addList.alternateMobile,
-         preferredLocation:addList.preferredLocation,
-         nativeLocation:addList.native,
-          relevantExperience:addList.relevantExperience,
-         currentCtc:addList.currentCtc,
-         expectedCtc:addList.expectedCtc,
-          dob: addList.day===undefined? "" : dob!== "--"?  addList.day+"-"+addList.month+"-"+addList.year:"",
-         noticePeriod:addList.noticePeriod,
-         reasonForJobChange:addList.reasonForJobChange,
-         candidateProcessed:addList.candidateProcessed,
-         differentlyAbled:addList.differentlyAbled,
-         educationalQualification:addList.educationalQualification,
-         gender:addList.gender,
-         reason: addList.reason, 
-         candidateRecruiterDiscussionRecording:addList.candidateRecruiterDiscussionRecording, 
-         candidateSkillExplanationRecording:addList.candidateSkillExplanationRecording,
-         candidateMindsetAssessmentLink:addList.candidateMindsetAssessmentLink,
-         candidateAndTechPannelDiscussionRecording:addList.candidateAndTechPannelDiscussionRecording,  
+        experience: addList.experience,
+        currentLocation: addList.location,
+        alternateMobile: addList.alternateMobile,
+        preferredLocation: addList.preferredLocation,
+        nativeLocation: addList.native,
+        relevantExperience: addList.relevantExperience,
+        currentCtc: addList.currentCtc,
+        expectedCtc: addList.expectedCtc,
+        dob: addList.day === undefined ? "" : dob !== "--" ? addList.day + "-" + addList.month + "-" + addList.year : "",
+        noticePeriod: addList.noticePeriod,
+        reasonForJobChange: addList.reasonForJobChange,
+        candidateProcessed: addList.candidateProcessed,
+        differentlyAbled: addList.differentlyAbled,
+        educationalQualification: addList.educationalQualification,
+        gender: addList.gender,
+        reason: addList.reason,
+        candidateRecruiterDiscussionRecording: addList.candidateRecruiterDiscussionRecording,
+        candidateSkillExplanationRecording: addList.candidateSkillExplanationRecording,
+        candidateMindsetAssessmentLink: addList.candidateMindsetAssessmentLink,
+        candidateAndTechPannelDiscussionRecording: addList.candidateAndTechPannelDiscussionRecording,
         sendMessage: send,
-        currentCompanyName:addList.currentCompanyName,
-       }
+        currentCompanyName: addList.currentCompanyName,
+      }
     }
 
     axios({
@@ -792,55 +796,56 @@ function CheckAlreadyExit(addList){
       },
     }).then(function (response) {
 
-    
+
       if (response.data.status === true) {
         handleClose();
-         var message ="";
+        var message = "";
 
-        if(file !== undefined ){
-          if(file?.length !== 0){
-          uploadResume(file, response.data.candidateDetailsId); 
-        }}
+        if (file !== undefined) {
+          if (file?.length !== 0) {
+            uploadResume(file, response.data.candidateDetailsId);
+          }
+        }
 
-        if(assessment !== undefined ){
-          if(assessment?.length !== 0){
+        if (assessment !== undefined) {
+          if (assessment?.length !== 0) {
             uploadAssessment(assessment, response.data.candidateId);
           }
-         }
-       
-        if (send === true) {  
-        if (candidate.freeValue === "YES") {
-          message = messageRef.current.value;
+        }
 
-          window.open(
-            "https://api.whatsapp.com/send?phone=+91" +
+        if (send === true) {
+          if (candidate.freeValue === "YES") {
+            message = messageRef.current.value;
+
+            window.open(
+              "https://api.whatsapp.com/send?phone=+91" +
               addList.mobile +
               "&text=" +
               message +
               "",
-          );
-        } else {
-          message =  "Hi " +   requirementList.cand1_name + ", Can we chat today about a job opening " +  localStorage.getItem('firstName') +
-          ", " +   localStorage.getItem('mobile') +  ", " +  localStorage.getItem('companyName') +   ". Always reply by clicking back arrow button/right swipe only.";
+            );
+          } else {
+            message = "Hi " + requirementList.cand1_name + ", Can we chat today about a job opening " + localStorage.getItem('firstName') +
+              ", " + localStorage.getItem('mobile') + ", " + localStorage.getItem('companyName') + ". Always reply by clicking back arrow button/right swipe only.";
 
-          handleMessage(
-            response.data.candidate_mobile,
-            message,
-            response.data.candidateId,
-          );
+            handleMessage(
+              response.data.candidate_mobile,
+              message,
+              response.data.candidateId,
+            );
+          }
         }
-      }
 
 
         handleNotificationCall("success", response.data.message);
 
-        history.push("/app/assign_requirements") 
+        history.push("/app/assign_requirements")
         setState({ ...state, right: false });
         candidateReset();
 
-      
+
       } else {
-       
+
         handleNotificationCall("error", response.data.message);
       }
 
@@ -859,7 +864,7 @@ function CheckAlreadyExit(addList){
         Authorization: token,
       },
     }).then(function (response) {
-    
+
       if (response.data.status === true) {
       } else {
         handleNotificationCall("error", response.data.message);
@@ -872,7 +877,7 @@ function CheckAlreadyExit(addList){
     var FormData = require("form-data");
     var data = new FormData();
     data.append("resume", File);
-    data.append("id", Id); 
+    data.append("id", Id);
     axios({
       method: "post",
       url: `${process.env.REACT_APP_SERVER}recruiter/updateCandidateResume`,
@@ -882,7 +887,7 @@ function CheckAlreadyExit(addList){
         Authorization: token,
       },
     }).then(function (response) {
-   
+
       if (response.data.status === true) {
         // aiResumeUpload(data)
       } else {
@@ -890,13 +895,13 @@ function CheckAlreadyExit(addList){
       }
     });
   }
-  
+
 
   function uploadAssessment(File, Id) {
     var FormData = require("form-data");
     var data = new FormData();
     data.append("file", File);
-    data.append("id", Id); 
+    data.append("id", Id);
     axios({
       method: "post",
       url: `${process.env.REACT_APP_SERVER}recruiter/updateCandidateMindSetAssessment`,
@@ -906,66 +911,90 @@ function CheckAlreadyExit(addList){
         Authorization: token,
       },
     }).then(function (response) {
-   
+
       if (response.data.status === true) {
-         
+
       } else {
         handleNotificationCall("error", response.data.message);
       }
     });
   }
 
-  
-    function handleMessage(mobile, message, candidateId) {
-      var url = "";
-  
-      if (candidate.freeValue === "YES") {
-        url = `${process.env.REACT_APP_SERVER}recruiter/changeYesCadidateStatus`;
-      } else {
-        url = `${process.env.REACT_APP_SERVER}chat/sendTemplateMessage`;
-      }
-  
-      axios({
-        method: "post",
-        url: url,
-        data: {
-          candidateId: candidateId,
-          phone_number: mobile,
-          template_name: "first_message",
-          vars: [
-            requirementList.cand1_name,
-            requirementList.rec_name,
-            requirementList.rec_mobile_no,
-            localStorage.getItem('companyName'),
-          ],
-          message: message,
-          candidate_name: requirementList.cand1_name,
-        },
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-      }).then(function (response) {
-        if (response.data.status === true) {
-          if (response.data.isNew === true) {
-            getmessageIni();
-          }
-  
-          setLoader(false);
-        } else {
-          handleNotificationCall("error", response.data.message);
-        }
-  
-        // handleStatusClose();
-        // handleStatusNewClose(); 
-        setLoader(false);
-      });
+
+  function handleMessage(mobile, message, candidateId) {
+    var url = "";
+
+    if (candidate.freeValue === "YES") {
+      url = `${process.env.REACT_APP_SERVER}recruiter/changeYesCadidateStatus`;
+    } else {
+      url = `${process.env.REACT_APP_SERVER}chat/sendTemplateMessage`;
     }
-  
-    function getmessageIni() {
+
+    axios({
+      method: "post",
+      url: url,
+      data: {
+        candidateId: candidateId,
+        phone_number: mobile,
+        template_name: "first_message",
+        vars: [
+          requirementList.cand1_name,
+          requirementList.rec_name,
+          requirementList.rec_mobile_no,
+          localStorage.getItem('companyName'),
+        ],
+        message: message,
+        candidate_name: requirementList.cand1_name,
+      },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+    }).then(function (response) {
+      if (response.data.status === true) {
+        if (response.data.isNew === true) {
+          getmessageIni();
+        }
+
+        setLoader(false);
+      } else {
+        handleNotificationCall("error", response.data.message);
+      }
+
+      // handleStatusClose();
+      // handleStatusNewClose(); 
+      setLoader(false);
+    });
+  }
+
+  function getmessageIni() {
+    axios({
+      method: "post",
+      url: `${process.env.REACT_APP_SERVER}auth/getMyWallet`,
+      data: {},
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+    }).then(function (response) {
+      if (response.data.status === true) {
+        localStorage.setItem(
+          "WalletValue",
+          response.data.data.remainingMessages,
+          { sameSite: "strict", secure: true },
+        );
+        window.dispatchEvent(new Event("storage"));
+      }
+    });
+  }
+
+
+
+  useEffect(() => {
+    if (decode.role !== "SUPERADMIN") {
       axios({
         method: "post",
-        url: `${process.env.REACT_APP_SERVER}auth/getMyWallet`,
+        url: `${process.env.REACT_APP_SERVER}source/viewSourcesList`,
         data: {},
         headers: {
           "Content-Type": "application/json",
@@ -973,386 +1002,362 @@ function CheckAlreadyExit(addList){
         },
       }).then(function (response) {
         if (response.data.status === true) {
-          localStorage.setItem(
-            "WalletValue",
-            response.data.data.remainingMessages,
-            { sameSite: "strict", secure: true },
-          );
-          window.dispatchEvent(new Event("storage"));
+          setSource(response.data.data);
         }
       });
     }
-  
+    // eslint-disable-next-line react-hooks/exhaustive-deps  
+  }, [token]);
 
-  
-      useEffect(() => {
-        if(decode.role !== "SUPERADMIN"){
-        axios({
-          method: "post",
-          url: `${process.env.REACT_APP_SERVER}source/viewSourcesList`,
-          data: {},
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token,
-          },
-        }).then(function (response) {
-          if (response.data.status === true) {
-            setSource(response.data.data);
-          }
-        });
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps  
-      }, [token]);
- 
-   
+
   /** End Candidate */
 
 
   const list = (anchor) =>
-  ( 
-          <>
-        <Box sx={{ width: "100%" }} role="presentation">
-          <List>
-            <Card className={classes.root}>
-              <CardHeader>
-                <Grid
-                  container
-                  direction="row"
-                  spacing={1}
-                  className={classes.drawerViewHeader}
-                >
-                  <Grid item xs={10} md={6}>
-                    <Typography variant="subtitle1">
-                       View Requirement - {requirementsView.requirementName}
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={2} lg={6} className={classes.drawerViewClose}>
-                    <CloseIcon
-                      className={classes.closeBtn}
-                      size="14px"
-                      onClick={toggleDrawer(anchor, false)}
-                    />
-                  </Grid>
+  (
+    <>
+      <Box sx={{ width: "100%" }} role="presentation">
+        <List>
+          <Card className={classes.root}>
+            <CardHeader>
+              <Grid
+                container
+                direction="row"
+                spacing={1}
+                className={classes.drawerViewHeader}
+              >
+                <Grid item xs={10} md={6}>
+                  <Typography variant="subtitle1">
+                    View Requirement - {requirementsView.requirementName}
+                  </Typography>
                 </Grid>
-              </CardHeader>
 
-              <CardContent className={classes.drawerViewContent}>
-                <Grid container direction="row" spacing={2}>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
-                      Requirement Name:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    {requirementsView.requirementName +
-                      " (" +
-                      requirementsView.uniqueId +
-                      ") "}
-                  </Grid>
+                <Grid item xs={2} lg={6} className={classes.drawerViewClose}>
+                  <CloseIcon
+                    className={classes.closeBtn}
+                    size="14px"
+                    onClick={toggleDrawer(anchor, false)}
+                  />
+                </Grid>
+              </Grid>
+            </CardHeader>
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                    {decode.companyType === "COMPANY" ? "Project Name:" :"Client Name:"}
+            <CardContent className={classes.drawerViewContent}>
+              <Grid container direction="row" spacing={2}>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
 
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    {requirementsView.clientName +
-                      " (" +
-                      requirementsView.clientUniqueId +
-                      ") "}
-                  </Grid>
+                  <Typography className={classes.boldtext}>
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
-                      Organization Recruiter Name:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    {requirementsView.orgRecruiterName}
-                  </Grid>
+                    Requirement Name:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
-                      Experience:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    {requirementsView.experience}
-                  </Grid>
+                  {requirementsView.requirementName +
+                    " (" +
+                    requirementsView.uniqueId +
+                    ") "}
+                </Grid>
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
-                      Skills:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    {requirementsView.skills}
-                  </Grid>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
 
+                  <Typography className={classes.boldtext}>
+                    {decode.companyType === "COMPANY" ? "Project Name:" : "Client Name:"}
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
-                      Location:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>   {requirementsView.jobLocation}
-                  </Grid>
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  {requirementsView.clientName +
+                    " (" +
+                    requirementsView.clientUniqueId +
+                    ") "}
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  <Typography className={classes.boldtext}>
+
+                    Organization Recruiter Name:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  {requirementsView.orgRecruiterName}
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  <Typography className={classes.boldtext}>
+
+                    Experience:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  {requirementsView.experience}
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  <Typography className={classes.boldtext}>
+
+                    Skills:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  {requirementsView.skills}
+                </Grid>
 
 
+                <Grid item xs={12} sm={6} md={6} lg={6}>
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
+                  <Typography className={classes.boldtext}>
+
+                    Location:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6} lg={6}>   {requirementsView.jobLocation}
+                </Grid>
+
+
+
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  <Typography className={classes.boldtext}>
+
                     Mode of work:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>   {requirementsView.modeOfWork}
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
-                    Special hiring:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>   {requirementsView.specialHiring}
-                  </Grid>
-
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
-                    Hide to Internal:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    {requirementsView.hideFromInternal=== true? "YES" :"NO"}
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
-                    JD :
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}> 
-
-                    <div className={classes.space +" "+ classes.alignItemsEnd}  > 
-
-  
-{ requirementsView?.jd !== "https://liverefo.s3.amazonaws.com/"? <>
-<Tooltip
-      title="View JD"
-      placement="bottom"
-      aria-label="view"
-    >
-      <RemoveRedEyeIcon
-        className={classes.toolIcon}
-        onClick={handleModalOpen}
-      />
-    </Tooltip>
-
-    <Tooltip
-      title="Downlaod JD"
-      placement="bottom"
-      aria-label="downlaod"
-    >
-      <a  className={classes.messageContent} href={requirementsView?.jd} download>
-        
-        <GetAppIcon className={classes.toolIcon} />
-      </a>
-    </Tooltip>
-    </> :""}
-    </div>
-
-                  </Grid>
-
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
-                      Requirement Gist:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                   
-                    <div dangerouslySetInnerHTML={{ __html: requirementsView.gist }}></div>
-
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
-                      Posted Candidate:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                   
-                 
-
-                  <Button
-                            variant="contained"
-                            size="small"
-                            className={classes.blue}
-                            onClick={(e)=>{
-                              
-                                sessionStorage.setItem('recruitmentId', requirementsView.id);
-
-                                history.push("/app/admin_candidates");
-
-                            }}
-                          >
-                             {requirementsView.candidateCount}
-                          </Button>
-
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
-                      Status:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    {requirementsView.status ? (
-                      requirementsView.status.statusName === "ACTIVE" ? (
-                        <>
-                          <Button
-                            variant="contained"
-                            size="small"
-                            className={classes.green+" "+ classes.noPointer}
-                          >
-                            ACTIVE
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button
-                            variant="contained"
-                            size="small"
-                            className={classes.red+" "+ classes.noPointer}
-                          >
-                            INACTIVE
-                          </Button>
-                        </>
-                      )
-                    ) : (
-                      ""
-                    )}
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    <Typography className={classes.boldtext}>
-                      
-                      Posted Date:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    
-                    {moment(requirementsView.createdAt).format(
-                      "DD-MM-YYYY",
-                    )}
-                  </Grid>
+                  </Typography>
                 </Grid>
-              </CardContent>
-              <CardActions>
-                <Grid
-                  container
-                  direction="row"
-                  spacing={2}
-                  className={classes.drawerFooter}
-                >
+                <Grid item xs={12} sm={6} md={6} lg={6}>   {requirementsView.modeOfWork}
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  <Typography className={classes.boldtext}>
+
+                    Special hiring:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6} lg={6}>   {requirementsView.specialHiring}
+                </Grid>
+
+
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  <Typography className={classes.boldtext}>
+
+                    Hide to Internal:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  {requirementsView.hideFromInternal === true ? "YES" : "NO"}
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  <Typography className={classes.boldtext}>
+
+                    JD :
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  <div className={classes.space + " " + classes.alignItemsEnd}  >
+
+
+                    {requirementsView?.jd !== "https://liverefo.s3.amazonaws.com/" ? <>
+                      <Tooltip
+                        title="View JD"
+                        placement="bottom"
+                        aria-label="view"
+                      >
+                        <RemoveRedEyeIcon
+                          className={classes.toolIcon}
+                          onClick={handleModalOpen}
+                        />
+                      </Tooltip>
+
+                      <Tooltip
+                        title="Downlaod JD"
+                        placement="bottom"
+                        aria-label="downlaod"
+                      >
+                        <a className={classes.messageContent} href={requirementsView?.jd} download>
+
+                          <GetAppIcon className={classes.toolIcon} />
+                        </a>
+                      </Tooltip>
+                    </> : ""}
+                  </div>
+
+                </Grid>
+
+
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  <Typography className={classes.boldtext}>
+
+                    Requirement Gist:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+
+                  <div dangerouslySetInnerHTML={{ __html: requirementsView.gist }}></div>
+
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  <Typography className={classes.boldtext}>
+
+                    Posted Candidate:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+
+
+
                   <Button
                     variant="contained"
                     size="small"
-                    color="secondary"
-                    onClick={toggleDrawer(anchor, false)}
+                    className={classes.blue}
+                    onClick={(e) => {
+
+                      sessionStorage.setItem('recruitmentId', requirementsView.id);
+
+                      history.push("/app/admin_candidates");
+
+                    }}
                   >
-                    Close
+                    {requirementsView.candidateCount}
                   </Button>
+
                 </Grid>
-              </CardActions>
-            </Card>
-          </List>
-        </Box>
-      </>
-    );
- 
-    
-    const Candidate = (anchor) =>
-  ( 
-    <> 
-    <Add
-          setValidation={setValidation}
-          validation={validation}
-          handleAddList={handleAddList}
-          register={candidateRegister}
-           source={source} 
-          recruitmentList={recruitmentList}
-          handleClose={handleClose}
-          errors={candidateErrors} 
-          setLoader={setLoader}
-          toggleDrawer={toggleDrawer}
-          setRecruitmentList={setRecruitmentList}
-          requirementList={requirementList}
-          handleSubmit={candidateSubmit}
-          handleAdd={handleAddCandidate}
-          requirement={requirementName}
-          isSubmitting={candidateIsSubmitting}
-          open={open}
-          messageRef={messageRef}
-          reset={candidateReset}
-          setCandidate={setCandidate}
-          candidate={candidate}
-          setFile={setFile}
-          file={file}
-          setAssessment={setAssessment}
-          assessment={assessment}
-          setRecruitmentId={setRecruitmentId}
-          recruitmentId={recruitmentId}
-          days={days}
-          months={months}
-          years={years}
-          setDay={setDay}
-          setMonth={setMonth}
-          setYear={setYear}
-          setPhoneValidation={setPhoneValidation} 
-          setHideContactDetails={setHideContactDetails}
-          hideContactDetails={hideContactDetails}
-          ExistCheck={ExistCheck} 
-          requirementId={"false"}
-        />
-  </>
-    );
+
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  <Typography className={classes.boldtext}>
+
+                    Status:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+                  {requirementsView.status ? (
+                    requirementsView.status.statusName === "ACTIVE" ? (
+                      <>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          className={classes.green + " " + classes.noPointer}
+                        >
+                          ACTIVE
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          className={classes.red + " " + classes.noPointer}
+                        >
+                          INACTIVE
+                        </Button>
+                      </>
+                    )
+                  ) : (
+                    ""
+                  )}
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  <Typography className={classes.boldtext}>
+
+                    Posted Date:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                  {moment(requirementsView.createdAt).format(
+                    "DD-MM-YYYY",
+                  )}
+                </Grid>
+              </Grid>
+            </CardContent>
+            <CardActions>
+              <Grid
+                container
+                direction="row"
+                spacing={2}
+                className={classes.drawerFooter}
+              >
+                <Button
+                  variant="contained"
+                  size="small"
+                  color="secondary"
+                  onClick={toggleDrawer(anchor, false)}
+                >
+                  Close
+                </Button>
+              </Grid>
+            </CardActions>
+          </Card>
+        </List>
+      </Box>
+    </>
+  );
+
+
+  const Candidate = (anchor) =>
+  (
+    <>
+      <Add
+        setValidation={setValidation}
+        validation={validation}
+        handleAddList={handleAddList}
+        register={candidateRegister}
+        source={source}
+        recruitmentList={recruitmentList}
+        handleClose={handleClose}
+        errors={candidateErrors}
+        setLoader={setLoader}
+        toggleDrawer={toggleDrawer}
+        setRecruitmentList={setRecruitmentList}
+        requirementList={requirementList}
+        handleSubmit={candidateSubmit}
+        handleAdd={handleAddCandidate}
+        requirement={requirementName}
+        isSubmitting={candidateIsSubmitting}
+        open={open}
+        messageRef={messageRef}
+        reset={candidateReset}
+        setCandidate={setCandidate}
+        candidate={candidate}
+        setFile={setFile}
+        file={file}
+        setAssessment={setAssessment}
+        assessment={assessment}
+        setRecruitmentId={setRecruitmentId}
+        recruitmentId={recruitmentId}
+        days={days}
+        months={months}
+        years={years}
+        setDay={setDay}
+        setMonth={setMonth}
+        setYear={setYear}
+        setPhoneValidation={setPhoneValidation}
+        setHideContactDetails={setHideContactDetails}
+        hideContactDetails={hideContactDetails}
+        ExistCheck={ExistCheck}
+        requirementId={"false"}
+      />
+    </>
+  );
 
   return (
     <>
@@ -1362,20 +1367,20 @@ function CheckAlreadyExit(addList){
         </Grid>
 
         <Grid item xs={3} sm={5} md={4} lg={6} className={classes.drawerClose}>
-         
+
           <SwipeableDrawer
             anchor="right"
             open={state["right"]}
             onClose={toggleDrawer("right", false)}
-            onOpen={toggleDrawer("right", true)} 
-            classes={{ paper: dataList === "Candidate"?  classes.clientDrawer : classes.drawer  }} 
+            onOpen={toggleDrawer("right", true)}
+            classes={{ paper: dataList === "Candidate" ? classes.clientDrawer : classes.drawer }}
 
           >
-          {dataList === "View"? 
-          list("right")
-           : dataList === "Candidate"?
-          Candidate("right")
-          :""}
+            {dataList === "View" ?
+              list("right")
+              : dataList === "Candidate" ?
+                Candidate("right")
+                : ""}
           </SwipeableDrawer>
         </Grid>
       </Grid>
@@ -1388,7 +1393,7 @@ function CheckAlreadyExit(addList){
         }}
       >
         <Grid container spacing={2} className={classes.filterGap}>
-         
+
           <Autocomplete
             className={classes.filterFullWidth}
             options={requirementName}
@@ -1419,7 +1424,7 @@ function CheckAlreadyExit(addList){
             defaultValue={fromDate}
             onChange={handleFromDateChange}
             className={classes.filterWidth}
-            
+
           />
 
           <TextField
@@ -1431,14 +1436,14 @@ function CheckAlreadyExit(addList){
             defaultValue={toDate}
             onChange={handleToDateChange}
             className={classes.filterWidth}
-            
+
           />
 
           <div className={classes.buttons}>
             <Button
               variant="contained"
               size="small"
-              color="primary" 
+              color="primary"
               type="submit"
             >
               Search
@@ -1468,7 +1473,7 @@ function CheckAlreadyExit(addList){
               download: false,
               print: false,
               customToolbar: () => <HeaderElements />,
-              responsive: mobileQuery===true? 'vertical' : 'standard',
+              responsive: mobileQuery === true ? 'vertical' : 'standard',
               textLabels: {
                 body: {
                   noMatch: 'Oops! Matching record could not be found',
@@ -1476,132 +1481,132 @@ function CheckAlreadyExit(addList){
               },
             }}
             columns={[
-                {
-                  name: "S.No",
-                },
-                {
-                  name: "Actions",
-                },
-                {
-                  name: "Requirement Name",
-                }, 
-                {
-                  name: decode.companyType === "COMPANY" ? "Assigned Recruiter" : "Assigned Company",
-                },
-                {
-                  name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
-                },
-                {
-                  name: decode.companyType === "COMPANY" ? "Project Name" : "Client Name",
-                },
-                {
-                  name: "Organization Recruiter Name",
-                },
-          
-                {
-                  name: "Experience",
-                },
-                {
-                  name: "Skills ",
-                },
-                {
-                  name: "Location ",
-                },
-                
-                {
-                  name: "Posted Date",
-                },
-              ]}
+              {
+                name: "S.No",
+              },
+              {
+                name: "Actions",
+              },
+              {
+                name: "Requirement Name",
+              },
+              {
+                name: decode.companyType === "COMPANY" ? "Assigned Recruiter" : "Assigned Company",
+              },
+              {
+                name: decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator",
+              },
+              {
+                name: decode.companyType === "COMPANY" ? "Project Name" : "Client Name",
+              },
+              {
+                name: "Organization Recruiter Name",
+              },
+
+              {
+                name: "Experience",
+              },
+              {
+                name: "Skills ",
+              },
+              {
+                name: "Location ",
+              },
+
+              {
+                name: "Posted Date",
+              },
+            ]}
             data={requirementsData.map((item, index) => {
-            
-                return [
-                  <>
-                    {currerntPage !== 0 ? 10 * currerntPage - 10 + index + 1 : index + 1}
-                  </>,
-                  <>
-                    <Grid container className={classes.space}>
-                      <Grid item xs className={classes.toolAlign}>
-                       
-                        <Tooltip
-                          title="View Requirement"
-                          placement="bottom"
-                          aria-label="view"
-                        >
-                          <ViewIcon
-                            className={classes.toolIcon}
-                            onClick={(e) => {
-                              handleShow(item.requirement?.id, "View");
-                              setFile([]);
-                              setAssessment([]);
-                            }}
-                          />
-                        </Tooltip>
-          
-                        <Tooltip
-                                  title="Add New Candidate"
-                                  placement="bottom"
-                                  aria-label="view"
-                                >
-                                  <PublishIcon
-                                    className={classes.toolIcon}
-                                    onClick={(e) => {
-                                      setDataList("Candidate"); 
-                                       setState({ ...state, right: true });  
-                                       setRecruitmentId(item.requirementId);
-                                       candidateReset();
-                                       setRecruitmentList({
-                                        ...requirementList,
-                                        id: item.requirement.id,
-                                        requirementName: item.requirement.requirementName,
-                                        clientId: item.requirement.clientId,
-                                        skills: item.requirement.skills,
-                                        orgRecruiterId: item.requirement.orgRecruiter.id,
-                                        orgRecruiterName: item.requirement.orgRecruiter.name,
-                                        jobLocation: item.requirement.jobLocation,
-                                        experience: item.requirement.experience,
-                                        clientUniqueId: item.requirement.client?.uniqueId,
-                                        clientName: item.requirement.client?.clientName,
-                                        status: item.requirement.statusList?.statusName,
-                                        uniqueId: item.requirement.uniqueId,
-                                      });
-                                    }}
-                                  />
-                                </Tooltip>
+
+              return [
+                <>
+                  {currerntPage !== 0 ? 10 * currerntPage - 10 + index + 1 : index + 1}
+                </>,
+                <>
+                  <Grid container className={classes.space}>
+                    <Grid item xs className={classes.toolAlign}>
+
+                      <Tooltip
+                        title="View Requirement"
+                        placement="bottom"
+                        aria-label="view"
+                      >
+                        <ViewIcon
+                          className={classes.toolIcon}
+                          onClick={(e) => {
+                            handleShow(item.requirement?.id, "View");
+                            setFile([]);
+                            setAssessment([]);
+                          }}
+                        />
+                      </Tooltip>
+
+                      <Tooltip
+                        title="Add New Candidate"
+                        placement="bottom"
+                        aria-label="view"
+                      >
+                        <PublishIcon
+                          className={classes.toolIcon}
+                          onClick={(e) => {
+                            setDataList("Candidate");
+                            setState({ ...state, right: true });
+                            setRecruitmentId(item.requirementId);
+                            candidateReset();
+                            setRecruitmentList({
+                              ...requirementList,
+                              id: item.requirement.id,
+                              requirementName: item.requirement.requirementName,
+                              clientId: item.requirement.clientId,
+                              skills: item.requirement.skills,
+                              orgRecruiterId: item.requirement.orgRecruiter.id,
+                              orgRecruiterName: item.requirement.orgRecruiter.name,
+                              jobLocation: item.requirement.jobLocation,
+                              experience: item.requirement.experience,
+                              clientUniqueId: item.requirement.client?.uniqueId,
+                              clientName: item.requirement.client?.clientName,
+                              status: item.requirement.statusList?.statusName,
+                              uniqueId: item.requirement.uniqueId,
+                            });
+                          }}
+                        />
+                      </Tooltip>
 
 
-                                
-                        <Tooltip
-                          title="View Candidate"
-                          placement="bottom"
-                          aria-label="view"
-                        >
-                          <PeopleIcon
-                            className={classes.toolIcon}
-                            onClick={(e) => {
-                              sessionStorage.setItem("recruitmentId", item.requirement.id);
-                              history.push("/app/assigned_candidates");
-                            }}
-                          />
-                        </Tooltip>
-                      </Grid>
+
+                      <Tooltip
+                        title="View Candidate"
+                        placement="bottom"
+                        aria-label="view"
+                      >
+                        <PeopleIcon
+                          className={classes.toolIcon}
+                          onClick={(e) => {
+                            sessionStorage.setItem("recruitmentId", item.requirement.id);
+                            history.push("/app/assigned_candidates");
+                          }}
+                        />
+                      </Tooltip>
                     </Grid>
-                  </>,
-                  <>
-                    {item.requirement?.requirementName} {"(" + item.requirement?.uniqueId + ")"}
-                  </>,
-                   <>
-                   {item.requirement?.recruiter?.companyName}
-                 </>,
-                  <>{item.recruiter?.firstName + " " + item.recruiter?.lastName} </>,
-                  <>{item.requirement?.client.clientName + " (" + item.requirement?.client?.uniqueId + ")"} </>,
-                  item.requirement?.orgRecruiter.name,
-                  item.requirement?.experience,
-                  item.requirement?.skills,
-                  item.requirement?.jobLocation,
-                  
-                  moment(item.createdAt).format("DD-MM-YYYY"),
-                ];
-              })}
+                  </Grid>
+                </>,
+                <>
+                  {item.requirement?.requirementName} {"(" + item.requirement?.uniqueId + ")"}
+                </>,
+                <>
+                  {item.requirement?.recruiter?.companyName}
+                </>,
+                <>{item.recruiter?.firstName + " " + item.recruiter?.lastName} </>,
+                <>{item.requirement?.client.clientName + " (" + item.requirement?.client?.uniqueId + ")"} </>,
+                item.requirement?.orgRecruiter.name,
+                item.requirement?.experience,
+                item.requirement?.skills,
+                item.requirement?.jobLocation,
+
+                moment(item.createdAt).format("DD-MM-YYYY"),
+              ];
+            })}
           />
 
           <Grid container spacing={2} className={classes.pagination}>
@@ -1621,45 +1626,46 @@ function CheckAlreadyExit(addList){
         aria-labelledby="dialog-title"
         onClose={handleModalClose}
         open={modalOpen}
-        width="lg"
-        maxWidth="lg"
+        fullWidth={true}
+        maxWidth="md"
         PaperProps={{
           style: {
             width: "100%",
           },
         }}
       >
-        <DialogContent className={classes.center}>
+        <DialogContent>
           <Grid container direction="row" spacing={2}>
             <div className={classes.heading + " " + classes.inputRoot}>
-              <Typography variant="subtitle2" className={classes.inputRoot}>
-                
-                JD
+              <Typography variant="subtitle2" className={classes.inputRoot} style={{ position: "absolute", zIndex: 1, background: '#fff', top: 0, padding: "6px 30px" }}>
+                Job Description
               </Typography>
               <div className={classes.drawerClose}>
                 <CloseIcon className={classes.closeBtn} onClick={handleModalClose} />
               </div>
             </div>
-            <div className={classes.iframediv}>
-            <iframe
-              src={
-                "https://docs.google.com/a/umd.edu/viewer?url=" +
-                requirementsView?.jd +
-                "&embedded=true"
+            <Grid item xs={12}>
+              {fileExtension === "pdf" ?
+                <CustomPdfView resumeUrl={requirementsView?.jd} />
+                :
+                <div className={classes.iframediv} style={{ marginTop: "40px" }}>
+                  <iframe
+                    src={
+                      "https://docs.google.com/a/umd.edu/viewer?url=" +
+                      requirementsView?.jd +
+                      "&embedded=true"
+                    }
+                    title="File"
+                    width="100%" height="500" sandbox="allow-scripts allow-same-origin"
+                  >
+                  </iframe>
+                  <div className={classes.iframeLogo} >
+                  </div>
+                </div>
               }
-              title="File"
-              width="100%"
-              height="500"
-            >
-              
-            </iframe>
-
-            <div className={classes.iframeLogo} > 
-</div>
-      </div>
-
+            </Grid>
             <div className={classes.sendWhatsapp + " " + classes.inputRoot}>
-              <Button variant="contained" size="small"  color="secondary" onClick={handleModalClose}>
+              <Button variant="contained" size="small" color="secondary" onClick={handleModalClose}>
                 Close
               </Button>
             </div>

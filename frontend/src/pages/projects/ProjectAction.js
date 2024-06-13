@@ -9,8 +9,6 @@ import ViewIcon from "@material-ui/icons/Visibility";
 
 const ProjectAction = (props) => {
   const classes = useStyles();
-  const [menu, setMenu] = useState(false);
-
   const resetCollapse = () =>{
     if(props.viewProjOpen.orgRecList || props.viewProjOpen.hireLevelList){
         props.setViewProjOpen({
@@ -25,28 +23,31 @@ const ProjectAction = (props) => {
         })
     }
   }
+
+  const handleClick = (e) => {
+    e.stopPropagation();
+    props.handleMenuClick(props.index, e);
+  };
+
   return (
     <>
       <MoreVertIcon
         key={props.index}
         className={classes.actions}
-        onClick={(e) => {
-          e.stopPropagation();
-          setMenu(e.currentTarget);
-        }}
+        onClick={handleClick}
         style={{cursor:"pointer"}}
       />
       <div className={classes.actionBtnPosition}>
-        <Popper open={menu} anchorEl={menu} className={classes.actionBtnZIndex}>
+        <Popper open={props.index === props.activeIndex} anchorEl={props.anchorEl} className={classes.actionBtnZIndex}>
           <ClickAwayListener
             onClickAway={(e) => {
-              setMenu(false);
+              props.handleMenuClick(props.index, null);
             }}
           >
             <div className={classes.actiondrop}>
               <MenuItem
                 onClick={(e) => {
-                    setMenu(false);
+                  props.handleMenuClick(props.index, null);
                     props.setDisplayAdd(false);
                     props.handleShow(props.item.id, "EDIT");
                 }}
@@ -62,7 +63,7 @@ const ProjectAction = (props) => {
 
               <MenuItem
                 onClick={(e) => {
-                  setMenu(false);
+                  props.handleMenuClick(props.index, null);
                   props.handleShow(props.item.id, "APPROVAL");
                   resetCollapse()
                 }}
@@ -77,7 +78,7 @@ const ProjectAction = (props) => {
               </MenuItem>
               <MenuItem
                 onClick={(e) => {
-                  setMenu(false);
+                  props.handleMenuClick(props.index, null);
                   props.handleShow(props.item.id, "VIEW");
                   resetCollapse()
                 }}

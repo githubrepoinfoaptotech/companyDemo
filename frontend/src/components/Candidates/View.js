@@ -598,6 +598,28 @@ export default function View(props) {
                   </Typography>
                 </Grid>
 
+                <Grid item xs={12} sm={5} md={5} lg={5}>
+                  <Typography className={classes.boldtext}>
+                    PAN Number:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={7} md={7} lg={7}>
+                  <Typography>
+                    {props.candidateView.panNumber}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} sm={5} md={5} lg={5}>
+                  <Typography className={classes.boldtext}>
+                    LinkedIn Profile URL:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={7} md={7} lg={7}>
+                  <Typography>
+                    {props.candidateView.linkedInProfile}
+                  </Typography>
+                </Grid>
+
                 {props.candidateView.candidateProcessed === "NO" ? (
                   <>
                     <Grid item xs={12} sm={5} md={5} lg={5}>
@@ -907,7 +929,7 @@ export default function View(props) {
                         </span>
                       </Grid>
 
-                      <Grid item xs={12} sm={6} md={6} lg={6}>
+                      {/* <Grid item xs={12} sm={6} md={6} lg={6}>
                         <Typography>
                           Interested for Job Role Responsibilities
                         </Typography>
@@ -915,13 +937,13 @@ export default function View(props) {
 
                       <Grid item xs={12} sm={3} md={3} lg={3}>
                         {cpvForm?.jobResponsibilities}
-                      </Grid>
+                      </Grid> 
 
                       <Grid item xs={12} sm={3} md={3} lg={3}>
                         <span className={classes.greenColor}>
                           {cpvForm?.jobResponsibilities !== null ? "Yes" : ""}
                         </span>
-                      </Grid>
+                      </Grid>*/}
 
                       <Grid item xs={12} sm={6} md={6} lg={6}>
                         <Typography>

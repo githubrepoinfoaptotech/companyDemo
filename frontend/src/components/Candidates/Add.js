@@ -70,7 +70,7 @@ export default function Add(props) {
     setDocFileName(event.target.name);
     props.setDocFile(event.target.files[0]);
   }
-  console.log(props.docFile, props.profile)
+  
   function handleProfileChange(event) {
     setProfileFileName(event.target.name);
     props.setProfile(event.target.files[0]);
@@ -823,7 +823,7 @@ export default function Add(props) {
                           <div className={classes.space + " " + classes.alignItemsEnd}  >
                             <div className={classes.marginTop}>
                               <input
-                                accept=".pdf,.doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                accept=".jpg,.jpeg,.png"
                                 className={classes.input}
                                 id="icon-button-profile"
                                 type="file"
@@ -837,7 +837,7 @@ export default function Add(props) {
                                   variant="contained"
                                   className={classes.button}
                                   color="primary"
-                                  startIcon={<DescriptionIcon />}
+                                  startIcon={<ImageIcon />}
                                   aria-label="upload picture"
                                   component="span"
                                 >
@@ -859,7 +859,7 @@ export default function Add(props) {
                         </Grid>
                       </Grid>
                       <Grid item xs={12} sm={6} md={3} lg={3}>
-                        <InputLabel shrink htmlFor="currentCompanyName">
+                        <InputLabel shrink htmlFor="panNumber">
                           Pan Card Details
                         </InputLabel>
                         <FormControl className={classes.margin}>
@@ -869,28 +869,28 @@ export default function Add(props) {
                             classes={{ root: classes.customTextField }}
                             size="small"
                             placeholder="Enter Pan Card Number"
-                            id="currentCompanyName"
-                            value={props.candidate.currentCompanyName}
-                            defaultValue={props.candidate.currentCompanyName}
-                            {...props.register("currentCompanyName", {
+                            id="panNumber"
+                            value={props.candidate.panNumber}
+                            defaultValue={props.candidate.panNumber}
+                            {...props.register("panNumber", {
                               onChange: (e) => {
                                 props.setCandidate({
                                   ...props.candidate,
-                                  currentCompanyName: e.target.value,
+                                  panNumber: e.target.value,
                                 });
                               },
                             })}
-                            error={props.errors.currentCompanyName ? true : false}
+                            error={props.errors.panNumber ? true : false}
                           />
 
                           <Typography variant="inherit" color="error">
-                            {props.errors.currentCompanyName?.message}
+                            {props.errors.panNumber?.message}
                           </Typography>
                         </FormControl>
                       </Grid>
 
                       <Grid item xs={12} sm={6} md={3} lg={3}>
-                        <InputLabel shrink htmlFor="native">
+                        <InputLabel shrink htmlFor="linkedInProfile">
                           LinkedIn Profile URL
                         </InputLabel>
                         <FormControl className={classes.margin}>
@@ -900,22 +900,22 @@ export default function Add(props) {
                             classes={{ root: classes.customTextField }}
                             size="small"
                             placeholder="Enter Your LinkedIn Profile URL"
-                            id="native"
-                            value={props.candidate.native}
-                            defaultValue={props.candidate.native}
-                            {...props.register("native", {
+                            id="linkedInProfile"
+                            value={props.candidate.linkedInProfile}
+                            defaultValue={props.candidate.linkedInProfile}
+                            {...props.register("linkedInProfile", {
                               onChange: (e) => {
                                 props.setCandidate({
                                   ...props.candidate,
-                                  native: e.target.value,
+                                  linkedInProfile: e.target.value,
                                 });
                               },
                             })}
-                            error={props.errors.native ? true : false}
+                            error={props.errors.linkedInProfile ? true : false}
                           />
 
                           <Typography variant="inherit" color="error">
-                            {props.errors.native?.message}
+                            {props.errors.linkedInProfile?.message}
                           </Typography>
                         </FormControl>
                       </Grid>

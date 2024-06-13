@@ -10,8 +10,6 @@ export default function ParsedResume() {
   const classes = useStyles();
   const { resumeParsedData } = useResumeDataContext();
 
-  console.log(resumeParsedData);
-
   const resdata = window.sessionStorage.getItem("candidateResume");
   const candidateName = window.sessionStorage.getItem("candidateName");
   const parsedResumeData = JSON.parse(resdata);

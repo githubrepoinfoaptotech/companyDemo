@@ -1649,8 +1649,8 @@ export default function Header(props) {
   }
 
   function handleCompanySettings(values) {
-    if(fromRef.current.value !=="" && toRef.current.value !==""){
-      handleNotificationCall("error", "Check Finacial Year Properly");
+    if (fromRef.current.value !== "" && toRef.current.value !== "") {
+      handleNotificationCall("error", "Check Financial Year Properly");
       return
     }
 
@@ -2021,40 +2021,40 @@ export default function Header(props) {
 
   async function handleChangePassword(values) {
     if (values.password !== values.confirm) {
-        handleNotificationCall("error", "Password is mismatch");
-        return
+      handleNotificationCall("error", "Password is mismatch");
+      return
     }
     setLoader(true);
     try {
-        var decode = jwtDecode(token);
-        var url = decode.role === "SUPERADMIN"
-            ? `${process.env.REACT_APP_SERVER}superadmin/changeMyPassword`
-            : `${process.env.REACT_APP_SERVER}auth/changeMyPassword`;
+      var decode = jwtDecode(token);
+      var url = decode.role === "SUPERADMIN"
+        ? `${process.env.REACT_APP_SERVER}superadmin/changeMyPassword`
+        : `${process.env.REACT_APP_SERVER}auth/changeMyPassword`;
 
-        const response = await axios({
-            method: "post",
-            url: url,
-            data: {
-                newPassword: values.password,
-                oldPassword: values.old,
-            },
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
-        });
+      const response = await axios({
+        method: "post",
+        url: url,
+        data: {
+          newPassword: values.password,
+          oldPassword: values.old,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      });
 
-        if (response.data.status === true) {
-            handleNotificationCall("success", response.data.message);
-            forceUpdate();
-            setState({ ...state, right: false });
-        } else {
-            handleNotificationCall("error", response.data.message);
-        }
+      if (response.data.status === true) {
+        handleNotificationCall("success", response.data.message);
+        forceUpdate();
+        setState({ ...state, right: false });
+      } else {
+        handleNotificationCall("error", response.data.message);
+      }
     } catch (error) {
-        console.error(error);
+      console.error(error);
     } finally {
-        setLoader(false);
+      setLoader(false);
     }
   }
 
@@ -2178,11 +2178,12 @@ export default function Header(props) {
                           justifyContent: "center",
                           alignItems: "center",
                         }}
+                        className={classes.ProfileLogoContainer}
                       >
                         <Avatar
                           alt="Profile"
                           src={image}
-                          className={classes.avatarButton}
+                        // className={classes.avatarButton}
                         />
                       </Box>
                     </Grid>
@@ -3214,8 +3215,8 @@ export default function Header(props) {
                                     profile.recruiter?.lastName}
                                 </Typography>
                                 <Typography>
-                                  {profile.roleName === "CLIENTCOORDINATOR" ? "Hiring Manager" : profile.roleName ==="SUBVENDOR" ? "Vendor" : profile.roleName }
-                                  {profile.recruiter?.companyName && " - "+profile.recruiter?.companyName}
+                                  {profile.roleName === "CLIENTCOORDINATOR" ? "Hiring Manager" : profile.roleName === "SUBVENDOR" ? "Vendor" : profile.roleName}
+                                  {profile.recruiter?.companyName && " - " + profile.recruiter?.companyName}
                                 </Typography>
                                 <Typography> {profile.email} </Typography>
                               </>
@@ -4296,6 +4297,7 @@ export default function Header(props) {
 
         <DialogContent className={classes.chatListBackGround}>
           <form onSubmit={inviteSubmit(inviteMSME)}>
+          <Grid container direction="row">
             <Grid item xs={12}>
               <InputLabel shrink htmlFor="email">
                 Enter Email
@@ -4317,6 +4319,8 @@ export default function Header(props) {
                 </Typography>
               </FormControl>
             </Grid>
+          </Grid>
+
             <div className={classes.sendWhatsapp}>
               <Button
                 variant="contained"
@@ -4385,82 +4389,85 @@ export default function Header(props) {
         <DialogContent className={classes.chatListBackGround}>
           <form onSubmit={shareCVSubmit(shareCVShortList)}>
             <div className={classes.shareCVContainer}>
-              <Grid item xs={12} spacing={2}>
-                <FormControl className={classes.margin}>
-                  <InputLabel shrink htmlFor="requirementId">
+              <Grid container direction="row" spacing={2}>
+                <Grid item xs={12} >
+                  <FormControl className={classes.margin}>
+                    <InputLabel shrink htmlFor="requirementId">
 
-                    Requirement Name
+                      Requirement Name
+                    </InputLabel>
+                    <Autocomplete
+                      // className={classes.AutocompleteFullWidth}
+                      options={requirementName}
+                      name="requirementId"
+                      disableClearable
+                      error={shareCVErrors.requirementId ? true : false}
+                      {...shareCV("requirementId")}
+                      getOptionLabel={(option) =>
+                        option.requirementName + " (" + option.uniqueId + ")"
+                      }
+                      onChange={(event, value) => {
+                        setRequirementId(value);
+                        getLink(value.id);
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          name="requirementId"
+                          variant="filled"
+                        />
+                      )}
+                    />
+                    <Typography variant="inherit" color="error">
+                      {shareCVErrors.requirementId?.message}
+                    </Typography>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <InputLabel shrink htmlFor="email">
+                    Enter Email
                   </InputLabel>
-                  <Autocomplete
-                    // className={classes.AutocompleteFullWidth}
-                    options={requirementName}
-                    name="requirementId"
-                    disableClearable
-                    error={shareCVErrors.requirementId ? true : false}
-                    {...shareCV("requirementId")}
-                    getOptionLabel={(option) =>
-                      option.requirementName + " (" + option.uniqueId + ")"
-                    }
-                    onChange={(event, value) => {
-                      setRequirementId(value);
-                      getLink(value.id);
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="requirementId"
-                        variant="filled"
-                      />
-                    )}
-                  />
-                  <Typography variant="inherit" color="error">
-                    {shareCVErrors.requirementId?.message}
-                  </Typography>
-                </FormControl>
+                  <FormControl className={classes.margin}>
+                    <TextField
+                      classes={{ root: classes.customTextField }}
+                      InputProps={{ disableUnderline: true }}
+                      size="small"
+                      placeholder="Enter Email ID"
+                      id="email"
+                      {...shareCV("email")}
+                      name="email"
+                      error={shareCVErrors.email ? true : false}
+                    />
+
+                    <Typography variant="inherit" color="error">
+                      {shareCVErrors.email?.message}
+                    </Typography>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <InputLabel shrink htmlFor="mobile">
+                    Mobile
+                  </InputLabel>
+                  <FormControl className={classes.margin}>
+                    <TextField
+                      InputProps={{ disableUnderline: true }}
+                      classes={{ root: classes.customTextField }}
+                      size="small"
+                      placeholder="Enter Mobile"
+                      id="mobile"
+                      name="mobile"
+                      {...shareCV("mobile")}
+                      error={shareCVErrors.mobile ? true : false}
+                    />
+
+                    <Typography variant="inherit" color="error">
+                      {shareCVErrors.mobile?.message}
+                    </Typography>
+                  </FormControl>
+                </Grid>
               </Grid>
 
-              <Grid item xs={12}>
-                <InputLabel shrink htmlFor="email">
-                  Enter Email
-                </InputLabel>
-                <FormControl className={classes.margin}>
-                  <TextField
-                    classes={{ root: classes.customTextField }}
-                    InputProps={{ disableUnderline: true }}
-                    size="small"
-                    placeholder="Enter Email ID"
-                    id="email"
-                    {...shareCV("email")}
-                    name="email"
-                    error={shareCVErrors.email ? true : false}
-                  />
-
-                  <Typography variant="inherit" color="error">
-                    {shareCVErrors.email?.message}
-                  </Typography>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <InputLabel shrink htmlFor="mobile">
-                  Mobile
-                </InputLabel>
-                <FormControl className={classes.margin}>
-                  <TextField
-                    InputProps={{ disableUnderline: true }}
-                    classes={{ root: classes.customTextField }}
-                    size="small"
-                    placeholder="Enter Mobile"
-                    id="mobile"
-                    name="mobile"
-                    {...shareCV("mobile")}
-                    error={shareCVErrors.mobile ? true : false}
-                  />
-
-                  <Typography variant="inherit" color="error">
-                    {shareCVErrors.mobile?.message}
-                  </Typography>
-                </FormControl>
-              </Grid>
             </div>
             <div className={classes.sendWhatsapp}>
               <Button

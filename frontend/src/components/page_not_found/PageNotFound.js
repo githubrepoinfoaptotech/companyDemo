@@ -8,7 +8,6 @@ import { useHistory } from 'react-router-dom';
 const PageNotFound = () => {
     const history = useHistory()
     const handleRedirect = () => {
-        // Redirect to a full URL
         history.push("/v1#/login")
     };
     return (<>

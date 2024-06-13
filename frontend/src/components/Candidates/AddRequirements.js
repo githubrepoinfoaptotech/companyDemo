@@ -77,7 +77,7 @@ function AddRequirements(props) {
           </CardHeader>
           <form onSubmit={props.handleSubmit(props.handleAdd)}>
             <CardContent>
-              <Grid container direction="row" spacing={2}>
+              <Grid container direction="row" spacing={2} style={{height: "79vh",overflow: "scroll"}}>
                 <Grid item xs={12} sm={6} md={6} lg={6}>
                   <FormControl className={classes.margin}>
                     <InputLabel shrink htmlFor="clientId">

@@ -36,7 +36,7 @@ function ProjectView({
   levelOfHireEditFields,
   handleViewProjClick,
 }) {
-  console.log(clientEdit)
+  
     const classes = useStyles(); 
   return (
     <div>

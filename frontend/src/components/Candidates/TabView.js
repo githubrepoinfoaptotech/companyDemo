@@ -34,7 +34,6 @@ export default function TabView({ jdData,removePercentage }) {
 
   const handleTabClick = (index) => {
     setValue(index);
-    console.log(index);
   };
 
   // const handleChange = (event, newValue) => {

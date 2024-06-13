@@ -56,15 +56,12 @@ export default function Tables(props) {
   const messageRef = useRef();
   const history = useHistory();
 
-
   const candidate_search = props.location.search;
   const token = localStorage.getItem("token");
   const decode = jwtDecode(token);
 
   const [count, setCount] = useState(0);
   const [loader, setLoader] = useState(false);
-
-
   const [source, setSource] = useState([]);
   const [candidatesData, setCandidatesData] = useState([]);
   const [candidatesNote, setCandidatesNote] = useState([]);
@@ -83,10 +80,11 @@ export default function Tables(props) {
     location: "",
     experience: null,
     resume: "",
+    document: "",
+    photo: "",
     gender: "",
     differentlyAbled: "",
     candidateProcessed: "",
-
     currentLocation: "",
     preferredLocation: "",
     nativeLocation: "",
@@ -106,8 +104,9 @@ export default function Tables(props) {
     mainId: "",
     recruiterId: "",
     currentCompanyName: "",
-    hideContactDetails: false
-
+    hideContactDetails: false,
+    panNumber: "",
+    linkedInProfile: "",
   });
   const [listCanditate, setListCanditate] = useState([]);
 
@@ -193,6 +192,8 @@ export default function Tables(props) {
     mainId: "",
     isCandidateCpv: "",
     currentCompanyName: "",
+    panNumber: "",
+    linkedInProfile: "",
   });
 
   const [page, setPage] = useState(0);
@@ -209,6 +210,19 @@ export default function Tables(props) {
 
   const [search, setSearch] = useState(new URLSearchParams(candidate_search).get('search'));
   const { setResumeParsedData } = useResumeDataContext();
+
+  //Action Button Popper
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(null);
+  const handleMenuClick = (index, event) => {
+    if (activeIndex === index) {
+      setAnchorEl(null);
+      setActiveIndex(null);
+    } else {
+      setAnchorEl(event.currentTarget);
+      setActiveIndex(index);
+    }
+  };
 
   const [date, setDay] = useState("");
   const [month, setMonth] = useState("");
@@ -310,6 +324,8 @@ export default function Tables(props) {
           candidateAndTechPannelDiscussionRecording: response.data.data?.candidateAndTechPannelDiscussionRecording,
           currentCompanyName: response.data.data?.currentCompanyName,
           freeValue: decode.isEnableFree === true ? "YES" : decode.isEnablePaid === true ? "NO" : "YES",
+          panNumber: response.data.data?.panNumber,
+          linkedInProfile: response.data.data?.linkedInProfile,
         });
       }
     });
@@ -448,6 +464,8 @@ export default function Tables(props) {
     preferredLocation: Yup.string().nullable().notRequired(),
     relevantExperience: Yup.number().nullable(true).transform((_, val) => val ? Number(val) : null),
     currentCompanyName: Yup.string().nullable().notRequired(),
+    panNumber: Yup.string(),
+    linkedInProfile: Yup.string(),
   });
 
   const editSchema = Yup.object().shape({
@@ -492,6 +510,8 @@ export default function Tables(props) {
     invoicedValue: Yup.string(),
     joinedDate: Yup.string(),
     currentCompanyName: Yup.string().nullable().notRequired(),
+    panNumber: Yup.string(),
+    linkedInProfile: Yup.string(),
   });
 
   const noteSchema = Yup.object().shape({
@@ -623,6 +643,8 @@ export default function Tables(props) {
             candidateAndTechPannelDiscussionRecording: response.data.data?.candidateAndTechPannelDiscussionRecording,
             currentCompanyName: response.data.data?.currentCompanyName,
             freeValue: decode.isEnableFree === true ? "YES" : decode.isEnablePaid === true ? "NO" : "YES",
+            panNumber: response.data.data?.panNumber,
+            linkedInProfile: response.data.data?.linkedInProfile,
           });
         }
       });
@@ -664,8 +686,6 @@ export default function Tables(props) {
 
 
   function updateData(id) {
-
-
     axios({
       method: "post",
       url: `${process.env.REACT_APP_SERVER}recruiter/getAllCandidateStatus`,
@@ -678,11 +698,8 @@ export default function Tables(props) {
       },
     })
       .then(function (response) {
-
         if (response.data.status === true) {
-
           var myCandidateStatuses = response.data.data;
-
           axios({
             method: "post",
             url: `${process.env.REACT_APP_SERVER}recruiter/candidate`,
@@ -695,9 +712,7 @@ export default function Tables(props) {
             },
           })
             .then(function (result) {
-
               if (result.data.status === true) {
-
                 const updateState = candidatesData.map(item => {
 
                   if (item.id === id) {
@@ -718,28 +733,21 @@ export default function Tables(props) {
                   }
                   return item;
                 });
-
                 setCandidatesData(updateState);
               }
               setLoader(false);
 
             });
-
-
-
         }
       })
       .catch(function (error) {
         console.log(error);
       });
-
   }
-
 
   function handleAddNotes(values) {
     return new Promise((resolve) => {
       setLoader(true);
-
       axios({
         method: "post",
         url: `${process.env.REACT_APP_SERVER}recruiter/addCandidateNotes`,
@@ -791,9 +799,7 @@ export default function Tables(props) {
   };
 
   const [dropReasonOpen, setDropReasonOpen] = useState(false);
-
   const handleDropReasonOpen = () => {
-
     setDropReasonOpen(true);
     setStatusOpen(false);
   };
@@ -803,9 +809,7 @@ export default function Tables(props) {
   };
 
   const reasonRef = useRef()
-
   const [reasonOpen, setReasonOpen] = useState(false);
-
   const handleReasonOpen = () => {
     setStatusOpen(false);
     setStatusNewOpen(false);
@@ -898,7 +902,6 @@ export default function Tables(props) {
         } else {
           setRequirement(response.data.data);
         }
-        console.log(response.data.data)
       }
     });
   }, [token]);
@@ -1103,6 +1106,8 @@ export default function Tables(props) {
           candidateAndTechPannelDiscussionRecording: values.candidateAndTechPannelDiscussionRecording,
           hideContactDetails: candidatesEdit.hideContactDetails,
           currentCompanyName: values.currentCompanyName,
+          panNumber: values.panNumber,
+          linkedInProfile: values.linkedInProfile,
         },
         headers: {
           "Content-Type": "application/json",
@@ -1111,18 +1116,17 @@ export default function Tables(props) {
       })
         .then(function (response) {
           if (response.data.status === true) {
-
-            if (file !== undefined) {
-              if (file?.length !== 0) {
-                uploadResume(file, response.data.candidateDetailsId);
+            const fileUploadTasks = [
+              { file: file, uploadFunction: uploadResume },
+              { file: docFile, uploadFunction: updateCandidateDocument },
+              { file: profile, uploadFunction: updateCandidatePhoto },
+              { file: assessment, uploadFunction: uploadAssessment }
+            ];
+            fileUploadTasks.forEach(({ file, uploadFunction }) => {
+              if (file !== undefined && file.length !== 0) {
+                uploadFunction(file, response.data.candidateDetailsId);
               }
-            }
-
-            if (assessment !== undefined) {
-              if (assessment?.length !== 0) {
-                uploadAssessment(assessment, response.data.candidateId);
-              }
-            }
+            });
             handleNotificationCall("success", response.data.message);
             updateData(candidatesEdit.id);
             setState({ ...state, right: false });
@@ -1180,6 +1184,8 @@ export default function Tables(props) {
         candidateMindsetAssessmentLink: addList.candidateMindsetAssessmentLink,
         candidateAndTechPannelDiscussionRecording: addList.candidateAndTechPannelDiscussionRecording,
         currentCompanyName: addList.currentCompanyName,
+        panNumber: addList.panNumber,
+        linkedInProfile: addList.linkedInProfile,
       }
     } else {
       url = `${process.env.REACT_APP_SERVER}recruiter/addCandidate`;
@@ -1214,6 +1220,8 @@ export default function Tables(props) {
         candidateMindsetAssessmentLink: addList.candidateMindsetAssessmentLink,
         candidateAndTechPannelDiscussionRecording: addList.candidateAndTechPannelDiscussionRecording,
         currentCompanyName: addList.currentCompanyName,
+        panNumber: addList.panNumber,
+        linkedInProfile: addList.linkedInProfile,
       }
     }
 
@@ -1233,18 +1241,19 @@ export default function Tables(props) {
 
         var message = "";
 
-        if (file !== undefined) {
-          if (file?.length !== 0) {
-            uploadResume(file, response.data.candidateDetailsId);
-            updateCandidateDocument(docFile, response.data.candidateDetailsId);
-            updateCandidatePhoto(profile, response.data.candidateDetailsId);
+        const fileUploadTasks = [
+          { file: file, uploadFunction: uploadResume },
+          { file: docFile, uploadFunction: updateCandidateDocument },
+          { file: profile, uploadFunction: updateCandidatePhoto },
+          { file: assessment, uploadFunction: uploadAssessment }
+        ];
+
+        fileUploadTasks.forEach(({ file, uploadFunction }) => {
+          if (file !== undefined && file.length !== 0) {
+            uploadFunction(file, response.data.candidateDetailsId);
           }
-        }
-        if (assessment !== undefined) {
-          if (assessment?.length !== 0) {
-            uploadAssessment(assessment, response.data.candidateId);
-          }
-        }
+        });
+
         if (send === true) {
           if (candidate.freeValue === "YES") {
             message = messageRef.current.value;
@@ -1331,6 +1340,10 @@ export default function Tables(props) {
   }
 
   function uploadResume(File, Id) {
+    if (File && File?.size >= 25000000) {
+      handleNotificationCall("error", "Maximum File Size Limit 25mb");
+      return
+    }
     var FormData = require("form-data");
     var data = new FormData();
     data.append("resume", File);
@@ -1354,6 +1367,10 @@ export default function Tables(props) {
   }
 
   function updateCandidateDocument(File, Id) {
+    if (File && File?.size >= 25000000) {
+      handleNotificationCall("error", "Maximum File Size Limit 25mb");
+      return;
+    }
     var FormData = require("form-data");
     var data = new FormData();
     data.append("document", File);
@@ -1375,6 +1392,10 @@ export default function Tables(props) {
   }
 
   function updateCandidatePhoto(File, Id) {
+    if (File && File?.size >= 10485760) {
+      handleNotificationCall("error", "Maximum File Size Limit 10mb");
+      return;
+    }
     var FormData = require("form-data");
     var data = new FormData();
     data.append("image", File);
@@ -1859,7 +1880,7 @@ export default function Tables(props) {
               educationalQualification: response.data.data.candidateDetail?.educationalQualification,
               gender: response.data.data.candidateDetail?.gender,
               resume: response.data.data.candidateDetail?.resume,
-              alternateMobile: response.data.data.candidateDetail?.alternateMobile,
+              alternateMobile: response.data.data?.candidateDetail?.alternateMobile,
               candidateRecruiterDiscussionRecording: response.data.data.candidateRecruiterDiscussionRecording,
               candidateSkillExplanationRecording: response.data.data.candidateSkillExplanationRecording,
               candidateMindsetAssessmentLink: response.data.data.candidateMindsetAssessmentLink,
@@ -1867,6 +1888,8 @@ export default function Tables(props) {
               mainId: response.data.data.mainId,
               isCandidateCpv: response.data.data.isCandidateCpv,
               currentCompanyName: response.data.data.candidateDetail?.currentCompanyName,
+              panNumber: response.data.data.candidateDetail?.panNumber,
+              linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
             });
 
             setCandidatesEdit({
@@ -1897,8 +1920,10 @@ export default function Tables(props) {
               differentlyAbled: response.data.data.candidateDetail?.differentlyAbled,
               educationalQualification: response.data.data.candidateDetail?.educationalQualification,
               gender: response.data.data.candidateDetail?.gender,
-              alternateMobile: response.data.data.candidateDetail?.alternateMobile.substring(2),
+              alternateMobile: response.data.data?.candidateDetail?.alternateMobile?.substring(2),
               resume: response.data.data.candidateDetail?.resume,
+              document: response.data.data.candidateDetail?.document,
+              photo: response.data.data.candidateDetail?.photo,
               candidateRecruiterDiscussionRecording: response.data.data.candidateRecruiterDiscussionRecording,
               candidateSkillExplanationRecording: response.data.data.candidateSkillExplanationRecording,
               candidateMindsetAssessmentLink: response.data.data.candidateMindsetAssessmentLink,
@@ -1907,6 +1932,8 @@ export default function Tables(props) {
               recruiterId: response.data.data.recruiterId,
               hideContactDetails: response.data.data.hideContactDetails,
               currentCompanyName: response.data.data.candidateDetail?.currentCompanyName,
+              panNumber: response.data.data.candidateDetail?.panNumber,
+              linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
             });
 
             setState({ ...state, right: true });
@@ -2089,7 +2116,8 @@ export default function Tables(props) {
     candidateMindsetAssessmentLink: "",
     candidateAndTechPannelDiscussionRecording: "",
     freeValue: decode.isEnableFree === true ? "YES" : decode.isEnablePaid === true ? "NO" : "YES",
-
+    panNumber: "",
+    linkedInProfile: "",
   });
   const handleClickOpen = () => {
     setOpen(true);
@@ -2273,7 +2301,6 @@ export default function Tables(props) {
           open={open}
           messageRef={messageRef}
           reset={reset}
-
           setCandidate={setCandidate}
           candidate={candidate}
           setFile={setFile}
@@ -2368,7 +2395,8 @@ export default function Tables(props) {
                   candidateMindsetAssessmentLink: "",
                   candidateAndTechPannelDiscussionRecording: "",
                   freeValue: decode.isEnableFree === true ? "YES" : decode.isEnablePaid === true ? "NO" : "YES",
-
+                  panNumber: "",
+                  linkedInProfile: "",
                 });
                 setState({ ...state, right: true });
                 setPhoneValidation(false);
@@ -2533,6 +2561,9 @@ export default function Tables(props) {
                 <Actions
                   index={index}
                   item={item}
+                  activeIndex={activeIndex}
+                  handleMenuClick={handleMenuClick}
+                  anchorEl={anchorEl}
                   reset={reset}
                   editreset={editreset}
                   noteReset={noteReset}
@@ -2543,6 +2574,8 @@ export default function Tables(props) {
                   handleReverseOpen={handleDropOpen}
                   handleShow={handleShow}
                   setFile={setFile}
+                  setDocFile={setDocFile}
+                  setProfile={setProfile}
                   setAssessment={setAssessment}
                   setCandidatesChange={setCandidatesChange}
                   setPhoneValidation={setPhoneValidation}
@@ -2564,10 +2597,14 @@ export default function Tables(props) {
                 ) : (
                   ""
                 ),
-                < >
-                  {item.candidateDetail?.firstName + " " + item.candidateDetail?.lastName}   <br />   {" (" + item.uniqueId + ")"}
-                </>,
-
+                <Grid container row spacing={2} className={classes.externalIconContainer} data-candidatename={item.candidateDetail?.firstName + " " + item.candidateDetail?.lastName}>
+                  <div>
+                    {item.candidateDetail?.firstName +
+                      " " +
+                      item.candidateDetail?.lastName}
+                    <br /> {" (" + item.uniqueId + ")"}
+                  </div>
+                </Grid>,
                 item.mainId === decode.mainId ?
                   <>  {item.candidateDetail?.email + " /"} <br />{"91 " + item.candidateDetail?.mobile.slice(2)}  </>
                   : item.hideContactDetails !== true ?

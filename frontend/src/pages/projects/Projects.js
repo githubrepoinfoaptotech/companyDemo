@@ -94,6 +94,19 @@ export default function Tables() {
 
   const [loader, setLoader] = useState(false);
 
+  //Action Button Popper
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(null);
+  const handleMenuClick = (index, event) => {
+    if (activeIndex === index) {
+      setAnchorEl(null);
+      setActiveIndex(null);
+    } else {
+      setAnchorEl(event.currentTarget);
+      setActiveIndex(index);
+    }
+  };
+
   const [reducerValue, forceUpdate] = useReducer((x) => x + 1, 0);
   const [page, setPage] = useState(0);
   const [currerntPage, setCurrerntPage] = useState(1);
@@ -496,8 +509,6 @@ export default function Tables() {
       return
     }
     const filteredRecruiterFields = recruiterFields.filter(item => item.recruiterId !== "");
-    console.log(recruiterFields, ' recFields====popopopopop')
-    console.log(filteredRecruiterFields, 'popopopopop')
     return new Promise((resolve) => {
       setLoader(true);
 
@@ -825,7 +836,6 @@ export default function Tables() {
 
     }
   };
-  console.log(recruiterFields, '====')
 
   const recruiterEditChange = (event, index) => {
     const { value } = event.target;
@@ -903,7 +913,6 @@ export default function Tables() {
   //   const values = [...recruiterFields];
   // };
 
-  console.log(displayOrgAdd, editRecFields, '90909')
   const levelOfHiringChange = (event, index) => {
     const values = [...levelOfHiringFields];
     values[index][event.target.name] = event.target.value;
@@ -2331,6 +2340,9 @@ export default function Tables() {
                       <ProjectAction
                         index={index}
                         item={item}
+                        activeIndex={activeIndex}
+                        handleMenuClick={handleMenuClick}
+                        anchorEl={anchorEl}
                         handleShow={handleShow}
                         setDisplayAdd={setDisplayAdd}
                         setDisplayOrgAdd={setDisplayOrgAdd}

@@ -17,7 +17,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
 import ViewIcon from "@material-ui/icons/Visibility";
@@ -68,10 +68,11 @@ export default function Tables(props) {
     location: "",
     experience: null,
     resume: "",
+    document: "",
+    photo: "",
     gender: "",
     differentlyAbled: "",
     candidateProcessed: "",
-
     currentLocation: "",
     preferredLocation: "",
     nativeLocation: "",
@@ -84,14 +85,16 @@ export default function Tables(props) {
     reason: "",
     educationalQualification: "",
     alternateMobile: "",
-    candidateRecruiterDiscussionRecording:"",
-    candidateSkillExplanationRecording:"",
-    candidateMindsetAssessmentLink:"",
-    candidateAndTechPannelDiscussionRecording:"",
-    mainId:"",
-    recruiterId:"",
+    candidateRecruiterDiscussionRecording: "",
+    candidateSkillExplanationRecording: "",
+    candidateMindsetAssessmentLink: "",
+    candidateAndTechPannelDiscussionRecording: "",
+    mainId: "",
+    recruiterId: "",
     currentCompanyName: "",
-    hideContactDetails: false
+    hideContactDetails: false,
+    panNumber: "",
+    linkedInProfile: "",
   });
   const [listCanditate, setListCanditate] = useState([]);
 
@@ -105,7 +108,7 @@ export default function Tables(props) {
   });
 
   const [candidateView, setCandidateView] = useState({
-    id:"",
+    id: "",
     chatId: "",
     email: "",
     firstName: "",
@@ -121,29 +124,30 @@ export default function Tables(props) {
     source: "",
     requiremenUniqueId: "",
     candidateUniqueId: "",
-
-    gender:"",
-    differentlyAbled:"", 
-    candidateProcessed:"",  
+    gender: "",
+    differentlyAbled: "",
+    candidateProcessed: "",
     currentLocation: "",
-    preferredLocation:"",
-    nativeLocation:"",
-    relevantExperience:null,
-    currentCtc:null,
-    expectedCtc:null,
-    dob:"",
-    noticePeriod:"",
-    reasonForJobChange:"",
-    reason:"",
-    educationalQualification:"",
+    preferredLocation: "",
+    nativeLocation: "",
+    relevantExperience: null,
+    currentCtc: null,
+    expectedCtc: null,
+    dob: "",
+    noticePeriod: "",
+    reasonForJobChange: "",
+    reason: "",
+    educationalQualification: "",
     alternateMobile: "",
-    candidateRecruiterDiscussionRecording:"",
-    candidateSkillExplanationRecording:"",
-    candidateMindsetAssessmentLink:"",
-    candidateAndTechPannelDiscussionRecording:"",
-    mainId:"",
-    isCandidateCpv:"",
-    currentCompanyName:"",
+    candidateRecruiterDiscussionRecording: "",
+    candidateSkillExplanationRecording: "",
+    candidateMindsetAssessmentLink: "",
+    candidateAndTechPannelDiscussionRecording: "",
+    mainId: "",
+    isCandidateCpv: "",
+    currentCompanyName: "",
+    panNumber: "",
+    linkedInProfile: "",
   });
 
   const [page, setPage] = useState(0);
@@ -153,8 +157,23 @@ export default function Tables(props) {
   const [setCandidatesChange] = useState([]);
   const [reducerValue, forceUpdate] = useReducer((x) => x + 1, 0);
   const [file, setFile] = useState([]);
-  const [assessment,setAssessment] = useState([]);
- 
+  const [docFile, setDocFile] = useState([]);
+  const [profile, setProfile] = useState([]);
+  const [assessment, setAssessment] = useState([]);
+
+  //Action Button Popper
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(null);
+  const handleMenuClick = (index, event) => {
+    if (activeIndex === index) {
+      setAnchorEl(null);
+      setActiveIndex(null);
+    } else {
+      setAnchorEl(event.currentTarget);
+      setActiveIndex(index);
+    }
+  };
+
   const [date, setDay] = useState("");
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
@@ -255,8 +274,10 @@ export default function Tables(props) {
             decode.isEnableFree === true
               ? "YES"
               : decode.isEnablePaid === true
-              ? "NO"
-              : "YES",
+                ? "NO"
+                : "YES",
+          panNumber: response.data.data?.panNumber,
+          linkedInProfile: response.data.data?.linkedInProfile,
         });
       }
     });
@@ -347,7 +368,7 @@ export default function Tables(props) {
   const [phoneValidation, setPhoneValidation] = useState(false);
 
   const editSchema = Yup.object().shape({
-    email: candidatesEdit.recruiterId === decode.recruiterId? Yup.string().email("Email must be a Valid Email Address").required('Email is required') : Yup.string().email("Email must be a Valid Email Address"),
+    email: candidatesEdit.recruiterId === decode.recruiterId ? Yup.string().email("Email must be a Valid Email Address").required('Email is required') : Yup.string().email("Email must be a Valid Email Address"),
     firstName: Yup.string()
       .max(255)
       .required("First Name is required")
@@ -367,9 +388,9 @@ export default function Tables(props) {
     alternateMobile:
       phoneValidation === true
         ? Yup.string()
-            .required("Alternate Contact Number is required")
-            .min(10, "Must be exactly 10 digits")
-            .max(10, "Must be exactly 10 digits")
+          .required("Alternate Contact Number is required")
+          .min(10, "Must be exactly 10 digits")
+          .max(10, "Must be exactly 10 digits")
         : Yup.string(),
     native: Yup.string().nullable().notRequired(),
     preferredLocation: Yup.string().nullable().notRequired(),
@@ -390,6 +411,8 @@ export default function Tables(props) {
     invoicedValue: Yup.string(),
     joinedDate: Yup.string(),
     currentCompanyName: Yup.string().nullable().notRequired(),
+    panNumber: Yup.string(),
+    linkedInProfile: Yup.string(),
   });
 
   const noteSchema = Yup.object().shape({
@@ -505,8 +528,10 @@ export default function Tables(props) {
               decode.isEnableFree === true
                 ? "YES"
                 : decode.isEnablePaid === true
-                ? "NO"
-                : "YES",
+                  ? "NO"
+                  : "YES",
+            panNumber: response.data.data?.panNumber,
+            linkedInProfile: response.data.data?.linkedInProfile,
           });
         }
       });
@@ -589,7 +614,7 @@ export default function Tables(props) {
               });
 
               setCandidatesData(updateState);
-             
+
             }
             setLoader(false);
           });
@@ -876,8 +901,8 @@ export default function Tables(props) {
             values.day === undefined
               ? ""
               : dob !== "--"
-              ? values.day + "-" + values.month + "-" + values.year
-              : "",
+                ? values.day + "-" + values.month + "-" + values.year
+                : "",
           noticePeriod: values.noticePeriod,
           reasonForJobChange: values.reasonForJobChange,
           candidateProcessed: values.candidateProcessed,
@@ -885,12 +910,14 @@ export default function Tables(props) {
           educationalQualification: values.educationalQualification,
           gender: values.gender,
           reason: values.reason,
-          candidateRecruiterDiscussionRecording:values.candidateRecruiterDiscussionRecording, 
-          candidateSkillExplanationRecording:values.candidateSkillExplanationRecording,
-          candidateMindsetAssessmentLink:values.candidateMindsetAssessmentLink,
-          candidateAndTechPannelDiscussionRecording:values.candidateAndTechPannelDiscussionRecording,
+          candidateRecruiterDiscussionRecording: values.candidateRecruiterDiscussionRecording,
+          candidateSkillExplanationRecording: values.candidateSkillExplanationRecording,
+          candidateMindsetAssessmentLink: values.candidateMindsetAssessmentLink,
+          candidateAndTechPannelDiscussionRecording: values.candidateAndTechPannelDiscussionRecording,
           hideContactDetails: candidatesEdit.hideContactDetails,
-          currentCompanyName:values.currentCompanyName,
+          currentCompanyName: values.currentCompanyName,
+          panNumber: values.panNumber,
+          linkedInProfile: values.linkedInProfile,
         },
         headers: {
           "Content-Type": "application/json",
@@ -899,17 +926,18 @@ export default function Tables(props) {
       })
         .then(function (response) {
           if (response.data.status === true) {
-            if (file !== undefined) {
-              if (file?.length !== 0) {
-                uploadResume(file, response.data.candidateDetailsId);
-              }
-            }
+            const fileUploadTasks = [
+              { file: file, uploadFunction: uploadResume },
+              { file: docFile, uploadFunction: updateCandidateDocument },
+              { file: profile, uploadFunction: updateCandidatePhoto },
+              { file: assessment, uploadFunction: uploadAssessment }
+            ];
 
-            if(assessment !== undefined ){
-              if(assessment?.length !== 0){
-                uploadAssessment(assessment, response.data.candidateId);
+            fileUploadTasks.forEach(({ file, uploadFunction }) => {
+              if (file !== undefined && file.length !== 0) {
+                uploadFunction(file, response.data.candidateDetailsId);
               }
-            }
+            });
 
             handleNotificationCall("success", response.data.message);
             updateData(candidatesEdit.id);
@@ -936,7 +964,7 @@ export default function Tables(props) {
         Authorization: token,
       },
     }).then(function (response) {
-    
+
       if (response.data.status === true) {
       } else {
         handleNotificationCall("error", response.data.message);
@@ -945,6 +973,10 @@ export default function Tables(props) {
   }
 
   function uploadResume(File, Id) {
+    if (File && File?.size >= 25000000) {
+      handleNotificationCall("error", "Maximum File Size Limit 25mb");
+      return
+    }
     var FormData = require("form-data");
     var data = new FormData();
     data.append("resume", File);
@@ -966,11 +998,62 @@ export default function Tables(props) {
     });
   }
 
+  function updateCandidateDocument(File, Id) {
+    if (File && File?.size >= 25000000) {
+      handleNotificationCall("error", "Maximum File Size Limit 25mb");
+      return
+    }
+    var FormData = require("form-data");
+    var data = new FormData();
+    data.append("document", File);
+    data.append("id", Id);
+    axios({
+      method: "post",
+      url: `${process.env.REACT_APP_SERVER}recruiter/updateCandidateDocument`,
+      data: data,
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: token,
+      },
+    }).then(function (response) {
+      if (response.data.status === true) {
+      } else {
+        handleNotificationCall("error", response.data.message);
+      }
+    });
+  }
+
+  function updateCandidatePhoto(File, Id) {
+    if (File && File?.size >= 10485760) {
+      handleNotificationCall("error", "Maximum File Size Limit 10mb");
+      return;
+    }
+    var FormData = require("form-data");
+    var data = new FormData();
+    data.append("image", File);
+    data.append("id", Id);
+    axios({
+      method: "post",
+      url: `${process.env.REACT_APP_SERVER}recruiter/updateCandidatePhoto`,
+      data: data,
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: token,
+      },
+    }).then(function (response) {
+      if (response.data.status === true) {
+      } else {
+        handleNotificationCall("error", response.data.message);
+      }
+    });
+  }
+
+
   function uploadAssessment(File, Id) {
     var FormData = require("form-data");
     var data = new FormData();
     data.append("file", File);
-    data.append("id", Id); 
+    data.append("id", Id);
     axios({
       method: "post",
       url: `${process.env.REACT_APP_SERVER}recruiter/updateCandidateMindSetAssessment`,
@@ -980,9 +1063,9 @@ export default function Tables(props) {
         Authorization: token,
       },
     }).then(function (response) {
-   
+
       if (response.data.status === true) {
-         
+
       } else {
         handleNotificationCall("error", response.data.message);
       }
@@ -995,43 +1078,43 @@ export default function Tables(props) {
       shortList.statusCode === 303
         ? "1st_interview_round"
         : shortList.statusCode === 3031
-        ? "initial_interview_rounds"
-        : shortList.statusCode === 304
-        ? status === "Schedule Another Interview"
           ? "initial_interview_rounds"
-          : status === "Schedule Final Interview"
-          ? "final_interview_round"
-          : status === "Send Document"
-          ? "document_collect"
-          : ""
-        : shortList.statusCode === 3041
-        ? "document_collect"
-        : shortList.statusCode === 305
-        ? "salary_breakup_shared_confirmation"
-        : shortList.statusCode === 307
-        ? "offer_released_confirmation"
-        : shortList.statusCode === 308
-        ? status === "Joining Confirmation"
-          ? "joining_confirmation"
-          : ""
-        : "";
+          : shortList.statusCode === 304
+            ? status === "Schedule Another Interview"
+              ? "initial_interview_rounds"
+              : status === "Schedule Final Interview"
+                ? "final_interview_round"
+                : status === "Send Document"
+                  ? "document_collect"
+                  : ""
+            : shortList.statusCode === 3041
+              ? "document_collect"
+              : shortList.statusCode === 305
+                ? "salary_breakup_shared_confirmation"
+                : shortList.statusCode === 307
+                  ? "offer_released_confirmation"
+                  : shortList.statusCode === 308
+                    ? status === "Joining Confirmation"
+                      ? "joining_confirmation"
+                      : ""
+                    : "";
 
     const vars =
       shortList.statusCode === 308
         ? [
-            shortList.cand_name,
-            shortList.job_id,
-            shortList.rec_name,
-            shortList.rec_mobile_no,
-            localStorage.getItem("companyName"),
-          ]
+          shortList.cand_name,
+          shortList.job_id,
+          shortList.rec_name,
+          shortList.rec_mobile_no,
+          localStorage.getItem("companyName"),
+        ]
         : [
-            shortList.cand_name,
-            shortList.job_id,
-            shortList.rec_name,
-            shortList.rec_mobile_no,
-            localStorage.getItem("companyName"),
-          ];
+          shortList.cand_name,
+          shortList.job_id,
+          shortList.rec_name,
+          shortList.rec_mobile_no,
+          localStorage.getItem("companyName"),
+        ];
 
     var url = "";
     if (shortList.free === "YES") {
@@ -1065,13 +1148,13 @@ export default function Tables(props) {
         if (shortList.free === "YES" && send === true) {
           window.open(
             "https://api.whatsapp.com/send?phone=" +
-              shortList.cand_mobile +
-              "&text=" +
-              message +
-              "",
+            shortList.cand_mobile +
+            "&text=" +
+            message +
+            "",
           );
-        } 
-      
+        }
+
         setState({ ...state, right: false });
         updateData(candidateId);
         handleNotificationCall("success", response.data.message);
@@ -1140,7 +1223,7 @@ export default function Tables(props) {
     setLoader(true);
     var url = props.DropStatusUrl;
     return new Promise((resolve) => {
-      
+
       axios({
         method: "post",
         url: url,
@@ -1185,7 +1268,7 @@ export default function Tables(props) {
         updateData(shortList.id);
         handleChangeMessageClose();
         handleNotificationCall("success", response.data.message);
-      }else {
+      } else {
         handleNotificationCall("error", response.data.message);
         setLoader(false);
       }
@@ -1197,7 +1280,7 @@ export default function Tables(props) {
     var url = props.OfferDeclineStatusUrl;
 
     return new Promise((resolve) => {
-    
+
       axios({
         method: "post",
         url: url,
@@ -1244,7 +1327,7 @@ export default function Tables(props) {
         },
       })
         .then(function (response) {
-      
+
           if (response.data.status === true) {
             setCandidateView({
               ...candidateView,
@@ -1264,30 +1347,32 @@ export default function Tables(props) {
               requiremenUniqueId: response.data.data.requirement?.uniqueId,
               candidateUniqueId: response.data.data.uniqueId,
               isAnswered: response.data.data.isAnswered,
-              currentLocation:  response.data.data.candidateDetail?.currentLocation,
+              currentLocation: response.data.data.candidateDetail?.currentLocation,
               preferredLocation: response.data.data.candidateDetail?.preferredLocation,
-              nativeLocation:  response.data.data.candidateDetail?.nativeLocation,
+              nativeLocation: response.data.data.candidateDetail?.nativeLocation,
               experience: response.data.data.candidateDetail?.experience,
               relevantExperience: response.data.data.candidateDetail?.relevantExperience,
               currentCtc: response.data.data.candidateDetail?.currentCtc,
               expectedCtc: response.data.data.candidateDetail?.expectedCtc,
               dob: response.data.data.candidateDetail?.dob,
               noticePeriod: response.data.data.candidateDetail?.noticePeriod,
-              reasonForJobChange:  response.data.data.candidateDetail?.reasonForJobChange,
+              reasonForJobChange: response.data.data.candidateDetail?.reasonForJobChange,
               reason: response.data.data.candidateDetail?.reason,
               candidateProcessed: response.data.data.candidateDetail?.candidateProcessed,
-              differentlyAbled:  response.data.data.candidateDetail?.differentlyAbled,
+              differentlyAbled: response.data.data.candidateDetail?.differentlyAbled,
               educationalQualification: response.data.data.candidateDetail?.educationalQualification,
               gender: response.data.data.candidateDetail?.gender,
               resume: response.data.data.candidateDetail?.resume,
-              alternateMobile: response.data.data.candidateDetail?.alternateMobile, 
-                candidateRecruiterDiscussionRecording:response.data.data.candidateRecruiterDiscussionRecording,
-                candidateSkillExplanationRecording:response.data.data.candidateSkillExplanationRecording,
-                candidateMindsetAssessmentLink:response.data.data.candidateMindsetAssessmentLink,
-                candidateAndTechPannelDiscussionRecording:response.data.data.candidateAndTechPannelDiscussionRecording,
-                mainId: response.data.data.mainId, 
-                isCandidateCpv: response.data.data.isCandidateCpv,
-                currentCompanyName:response.data.data.candidateDetail?.currentCompanyName,
+              alternateMobile: response.data.data.candidateDetail?.alternateMobile,
+              candidateRecruiterDiscussionRecording: response.data.data.candidateRecruiterDiscussionRecording,
+              candidateSkillExplanationRecording: response.data.data.candidateSkillExplanationRecording,
+              candidateMindsetAssessmentLink: response.data.data.candidateMindsetAssessmentLink,
+              candidateAndTechPannelDiscussionRecording: response.data.data.candidateAndTechPannelDiscussionRecording,
+              mainId: response.data.data.mainId,
+              isCandidateCpv: response.data.data.isCandidateCpv,
+              currentCompanyName: response.data.data.candidateDetail?.currentCompanyName,
+              panNumber: response.data.data.candidateDetail?.panNumber,
+              linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
             });
 
             setCandidatesEdit({
@@ -1303,36 +1388,40 @@ export default function Tables(props) {
               invoicedDate: response.data.data.invoicedDate,
               joinedDate: response.data.data.joinedDate,
               invoiceValue: response.data.data.invoiceValue,
-              currentLocation:  response.data.data.candidateDetail?.currentLocation,
-              preferredLocation:  response.data.data.candidateDetail?.preferredLocation,
-              nativeLocation:   response.data.data.candidateDetail?.nativeLocation,
+              currentLocation: response.data.data.candidateDetail?.currentLocation,
+              preferredLocation: response.data.data.candidateDetail?.preferredLocation,
+              nativeLocation: response.data.data.candidateDetail?.nativeLocation,
               experience: response.data.data.candidateDetail?.experience,
-              relevantExperience:   response.data.data.candidateDetail?.relevantExperience,
+              relevantExperience: response.data.data.candidateDetail?.relevantExperience,
               currentCtc: response.data.data.candidateDetail?.currentCtc,
               expectedCtc: response.data.data.candidateDetail?.expectedCtc,
               dob: response.data.data.candidateDetail?.dob,
               noticePeriod: response.data.data.candidateDetail?.noticePeriod,
-              reasonForJobChange:  response.data.data.candidateDetail?.reasonForJobChange,
+              reasonForJobChange: response.data.data.candidateDetail?.reasonForJobChange,
               reason: response.data.data.candidateDetail?.reason,
               candidateProcessed: response.data.data.candidateDetail?.candidateProcessed,
               differentlyAbled: response.data.data.candidateDetail?.differentlyAbled,
-              educationalQualification:  response.data.data.candidateDetail?.educationalQualification,
+              educationalQualification: response.data.data.candidateDetail?.educationalQualification,
               gender: response.data.data.candidateDetail?.gender,
               alternateMobile: response.data.data.candidateDetail?.alternateMobile.substring(2),
               resume: response.data.data.candidateDetail?.resume,
-              candidateRecruiterDiscussionRecording:response.data.data.candidateRecruiterDiscussionRecording,
-              candidateSkillExplanationRecording:response.data.data.candidateSkillExplanationRecording,
-              candidateMindsetAssessmentLink:response.data.data.candidateMindsetAssessmentLink,
-              candidateAndTechPannelDiscussionRecording:response.data.data.candidateAndTechPannelDiscussionRecording,
-              mainId: response.data.data.mainId, 
-              recruiterId: response.data.data.recruiterId, 
+              document: response.data.data.candidateDetail?.document,
+              photo: response.data.data.candidateDetail?.photo,
+              candidateRecruiterDiscussionRecording: response.data.data.candidateRecruiterDiscussionRecording,
+              candidateSkillExplanationRecording: response.data.data.candidateSkillExplanationRecording,
+              candidateMindsetAssessmentLink: response.data.data.candidateMindsetAssessmentLink,
+              candidateAndTechPannelDiscussionRecording: response.data.data.candidateAndTechPannelDiscussionRecording,
+              mainId: response.data.data.mainId,
+              recruiterId: response.data.data.recruiterId,
               hideContactDetails: response.data.data.hideContactDetails,
-              currentCompanyName:response.data.data.candidateDetail?.currentCompanyName,
+              currentCompanyName: response.data.data.candidateDetail?.currentCompanyName,
+              panNumber: response.data.data.candidateDetail?.panNumber,
+              linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
             });
 
             setState({ ...state, right: true });
             setLoader(false);
-          }  else{
+          } else {
             setLoader(false);
           }
         })
@@ -1428,7 +1517,7 @@ export default function Tables(props) {
     print: false,
     download: false,
     customToolbar: () => <HeaderElements />,
-    onFilterChange: (changedColumn, filterList) => {},
+    onFilterChange: (changedColumn, filterList) => { },
     filterType: "dropdown",
     search: false,
     rowsPerPage: 50,
@@ -1490,8 +1579,10 @@ export default function Tables(props) {
       decode.isEnableFree === true
         ? "YES"
         : decode.isEnablePaid === true
-        ? "NO"
-        : "YES",
+          ? "NO"
+          : "YES",
+    panNumber: "",
+    linkedInProfile: "",
   });
 
   const handleStatusOpen = () => {
@@ -1551,7 +1642,7 @@ export default function Tables(props) {
 
           setLoader(false);
           handleMessageClose();
-          handleNotificationCall("success", response.data.message); 
+          handleNotificationCall("success", response.data.message);
 
         } else {
           setLoader(false);
@@ -1662,7 +1753,7 @@ export default function Tables(props) {
           month={month}
           year={year}
           setPhoneValidation={setPhoneValidation}
-          show ={candidatesEdit.recruiterId=== decode.recruiterId? true : false}  
+          show={candidatesEdit.recruiterId === decode.recruiterId ? true : false}
         />
       </>
     ) : dataList === "VIEW" ? (
@@ -1794,6 +1885,9 @@ export default function Tables(props) {
                 <Actions
                   index={index}
                   item={item}
+                  activeIndex={activeIndex}
+                  handleMenuClick={handleMenuClick}
+                  anchorEl={anchorEl}
                   reset={editreset}
                   editreset={editreset}
                   noteReset={noteReset}
@@ -1804,6 +1898,8 @@ export default function Tables(props) {
                   handleReverseOpen={handleReverseOpen}
                   handleShow={handleShow}
                   setFile={setFile}
+                  setDocFile={setDocFile}
+                  setProfile={setProfile}
                   setAssessment={setAssessment}
                   setCandidatesChange={setCandidatesChange}
                   setPhoneValidation={setPhoneValidation}
@@ -1825,34 +1921,36 @@ export default function Tables(props) {
                 ) : (
                   ""
                 ),
+                <Grid container row spacing={2} className={classes.externalIconContainer} data-candidatename={item.candidateDetail?.firstName + " " + item.candidateDetail?.lastName}>
+                  <div>
+                    {item.candidateDetail?.firstName +
+                      " " +
+                      item.candidateDetail?.lastName}
+                    <br /> {" (" + item.uniqueId + ")"}
+                  </div>
+                </Grid>,
+                item.mainId === decode.mainId ?
+                  <>  {item.candidateDetail?.email + " /"} <br />{"91 " + item.candidateDetail?.mobile.slice(2)}  </>
+                  : item.hideContactDetails !== true ?
+                    <>  {item.candidateDetail?.email + " /"} <br />{"91 " + item.candidateDetail?.mobile.slice(2)}  </>
+                    : "",
                 <>
-                  {item.candidateDetail?.firstName +
-                    " " +
-                    item.candidateDetail?.lastName}
-                  <br /> {" (" + item.uniqueId + ")"}
-                </>,
-                item.mainId === decode.mainId ? 
-                <>  { item.candidateDetail?.email + " /"} <br/>{"91 " + item.candidateDetail?.mobile.slice(2)}  </> 
-                : item.hideContactDetails !== true?
-                <>  { item.candidateDetail?.email + " /"} <br/>{"91 " + item.candidateDetail?.mobile.slice(2)}  </>  
-                :"",
-                <>
-                  
+
                   {item.requirement?.requirementName} <br />
                   {"(" + item.requirement?.uniqueId + ")"}
                 </>,
                 item.recruiter?.firstName + " " + item.recruiter?.lastName,
                 item.requirement?.recruiter?.firstName +
-                  " " +
-                  item.requirement?.recruiter?.lastName,
-                  <Tooltip title="View Candidate" placement="bottom" aria-label="view">
-                 <ViewIcon
-                   className={classes.toolIcon}
-                   onClick={(e) => {
-                     handleShow(item.id,  "VIEW");
-                   }}
-                 />
-               </Tooltip>,
+                " " +
+                item.requirement?.recruiter?.lastName,
+                <Tooltip title="View Candidate" placement="bottom" aria-label="view">
+                  <ViewIcon
+                    className={classes.toolIcon}
+                    onClick={(e) => {
+                      handleShow(item.id, "VIEW");
+                    }}
+                  />
+                </Tooltip>,
                 moment(item.createdAt).format("DD-MM-YYYY"),
               ];
             })}

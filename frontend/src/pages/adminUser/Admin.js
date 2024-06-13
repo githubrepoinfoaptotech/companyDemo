@@ -63,6 +63,7 @@ export default function Admin(props) {
     lastName: "",
     mobile: "",
     companyName: "",
+    companyWebsite: "",
     companyType: "",
     companyAddress: "",
     isActive: "",
@@ -202,6 +203,7 @@ export default function Admin(props) {
       .required("Password is required")
       .min(8, "Password must be at least 8 characters"),
     company: Yup.string().max(255).required("Company Name is required"),
+    companyWebsite: Yup.string().max(255).required("Company Website is required"),
     address: Yup.string().max(255).required("Company Address is required"),
     company_type: Yup.string().required("Select your company type")
   });
@@ -227,6 +229,7 @@ export default function Admin(props) {
       .min(10, "Must be exactly 10 digits")
       .max(10, "Must be exactly 10 digits"),
     company: Yup.string().max(255).required("Company Name is required"),
+    companyWebsite: Yup.string().max(255).required("Company Website is required"),
     address: Yup.string().max(255).required("Company Address is required"),
   });
 
@@ -382,6 +385,7 @@ export default function Admin(props) {
             password: values.password,
             mobile: values.mobile,
             companyName: values.company,
+            companyWebsite: values.companyWebsite,
             companyAddress: values.address,
             company_type: values.company_type
           },
@@ -428,6 +432,7 @@ export default function Admin(props) {
           password: values.password,
           mobile: values.mobile,
           companyName: values.company,
+          companyWebsite: values.companyWebsite,
           companyAddress: values.address,
         },
         headers: {
@@ -761,6 +766,28 @@ export default function Admin(props) {
                       </FormControl>
                     </Grid>
 
+                    <Grid item xs={12} sm={6} lg={6}>
+                      <InputLabel shrink htmlFor="companyWebsite">
+                        Company Website
+                      </InputLabel>
+                      <FormControl className={classes.margin}>
+                        <TextField
+                          classes={{ root: classes.customTextField }}
+                          InputProps={{ disableUnderline: true }}
+                          size="small"
+                          placeholder="Enter company website"
+                          id="companyWebsite"
+                          defaultValue={userEdit.companyWebsite}
+                          {...editUser("companyWebsite")}
+                          error={editErrors.companyWebsite ? true : false}
+                        />
+
+                        <Typography variant="inherit" color="error">
+                          {editErrors.companyWebsite?.message}
+                        </Typography>
+                      </FormControl>
+                    </Grid>
+                    
                     <Grid item xs={12}>
                       <InputLabel shrink htmlFor="address">
                         Company Address
@@ -977,7 +1004,6 @@ export default function Admin(props) {
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>
                     <InputLabel shrink htmlFor="company">
-                      
                       Company Name
                     </InputLabel>
                     <FormControl className={classes.margin}>
@@ -997,10 +1023,28 @@ export default function Admin(props) {
                     </FormControl>
                   </Grid>
 
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    <InputLabel shrink htmlFor="companyWebsite">
+                      Company Website
+                    </InputLabel>
+                    <FormControl className={classes.margin}>
+                      <TextField
+                        classes={{ root: classes.customTextField }}
+                        InputProps={{ disableUnderline: true }}
+                        size="small"
+                        placeholder="Enter company website"
+                        id="companyWebsite"
+                        {...register("companyWebsite")}
+                        error={errors.companyWebsite ? true : false}
+                      />
+                      <Typography variant="inherit" color="error">
+                        {errors.companyWebsite?.message}
+                      </Typography>
+                    </FormControl>
+                  </Grid>
 
                   <Grid item xs={12}  sm={6} md={6} lg={6}>
                     <InputLabel shrink htmlFor="address">
-                      
                       Company Address
                     </InputLabel>
                     <FormControl className={classes.margin}>
@@ -1166,7 +1210,16 @@ export default function Admin(props) {
                     
                     {userEdit.companyName}
                   </Grid>
-
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    
+                    <Typography className={classes.boldtext}>
+                      Company Website
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    
+                    {userEdit.companyWebsite}
+                  </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
                     
                     <Typography className={classes.boldtext}>
@@ -1941,6 +1994,7 @@ export default function Admin(props) {
                               lastName: item.recruiter.lastName,
                               mobile: item.recruiter.mobile,
                               companyName: item.recruiter.companyName,
+                              companyWebsite: item.recruiter.companyWebsite,
                               companyType: item.companyType,
                               companyAddress: item.recruiter.companyAddress,
                               isActive: item.isActive,
@@ -1983,6 +2037,7 @@ export default function Admin(props) {
                                   lastName: item.recruiter.lastName,
                                   mobile: item.recruiter.mobile,
                                   companyName: item.recruiter.companyName,
+                                  companyWebsite: item.recruiter.companyWebsite,
                                   companyType: item.companyType,
                                   companyAddress: item.recruiter.companyAddress,
                                   isActive: item.isActive,

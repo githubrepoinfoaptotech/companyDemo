@@ -292,11 +292,6 @@ export default makeStyles(theme => ({
   noPointer: {
     cursor: "unset"
   },
-
-
-
-
-
   drawerFooter: {
     borderTop: "1px solid rgba(0, 0, 0, 0.1) !important",
     position: "fixed !important",
@@ -382,7 +377,7 @@ export default makeStyles(theme => ({
     columnGap: "10px",
     rowGap: "10px",
     paddingTop: "20px",
-    "& $rti--container": {
+    "& $.rti--container": {
       border: "1px solid #ced4da",
       width: "50% !important",
       borderRadius: "0px",
@@ -411,7 +406,7 @@ export default makeStyles(theme => ({
     color: "white",
     boxShadow: "0 3px 9px 0 rgba(0,0,0,0.3)"
   },
-  cpvIcon:{
+  cpvIcon: {
     cursor: "pointer",
     width: "25px",
     height: "25px",
@@ -1813,15 +1808,15 @@ export default makeStyles(theme => ({
   h34: {
     height: "34px !important",
   },
-  externalIconContainer:{
-    display:'flex',
+  externalIconContainer: {
+    display: 'flex',
     flexDirection: 'row',
-    flexWrap:'nowrap',
-    whiteSpace:'nowrap',
-    width:"160px",
+    flexWrap: 'nowrap',
+    whiteSpace: 'nowrap',
+    width: "160px",
     position: 'relative',
-    "& div":{
-      overflow:'hidden'
+    "& div": {
+      overflow: 'hidden'
     },
     "&:hover::before": {
       content: "attr(data-candidatename)",
@@ -1832,7 +1827,7 @@ export default makeStyles(theme => ({
       color: "#fff",
       fontSize: "11px",
       whiteSpace: "nowrap",
-      borderRadius:'4px',
+      borderRadius: '4px',
     },
     "&:hover::after": {
       content: '""',
@@ -2135,13 +2130,13 @@ export default makeStyles(theme => ({
 
   },
   appBar1: {
-    left: "270px",
+    left: "230px",
     right: "unset",
     boxShadow: "none",
     color: "#000",
     backgroundColor: "white",
     borderBottom: "1px solid #f4f4f4",
-    width: `calc(100vw - ${270 + theme.spacing(3.5)}px)`,
+    width: `calc(100vw - ${230 + theme.spacing(2.5)}px)`,
     transition: theme.transitions.create(["margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -2578,26 +2573,39 @@ export default makeStyles(theme => ({
     },
     padding: "10px 40px"
   },
-  MultiSelectRec:{
-    "& label":{
-      fontSize:'16px'
+  MultiSelectRec: {
+    "& label": {
+      fontSize: '16px'
     },
-    "& div":{
-      "& div":{
+    "& div": {
+      "& div": {
         height: "24px",
-        "& span":{
-          fontSize:'12px'
+        "& span": {
+          fontSize: '12px'
         },
-        "& >svg":{
+        "& >svg": {
           width: "16px",
         }
       }
     }
   },
-  EditRecUserChip:{
+  ProfileLogoContainer: {
+    "& div": {
+      width: '100px',
+      height: '100px'
+    }
+  },
+  acknowledgementCheckBox: {
+    display: "flex",
+    alignItems: "flex-start",
+    "& span:last-child": {
+      padding: '9px 0px'
+    },
+  },
+  EditRecUserChip: {
     '& >div': {
-      width: '25px', 
-      height: '25px', 
+      width: '25px',
+      height: '25px',
     },
   }
 }));

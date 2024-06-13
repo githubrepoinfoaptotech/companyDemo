@@ -182,7 +182,6 @@ export default function Layout(props) {
   const [userName, setUserName] = useState([]);
 
   const [recruiterId, setRecruiterId] = useState(null);
-  console.log(props.statusCode)
 
   useEffect(() => {
     axios({
@@ -219,8 +218,8 @@ export default function Layout(props) {
         draggable: true,
         progress: undefined,
         theme: "light",
-        });
-        
+      });
+
       return
     }
 
@@ -479,7 +478,9 @@ export default function Layout(props) {
             candidateMindsetAssessmentLink: response.data.data.candidateMindsetAssessmentLink,
             candidateAndTechPannelDiscussionRecording: response.data.data.candidateAndTechPannelDiscussionRecording,
             mainId: response.data.data.mainId,
-            isCandidateCpv: response.data.data.isCandidateCpv
+            isCandidateCpv: response.data.data.isCandidateCpv,
+            panNumber: response.data.data.candidateDetail?.panNumber,
+            linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
           });
 
           setState({ ...state, right: true });
@@ -705,9 +706,9 @@ export default function Layout(props) {
             <Tooltip title="SUBVENDOR" placement="bottom" aria-label="title">
               <Avatar alt="Profile" src={external} className={classes.externalIcon} />
             </Tooltip> : ""}
-            <div>
-              {item.candidateDetail?.firstName + " " + item.candidateDetail?.lastName} <br /> {" (" + item.uniqueId + ")"}
-            </div>
+          <div>
+            {item.candidateDetail?.firstName + " " + item.candidateDetail?.lastName} <br /> {" (" + item.uniqueId + ")"}
+          </div>
 
         </div>,
         item.mainId === decode.mainId ?
@@ -717,7 +718,7 @@ export default function Layout(props) {
             : "",
         <> {item.requirement?.requirementName} <br /> {"(" + item.requirement?.uniqueId + ")"}</>,
         item.requirement?.recruiter?.firstName + " " + item.requirement?.recruiter?.lastName,
-        item.requirement?.client?.handler?.firstName +" " +item.requirement?.client?.handler?.lastName,
+        item.requirement?.client?.handler?.firstName + " " + item.requirement?.client?.handler?.lastName,
 
 
 
@@ -744,15 +745,15 @@ export default function Layout(props) {
           </Tooltip>
         </Grid>,
         <Grid container row spacing={2} >
-        <div className={classes.externalIconContainer}>
-          {item.candidate.candidateDetail?.isExternal === "YES" ?
-            <Tooltip title="SUBVENDOR" placement="bottom" aria-label="title">
-              <Avatar alt="Profile" src={external} className={classes.externalIcon} />
-            </Tooltip> : ""}
+          <div className={classes.externalIconContainer}>
+            {item.candidate.candidateDetail?.isExternal === "YES" ?
+              <Tooltip title="SUBVENDOR" placement="bottom" aria-label="title">
+                <Avatar alt="Profile" src={external} className={classes.externalIcon} />
+              </Tooltip> : ""}
             <div>
               {item.candidate.candidateDetail?.firstName + " " + item.candidate.candidateDetail?.lastName} <br />{" (" + item.candidate.uniqueId + ")"}
             </div>
-        </div>
+          </div>
         </Grid>,
 
         item.mainId === decode.mainId ?
@@ -835,7 +836,7 @@ export default function Layout(props) {
       {graphLoader === false ?
         <>
           <Grid container spacing={2} className={Math.max(...invoicedValue) === 0 ? classes.barBlur : classes.barGraph}  >
-        
+
             <ResponsiveContainer width="100%" minWidth={300} height={175} padding={2}>
 
               <ComposedChart margin={{ top: 20, right: 30, left: 0, bottom: 10 }} data={invoicedCandidate}   >
@@ -888,10 +889,10 @@ export default function Layout(props) {
               />
             )}
 
-            <Grid item xs={12} style={{marginLeft:'20px'}}>
-              <Typography style={{color:'#303f9f'}} variant="body1"> Total count of {year + "-" + Number(year + 1) + ":  " + (invoicedValue.reduce((a, v) => a = a + v, 0))}  </Typography>
+            <Grid item xs={12} style={{ marginLeft: '20px' }}>
+              <Typography style={{ color: '#303f9f' }} variant="body1"> Total count of {year + "-" + Number(year + 1) + ":  " + (invoicedValue.reduce((a, v) => a = a + v, 0))}  </Typography>
               {props.statusCode === 312 &&
-                <Typography style={{color:'#368413'}} variant="body1"> Total Invoice Amount of {year + "-" + Number(year + 1) + ":  " + (invoicedTotalAmt.reduce((a, v) => a = a + v, 0))}  </Typography>
+                <Typography style={{ color: '#368413' }} variant="body1"> Total Invoice Amount of {year + "-" + Number(year + 1) + ":  " + (invoicedTotalAmt.reduce((a, v) => a = a + v, 0))}  </Typography>
               }
             </Grid>
           </Grid>

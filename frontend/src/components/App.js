@@ -18,6 +18,7 @@ import candidateCPV from "../pages/register/candidateCPV";
 import Layouts from "../pages/share/Shortlist";
 import ApproveMail from "../pages/mailApproval/ApproveMail";
 import PageNotFound from "./page_not_found/PageNotFound";
+import CandidateCPVconfirmation from "../pages/register/CandidateCPVconfirmation";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
   import.meta.url,
@@ -44,6 +45,7 @@ export default function App() {
         <PublicRoute path="/auth/forget/:id" component={Forget} />
         <PublicRoute path="/author269" component={Author269} />
         <PublicRoute path="/candidateCPV" component={candidateCPV} />
+        <PublicRoute path="/candidateConfirmationCPV" component={CandidateCPVconfirmation} />
         <PublicRoute path="/shortlist" component={Layouts} />
         <Route path="" component={PageNotFound} />
         <Route component={Error} />

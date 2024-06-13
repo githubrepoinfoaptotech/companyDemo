@@ -98,7 +98,6 @@ export default function Add(props) {
   };
 
   const handleSendApprove = async (id) => {
-    console.log(id);
     try {
       const response = await axios({
         method: 'post',

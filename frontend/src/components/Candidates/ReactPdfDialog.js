@@ -1,4 +1,4 @@
-import React,{ useState } from "react";
+import React, { useState } from "react";
 import {
   Grid,
   Button,
@@ -63,7 +63,6 @@ const ReactPdfDialog = (props) => {
     return textContent.items;
   };
 
-
   return (
     <>
       <Dialog
@@ -80,36 +79,35 @@ const ReactPdfDialog = (props) => {
       >
         <DialogContent>
           <Grid container direction="row" spacing={2}>
-            <div className={classes.heading + " " + classes.inputRoot} style={{position:"absolute",zIndex:1,background:'#fff',    top: 0,padding: "6px 30px"}}>
+            <div className={classes.heading + " " + classes.inputRoot} style={{ position: "absolute", zIndex: 1, background: '#fff', top: 0, padding: "6px 30px" }}>
               <Typography variant="subtitle2" className={classes.inputRoot}>  Updated Resume </Typography>
               <div className={classes.drawerClose}>
                 <CloseIcon className={classes.closeBtn} onClick={props.handleResumeClose} />
               </div>
             </div>
             <Grid item xs={12}>
-            {isFileType ==="pdf" ?
-              <Document file={props.resume[0]?.url} onLoadSuccess={onDocumentLoadSuccess} width="100%">
-              {Array.from(new Array(numPages), (el, index) => (
-                <div key={`page_${index + 1}`} className="page">
-                  <Page
-                    pageNumber={index + 1}
-                    renderTextLayer={false}
-                    customTextRenderer={() => (
-                      <TextLayerWithHighlights textItems={textItems} wordsToHighlight={['HRMS', 'JAVA', 'Indeed']} />
-                    )}
-                  />
+              {isFileType === "pdf" ?
+                <Document file={props.resume[0]?.url} onLoadSuccess={onDocumentLoadSuccess} width="100%">
+                  {Array.from(new Array(numPages), (el, index) => (
+                    <div key={`page_${index + 1}`} className="page">
+                      <Page
+                        pageNumber={index + 1}
+                        renderTextLayer={false}
+                        customTextRenderer={() => (
+                          <TextLayerWithHighlights textItems={textItems} wordsToHighlight={['HRMS', 'JAVA', 'Indeed']} />
+                        )}
+                      />
+                    </div>
+                  ))}
+                </Document>
+                :
+                <div className={classes.iframediv} style={{ marginTop: "40px" }}>
+                  <iframe className="iframe" src={"https://docs.google.com/gview?url=" + props.resume[0]?.url + "&embedded=true"} title="File" width="100%" height="500" sandbox="allow-scripts allow-same-origin"> </iframe>
+                  <div className={classes.iframeLogo} >
+                  </div>
                 </div>
-              ))}
-              </Document>
-            :
-              <div className={classes.iframediv} style={{marginTop: "40px"}}>
-                <iframe className="iframe" src={"https://docs.google.com/gview?url=" + props.resume[0]?.url + "&embedded=true"} title="File" width="100%" height="500" sandbox="allow-scripts allow-same-origin"> </iframe>
-                <div className={classes.iframeLogo} >
-                </div>
-              </div>
-            }
+              }
             </Grid>
-
 
             <div className={classes.sendWhatsapp + " " + classes.inputRoot}>
               <Button variant="contained" size="small" color="secondary" onClick={props.handleResumeClose}>

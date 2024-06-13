@@ -8,10 +8,9 @@ import {
 
 } from "@material-ui/core";
 import useStyles from "../../themes/style.js";
-import CloseIcon from "@material-ui/icons/Close";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-
+import copy from 'copy-to-clipboard';
 
 const CPVFormView = (props) => {
 
@@ -19,7 +18,6 @@ const CPVFormView = (props) => {
     const [cpvForm, setCpvForm] = useState([]);
     const [candidateView, setCandidateView] = useState({
     })
-    console.log(candidateView, '-=-=')
     const token = localStorage.getItem("token");
     const decode = jwtDecode(token);
     useEffect(() => {
@@ -30,6 +28,16 @@ const CPVFormView = (props) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.cpvOpen]);
 
+
+    function handleCopy(candidateLink) {
+        try {
+            copy(candidateLink)
+            props.handleNotificationCall("success", "Copied")
+        } catch (error) {
+            console.log(error)
+            props.handleNotificationCall("error", "error")
+        }
+    }
 
     function fetchCPVData() {
         props.setLoader(true)
@@ -60,10 +68,10 @@ const CPVFormView = (props) => {
 
     function getCandidateDate() {
         props.setLoader(true)
-        let url =""
-        if (decode.role ==="ADMIN") {
+        let url = ""
+        if (decode.role === "ADMIN") {
             url = `${process.env.REACT_APP_SERVER}admin/viewCandidate`
-        }else{
+        } else {
             url = `${process.env.REACT_APP_SERVER}recruiter/candidate`
         }
         axios({
@@ -92,7 +100,6 @@ const CPVFormView = (props) => {
 
     return (
         <>
-
             <Dialog
                 aria-labelledby="dialog-title"
                 onClose={props.handleCPVClose}
@@ -118,26 +125,28 @@ const CPVFormView = (props) => {
                                     >
                                         Candidate Probing & Validation Form
                                     </Typography>
-                                    <Button
-                                        variant="contained"
-                                        size="small"
-                                        color="primary"
-                                        style={{ position: 'absolute', right: 10, top: 10 }}
-                                        onClick={(e) => {
-                                            window.open(
-                                                `https://api.whatsapp.com/send?phone=+${candidateView.candidateDetail?.mobile
-                                                }&text="Hi ${candidateView.candidateDetail?.firstName +
-                                                "" +
-                                                candidateView.candidateDetail?.lastName
-                                                }, view link and confirm ${process.env.REACT_APP_SITE
-                                                }v1/%23/candidateCPV?candidateId=${candidateView?.id
-                                                }"`,
-                                            );
-                                        }}
-                                    >
 
-                                        {`Get  ${candidateView.candidateDetail?.firstName} ${candidateView.candidateDetail?.lastName} Confirmation`}
-                                    </Button>
+                                    {cpvForm?.candidateConformation === true ?
+                                        <Button
+                                            variant="contained"
+                                            size="small"
+                                            style={{ position: 'absolute', right: 10, top: 10, zIndex: 1, background: '#06D001', color: '#fff' }}
+                                        >
+                                            {`${candidateView.candidateDetail?.firstName} ${candidateView.candidateDetail?.lastName} has Confirmed`}
+                                        </Button>
+                                        :
+                                        <Button
+                                            variant="contained"
+                                            size="small"
+                                            color="primary"
+                                            style={{ position: 'absolute', right: 10, top: 10, zIndex: 1 }}
+                                            onClick={() => {
+                                                handleCopy(`${process.env.REACT_APP_SITE}v1/#/candidateConfirmationCPV?candidateId=${candidateView?.id}`)
+                                            }}
+                                        >
+                                            {`Copy link to get ${candidateView.candidateDetail?.firstName} ${candidateView.candidateDetail?.lastName} Confirmation`}
+                                        </Button>
+                                    }
 
                                 </div>
                                 <Grid
@@ -198,7 +207,7 @@ const CPVFormView = (props) => {
                                         </span>
                                     </Grid>
 
-                                    <Grid item xs={12} sm={6} md={6} lg={6}>
+                                    {/* <Grid item xs={12} sm={6} md={6} lg={6}>
                                         <Typography>
                                             Interested for Job Role Responsibilities
                                         </Typography>
@@ -206,13 +215,13 @@ const CPVFormView = (props) => {
 
                                     <Grid item xs={12} sm={3} md={3} lg={3}>
                                         {cpvForm?.jobResponsibilities}
-                                    </Grid>
+                                    </Grid> 
 
                                     <Grid item xs={12} sm={3} md={3} lg={3}>
                                         <span className={classes.greenColor}>
                                             {cpvForm?.jobResponsibilities !== null ? "Yes" : ""}
                                         </span>
-                                    </Grid>
+                                    </Grid>*/}
 
                                     <Grid item xs={12} sm={6} md={6} lg={6}>
                                         <Typography>
@@ -336,13 +345,13 @@ const CPVFormView = (props) => {
                                     <Grid item xs={12} sm={3} md={3} lg={3}>
                                         <Grid item xs={12} sm={6} md={6} lg={6}>
                                             <Typography>
-                                                Current CTC : {cpvForm?.currentCtcAndTakeHome}
+                                                Current CTC : {cpvForm?.currentCtcAndTakeHome?.split(", ")[0]}
                                             </Typography>
                                         </Grid>
 
                                         <Grid item xs={12} sm={6} md={6} lg={6}>
                                             <Typography>
-                                                Current Take Home: {cpvForm?.currentTakeHome}
+                                                Current Take Home: {cpvForm?.currentCtcAndTakeHome?.split(", ")[1]}
                                             </Typography>
                                         </Grid>
                                     </Grid>
@@ -362,13 +371,13 @@ const CPVFormView = (props) => {
                                     <Grid item xs={12} sm={3} md={3} lg={3}>
                                         <Grid item xs={12} sm={6} md={6} lg={6}>
                                             <Typography>
-                                                Expected CTC : {cpvForm?.expectedCtcAndTakeHome}
+                                                Expected CTC :  {cpvForm?.expectedCtcAndTakeHome?.split(", ")[0]}
                                             </Typography>
                                         </Grid>
 
                                         <Grid item xs={12} sm={6} md={6} lg={6}>
                                             <Typography>
-                                                Expected Take Home: {cpvForm?.expectedTakeHome}
+                                                Expected Take Home: {cpvForm?.expectedCtcAndTakeHome?.split(", ")[1]}
                                             </Typography>
                                         </Grid>
                                     </Grid>
@@ -431,7 +440,7 @@ const CPVFormView = (props) => {
                                     <Grid item xs={12} sm={6} md={6} lg={6}>
                                         <Typography>
                                             Confirm that on selection for Offer that you have all
-                                            relevant documents in order to submit for Offer
+                                            relevant documents in-order to submit for Offer
                                             release and onboarding
                                         </Typography>
                                     </Grid>

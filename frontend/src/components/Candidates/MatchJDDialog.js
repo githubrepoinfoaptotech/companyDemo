@@ -21,7 +21,6 @@ const MatchJDDialog = (props) => {
   const decode = jwtDecode(token);
 
   const handleChange = (event, value) => {
-    console.log(value);
     if (value) {
       props.cvMatchingPercentage(props.candidMatchId, value.id);
     }

@@ -391,7 +391,7 @@ export default function AddProject(props) {
                   ))}
                 <div id="section-level-of-hire"> </div>
                 <Grid item xs lg={3}></Grid>
-                  {props.recruiterFields.map((user, index) =>{ console.log(user)
+                  {props.recruiterFields.map((user, index) =>{
                     return(
                     <div key={index} className={classNames(classes.fields)}>
                       <Grid

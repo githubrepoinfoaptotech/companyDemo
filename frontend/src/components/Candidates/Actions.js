@@ -13,35 +13,33 @@ import { jwtDecode } from "jwt-decode";
 
 const Actions = (props) => {
   const classes = useStyles();
-
-  const [menu, setMenu] = useState(false);
   const token = localStorage.getItem("token");
   const decode = jwtDecode(token);
+
+  const handleClick = (e) => {
+    e.stopPropagation();
+    props.handleMenuClick(props.index, e);
+  };
 
   return (
     <>
       <MoreVertIcon
         key={props.index}
         className={classes.actions}
-        onClick={(e) => {
-          e.stopPropagation();
-          setMenu(e.currentTarget);
-        }}
+        onClick={handleClick}
       />
       <div className={classes.actionBtnPosition}>
-        <Popper open={menu} anchorEl={menu} className={classes.actionBtnZIndex}>
-          <ClickAwayListener
-            onClickAway={e => {
-              setMenu(false);
-            }}
-          >
+        <Popper open={props.index === props.activeIndex} anchorEl={props.anchorEl} className={classes.actionBtnZIndex}>
+          <ClickAwayListener onClickAway={() => props.handleMenuClick(props.index, null)}>
             <div className={classes.actiondrop}>
 
               <MenuItem onClick={(e) => {
-                setMenu(false);
+                props.handleMenuClick(props.index, null);
                 props.setPhoneValidation(false);
                 props.editreset();
                 props.setFile([]);
+                props.setDocFile([]);
+                props.setProfile([]);
                 props.setAssessment([]);
                 props.handleShow(props.item.id, "EDIT");
               }} >
@@ -56,7 +54,7 @@ const Actions = (props) => {
 
               {/* 
   <MenuItem    onClick={(e) => {
-      setMenu(false);
+      props.handleMenuClick(props.index, null);
       props.handleShow(props.item.id, "VIEW");
     }}   >
 <Tooltip title="View Candidate" placement="right" aria-label="view">
@@ -73,7 +71,7 @@ const Actions = (props) => {
                 <>
                   {props.item.statusCode !== 301 ? (
                     <MenuItem onClick={(e) => {
-                      setMenu(false);
+                      props.handleMenuClick(props.index, null);
                       props.handleReverseOpen();
                       props.setCandidateList({
                         ...props.candidateList,
@@ -101,7 +99,7 @@ const Actions = (props) => {
               )}
 
               <MenuItem onClick={(e) => {
-                setMenu(false);
+                props.handleMenuClick(props.index, null);
                 props.handleShow(props.item.id, "NOTES");
                 props.noteReset();
               }}    >
@@ -120,7 +118,7 @@ const Actions = (props) => {
               {props.item.free === "NO" ? (
                 <>
                   <MenuItem onClick={(e) => {
-                    setMenu(false);
+                    props.handleMenuClick(props.index, null);
                     props.handleMessageOpen();
                     props.setCandidateList({
                       ...props.candidateList,
@@ -167,7 +165,7 @@ const Actions = (props) => {
               )}
 
 
-              <MenuItem onClick={(e) => { setMenu(false); props.handleUse(props.item.candidateDetail?.mobile) }}    >
+              <MenuItem onClick={(e) => { props.handleMenuClick(props.index, null); props.handleUse(props.item.candidateDetail?.mobile) }}    >
                 <Tooltip
                   title="Reuse Candidate"
                   placement="right"
@@ -191,7 +189,7 @@ const Actions = (props) => {
                 props.item.statusCode === 307 ? (
                 <MenuItem
                   onClick={(e) => {
-                    setMenu(false);
+                    props.handleMenuClick(props.index, null);
                     props.handleDropOpen();
                     props.setCandidateList({
                       ...props.candidateList,
@@ -214,8 +212,6 @@ const Actions = (props) => {
               ) : (
                 ""
               )}
-
-
             </div>
           </ClickAwayListener>
         </Popper>
