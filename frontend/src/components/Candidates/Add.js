@@ -63,14 +63,14 @@ export default function Add(props) {
   function handleChange(event) {
     setFileName(event.target.name);
     props.setFile(event.target.files[0]);
-     extractEmail(event.target.files[0])
+    extractEmail(event.target.files[0])
   }
 
   function handleDocUploadChange(event) {
     setDocFileName(event.target.name);
     props.setDocFile(event.target.files[0]);
   }
-  
+
   function handleProfileChange(event) {
     setProfileFileName(event.target.name);
     props.setProfile(event.target.files[0]);
@@ -79,8 +79,6 @@ export default function Add(props) {
   const days = dob[0];
   const months = dob[1];
   const years = dob[2];
-
-
   const [disabled, setDisabled] = useState(props.requirementId !== "false" ? decode.role !== "SUBVENDOR" && decode.role !== "FREELANCER" ? true : false : false);
 
   const [hoverText, setHoverText] = React.useState({
@@ -88,7 +86,6 @@ export default function Add(props) {
     email: null
   });
 
-  
   function extractEmail(resumeFile) {
     const formData = new FormData();
     formData.append('resume', resumeFile);
@@ -104,7 +101,7 @@ export default function Add(props) {
     }).then(function (response) {
       if (response.data.status === true) {
         const candidateExtractEmail = response.data.data.candidate_email
-        const candidateExtractMobile =response.data.data.candidate_mobile
+        const candidateExtractMobile = response.data.data.candidate_mobile
         props.setCandidate({
           ...props.candidate,
           email: candidateExtractEmail,
@@ -256,138 +253,138 @@ export default function Add(props) {
                           Select Requirement
                         </InputLabel>
 
-                    {decode.companyType === "COMPANY" && decode.role ==="CLIENTCOORDINATOR" 
-                      ?
-                      <Autocomplete
-                          options={props.requirement}
-                          onChange={(e, value) => {
-                            setDisabled(false);
-                            props.setRecruitmentId(decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? value.requirementId : value.id);
+                        {decode.companyType === "COMPANY" && decode.role === "CLIENTCOORDINATOR"
+                          ?
+                          <Autocomplete
+                            options={props.requirement}
+                            onChange={(e, value) => {
+                              setDisabled(false);
+                              props.setRecruitmentId(decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? value.requirementId : value.id);
 
-                            props.reset({
-                              requirementId: decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? value.requirementId : value.id,
-                            });
-                            props.setLoader(true);
-                            var url = "";
-                            if (decode.role === "SUBVENDOR" || decode.role === "FREELANCER") {
-                              url = `${process.env.REACT_APP_SERVER}recruiter/getRequirement`;
-                            } else {
-                              url = `${process.env.REACT_APP_SERVER}CC/getRequirement`;
-                            }
-                            axios({
-                              method: "post",
-                              url: url,
-                              data: {
-                                id: decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? value.requirementId : value.id,
-                              },
-                              headers: {
-                                "Content-Type": "application/json",
-                                Authorization: token,
-                              },
-                            }).then(function (response) {
-                              if (response.data.status === true) {
-
-                                props.setLoader(false);
-                                props.setRecruitmentList({
-                                  ...props.requirementList,
-                                  id: response.data.data.id,
-                                  requirementName: response.data.data.requirementName,
-                                  clientId: response.data.data.clientId,
-                                  skills: response.data.data.skills,
-                                  orgRecruiterId: decode.companyType === "COMPANY" ? "" : response.data.data.orgRecruiter.id,
-                                  orgRecruiterName: decode.companyType === "COMPANY" ? "" : response.data.data.orgRecruiter.name,
-                                  jobLocation: response.data.data.jobLocation,
-                                  experience: response.data.data.experience,
-                                  clientUniqueId: response.data.data.client?.uniqueId,
-                                  clientName: response.data.data.client?.clientName,
-                                  status: response.data.data.statusList?.statusName,
-                                  uniqueId: response.data.data.uniqueId,
-                                });
+                              props.reset({
+                                requirementId: decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? value.requirementId : value.id,
+                              });
+                              props.setLoader(true);
+                              var url = "";
+                              if (decode.role === "SUBVENDOR" || decode.role === "FREELANCER") {
+                                url = `${process.env.REACT_APP_SERVER}recruiter/getRequirement`;
+                              } else {
+                                url = `${process.env.REACT_APP_SERVER}CC/getRequirement`;
                               }
-                            });
-                          }}
-                          getOptionLabel={(option) => decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? option.requirement?.requirementName + " (" + option.requirement?.uniqueId + ")" : option.requirementName + " (" + option.uniqueId + ")"}
-                          disableClearable={true}
-                          error={props.errors.requirementId ? true : false}
-                          classes={{
-                            popupIndicator: classes.autocompleteIndicator,
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              variant="filled"
-                              placeholder="Select Requirement"
-                              name="requirementId"
-                              className="requirement"
-                            />
-                          )}
-                        />
-                      :
-                        <Autocomplete
-                          options={props.requirement}
-                          onChange={(e, value) => {
-                            setDisabled(false);
-                            props.setRecruitmentId(decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? value.requirementId : value.id);
+                              axios({
+                                method: "post",
+                                url: url,
+                                data: {
+                                  id: decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? value.requirementId : value.id,
+                                },
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  Authorization: token,
+                                },
+                              }).then(function (response) {
+                                if (response.data.status === true) {
 
-                            props.reset({
-                              requirementId: decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? value.requirementId : value.id,
-                            });
-                            props.setLoader(true);
-                            var url = "";
-                            if (decode.role === "SUBVENDOR" || decode.role === "FREELANCER") {
-                              url = `${process.env.REACT_APP_SERVER}recruiter/getRequirement`;
-                            } else {
-                              url = `${process.env.REACT_APP_SERVER}CC/getRequirement`;
-                            }
-                            axios({
-                              method: "post",
-                              url: url,
-                              data: {
-                                id: decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? value.requirementId : value.id,
-                              },
-                              headers: {
-                                "Content-Type": "application/json",
-                                Authorization: token,
-                              },
-                            }).then(function (response) {
-                              if (response.data.status === true) {
+                                  props.setLoader(false);
+                                  props.setRecruitmentList({
+                                    ...props.requirementList,
+                                    id: response.data.data.id,
+                                    requirementName: response.data.data.requirementName,
+                                    clientId: response.data.data.clientId,
+                                    skills: response.data.data.skills,
+                                    orgRecruiterId: decode.companyType === "COMPANY" ? "" : response.data.data.orgRecruiter.id,
+                                    orgRecruiterName: decode.companyType === "COMPANY" ? "" : response.data.data.orgRecruiter.name,
+                                    jobLocation: response.data.data.jobLocation,
+                                    experience: response.data.data.experience,
+                                    clientUniqueId: response.data.data.client?.uniqueId,
+                                    clientName: response.data.data.client?.clientName,
+                                    status: response.data.data.statusList?.statusName,
+                                    uniqueId: response.data.data.uniqueId,
+                                  });
+                                }
+                              });
+                            }}
+                            getOptionLabel={(option) => decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? option.requirement?.requirementName + " (" + option.requirement?.uniqueId + ")" : option.requirementName + " (" + option.uniqueId + ")"}
+                            disableClearable={true}
+                            error={props.errors.requirementId ? true : false}
+                            classes={{
+                              popupIndicator: classes.autocompleteIndicator,
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                variant="filled"
+                                placeholder="Select Requirement"
+                                name="requirementId"
+                                className="requirement"
+                              />
+                            )}
+                          />
+                          :
+                          <Autocomplete
+                            options={props.requirement}
+                            onChange={(e, value) => {
+                              setDisabled(false);
+                              props.setRecruitmentId(decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? value.requirementId : value.id);
 
-                                props.setLoader(false);
-                                props.setRecruitmentList({
-                                  ...props.requirementList,
-                                  id: response.data.data.id,
-                                  requirementName: response.data.data.requirementName,
-                                  clientId: response.data.data.clientId,
-                                  skills: response.data.data.skills,
-                                  orgRecruiterId: decode.companyType === "COMPANY" ? "" : response.data.data.orgRecruiter.id,
-                                  orgRecruiterName: decode.companyType === "COMPANY" ? "" : response.data.data.orgRecruiter.name,
-                                  jobLocation: response.data.data.jobLocation,
-                                  experience: response.data.data.experience,
-                                  clientUniqueId: response.data.data.client?.uniqueId,
-                                  clientName: response.data.data.client?.clientName,
-                                  status: response.data.data.statusList?.statusName,
-                                  uniqueId: response.data.data.uniqueId,
-                                });
+                              props.reset({
+                                requirementId: decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? value.requirementId : value.id,
+                              });
+                              props.setLoader(true);
+                              var url = "";
+                              if (decode.role === "SUBVENDOR" || decode.role === "FREELANCER") {
+                                url = `${process.env.REACT_APP_SERVER}recruiter/getRequirement`;
+                              } else {
+                                url = `${process.env.REACT_APP_SERVER}CC/getRequirement`;
                               }
-                            });
-                          }}
-                          getOptionLabel={(option) => decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? option.requirement?.requirementName + " (" + option.requirement?.uniqueId + ")" : option.requirementName + " (" + option.uniqueId + ")"}
-                          disableClearable={true}
-                          error={props.errors.requirementId ? true : false}
-                          classes={{
-                            popupIndicator: classes.autocompleteIndicator,
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              variant="filled"
-                              placeholder="Select Requirement"
-                              name="requirementId"
-                              className="requirement"
-                            />
-                          )}
-                        />
-                    }
+                              axios({
+                                method: "post",
+                                url: url,
+                                data: {
+                                  id: decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? value.requirementId : value.id,
+                                },
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  Authorization: token,
+                                },
+                              }).then(function (response) {
+                                if (response.data.status === true) {
+
+                                  props.setLoader(false);
+                                  props.setRecruitmentList({
+                                    ...props.requirementList,
+                                    id: response.data.data.id,
+                                    requirementName: response.data.data.requirementName,
+                                    clientId: response.data.data.clientId,
+                                    skills: response.data.data.skills,
+                                    orgRecruiterId: decode.companyType === "COMPANY" ? "" : response.data.data.orgRecruiter.id,
+                                    orgRecruiterName: decode.companyType === "COMPANY" ? "" : response.data.data.orgRecruiter.name,
+                                    jobLocation: response.data.data.jobLocation,
+                                    experience: response.data.data.experience,
+                                    clientUniqueId: response.data.data.client?.uniqueId,
+                                    clientName: response.data.data.client?.clientName,
+                                    status: response.data.data.statusList?.statusName,
+                                    uniqueId: response.data.data.uniqueId,
+                                  });
+                                }
+                              });
+                            }}
+                            getOptionLabel={(option) => decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? option.requirement?.requirementName + " (" + option.requirement?.uniqueId + ")" : option.requirementName + " (" + option.uniqueId + ")"}
+                            disableClearable={true}
+                            error={props.errors.requirementId ? true : false}
+                            classes={{
+                              popupIndicator: classes.autocompleteIndicator,
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                variant="filled"
+                                placeholder="Select Requirement"
+                                name="requirementId"
+                                className="requirement"
+                              />
+                            )}
+                          />
+                        }
 
                         <Typography variant="inherit" color="error">
                           {props.errors.requirementId?.message}
@@ -680,12 +677,10 @@ export default function Add(props) {
 
                   <Grid item xs={12} sm={6} md={3} lg={3}>
                     <InputLabel shrink htmlFor="gender">
-
                       Gender
                     </InputLabel>
                     <FormControl className={classes.margin}>
                       <Select
-
                         name="gender"
                         value={props.candidate.gender}
                         defaultValue={props.candidate.gender}
@@ -708,13 +703,76 @@ export default function Add(props) {
                         <MenuItem value="Female">Female</MenuItem>
                         <MenuItem value="Transgender">Transgender</MenuItem>
                         <MenuItem value="Prefer not to say">Prefer not to say</MenuItem>
-
                       </Select>
-
                       <Typography variant="inherit" color="error">
                         {props.errors.gender?.message}
                       </Typography>
                     </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} md={3} lg={3}>
+                    <InputLabel shrink htmlFor="dob">
+                      DOB
+                    </InputLabel>
+                    <FormControl
+                      className={classes.margin + " " + classes.dateSelect}
+                    >
+                      <select
+                        defaultValue={days}
+                        onChange={(e) => {
+                          props.setDay(e.target.value);
+                        }}
+                        {...props.register("day")}
+                        className={classes.selectDrop}
+                        required
+                      >
+                        <option value="">DD</option>
+                        {props.days.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+
+                      <select
+                        defaultValue={months}
+                        onChange={(e) => {
+                          props.setMonth(e.target.value);
+                        }}
+                        {...props.register("month")}
+                        className={classes.selectDrop}
+                        required
+                      >
+                        <option value="">MM</option>
+                        {props.months.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+
+                      <select
+                        defaultValue={years}
+                        onChange={(e) => {
+                          props.setYear(e.target.value);
+                        }}
+                        {...props.register("year")}
+                        className={classes.selectDrop}
+                        required
+                      >
+                        <option value="">YYYY</option>
+                        {props.years.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    </FormControl>
+                    <Typography variant="inherit" color="error">
+                      {props.errors.day?.message &&
+                        props.errors.month?.message &&
+                        props.errors.year?.message}
+                    </Typography>
                   </Grid>
 
                   <Grid item xs={6} sm={6} md={3} lg={3}>
@@ -815,7 +873,6 @@ export default function Add(props) {
                       </Grid>
                       <Grid item xs={6} sm={6} md={3} lg={3}>
                         <InputLabel shrink htmlFor="resume">
-
                           Upload Photograph
                         </InputLabel>
                         <FormControl className={classes.margin}>
@@ -1006,12 +1063,6 @@ export default function Add(props) {
                       </FormControl>
                     </Grid> </> : ""}
 
-
-
-
-
-
-
                   <Grid item xs={12} className={classes.drawerClose}>
                     {display === false ? (
                       <Button
@@ -1044,72 +1095,6 @@ export default function Add(props) {
 
                   {display === true ? (
                     <>
-                      <Grid item xs={12} sm={6} md={3} lg={3}>
-                        <InputLabel shrink htmlFor="dob">
-
-                          DOB
-                        </InputLabel>
-                        <FormControl
-                          className={classes.margin + " " + classes.dateSelect}
-                        >
-                          <select
-
-                            defaultValue={days}
-                            onChange={(e) => {
-                              props.setDay(e.target.value);
-                            }}
-                            {...props.register("day")}
-                            className={classes.selectDrop}
-                          >
-                            <option value=""> </option>
-                            {props.days.map((option) => (
-                              <option key={option} value={option}>
-                                {option}
-                              </option>
-                            ))}
-                          </select>
-
-                          <select
-
-                            defaultValue={months}
-                            onChange={(e) => {
-                              props.setMonth(e.target.value);
-                            }}
-                            {...props.register("month")}
-                            className={classes.selectDrop}
-                          >
-                            <option value=""> </option>
-                            {props.months.map((option) => (
-                              <option key={option} value={option}>
-                                {option}
-                              </option>
-                            ))}
-                          </select>
-
-                          <select
-
-                            defaultValue={years}
-                            onChange={(e) => {
-                              props.setYear(e.target.value);
-                            }}
-                            {...props.register("year")}
-                            className={classes.selectDrop}
-                          >
-                            <option value=""> </option>
-                            {props.years.map((option) => (
-                              <option key={option} value={option}>
-                                {option}
-                              </option>
-                            ))}
-                          </select>
-                        </FormControl>
-                        <Typography variant="inherit" color="error">
-                          {props.errors.day?.message &&
-                            props.errors.month?.message &&
-                            props.errors.year?.message}
-                        </Typography>
-                      </Grid>
-
                       <Grid item xs={12} sm={6} md={3} lg={3}>
                         <InputLabel shrink htmlFor="currentCompanyName">
                           Current Company Name
@@ -1384,7 +1369,7 @@ export default function Add(props) {
                         </FormControl>
                       </Grid>
 
-                        {decode.companyType !=="COMPANY" &&
+                      {decode.companyType !== "COMPANY" &&
                         <>
                           <Grid item xs={12} sm={6} md={5} lg={5}>
                             <InputLabel shrink htmlFor="candidateRecruiterDiscussionRecording">
@@ -1520,7 +1505,7 @@ export default function Add(props) {
                             </FormControl>
                           </Grid>
                         </>
-                        }
+                      }
 
                       <Grid item xs={12} sm={6} md={3} lg={3}>
                         <InputLabel shrink htmlFor="currentCtc">

@@ -2607,6 +2607,42 @@ export default makeStyles(theme => ({
       width: '25px',
       height: '25px',
     },
+  },
+  documentViewBtn: {
+    display: "flex",
+    flexDirection: "row",
+    border: "none",
+    outline:'none',
+    background: "linear-gradient(0deg, #08264a 0%, #08264a 100%)", 
+    color: "#fff",
+    width: "fit-content",
+    padding: "2px 8px",
+    borderRadius: "4px",
+    alignItems: "center",
+    gap: '5px',
+    cursor:'pointer',
+    boxShadow:'inset 1px 1px 2px 0px rgba(255, 255, 255, .5), 4px 4px 20px 0px rgba(0, 0, 0, .1), 4px 4px 5px 0px rgba(0, 0, 0, .1)',
+    "&:hover":{
+      background: "linear-gradient(0deg, #092647 0%, #3968a0 100%)", 
+    }
+  },
+  photoViewbtn: {
+    display: "flex",
+    flexDirection: "row",
+    border: "none",
+    outline:'none',
+    background: "linear-gradient(0deg, #e91874 0%, #e91874 100%)",
+    color: "#fff",
+    width: "fit-content",
+    padding: "2px 8px",
+    borderRadius: "4px",
+    alignItems: "center",
+    gap: '5px',
+    cursor:'pointer',
+    boxShadow:'inset 1px 1px 2px 0px rgba(255, 255, 255, .5), 4px 4px 20px 0px rgba(0, 0, 0, .1), 4px 4px 5px 0px rgba(0, 0, 0, .1)',
+    "&:hover":{
+      background: "linear-gradient(0deg, #c2095b 0%, #de488a 100%)", 
+    }
   }
 }));
 

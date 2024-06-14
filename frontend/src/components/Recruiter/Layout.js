@@ -872,6 +872,10 @@ export default function Tables(props) {
 
   function handleEdit(values) {
     return new Promise((resolve) => {
+      if (!values.day || !values.month || !values.year) {
+        handleNotificationCall("error", "Please select the date of birth properly.");
+        return;
+      }
       setLoader(true);
       var dob = values.day + "-" + values.month + "-" + values.year;
 

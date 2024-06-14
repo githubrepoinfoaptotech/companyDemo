@@ -709,6 +709,10 @@ export default function Tables() {
   }
 
   function handleAddList(send) {
+    if (!addList.day || !addList.month || !addList.year) {
+      handleNotificationCall("error", "Please select the date of birth properly.");
+      return;
+    }
     setLoader(true);
     var url = "";
     var data = {};

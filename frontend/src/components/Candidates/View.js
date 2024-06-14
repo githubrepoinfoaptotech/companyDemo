@@ -15,6 +15,8 @@ import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardMedia";
 import CardActions from "@material-ui/core/CardActions";
 import CloseIcon from "@material-ui/icons/Close";
+import { IoMdPhotos } from "react-icons/io";
+import { IoDocumentText } from "react-icons/io5";
 
 import WhatsappIcon from "@material-ui/icons/WhatsApp";
 import MUIDataTable from "mui-datatables";
@@ -26,16 +28,28 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { RemoveRedEye } from "@material-ui/icons";
 import Slider from "react-slick";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import copy from 'copy-to-clipboard';
 
 import "react-toastify/dist/ReactToastify.css";
+import ViewFiles from "./ViewFiles.js";
 
 export default function View(props) {
 
   const positions = [toast.POSITION.TOP_RIGHT];
   var [errorToastId, setErrorToastId] = useState(null);
-  
+  const [docFile, setDocFile] = useState("")
+  const [fileType, setFileType] = useState("")
+  const [fileOpen, setFileOpen] = useState(false)
+  const handleFileClose =() =>{
+    setFileOpen(false)
+  }
+  const handleFileOpen =(fileUrl,type) =>{
+    console.log(fileUrl)
+    setDocFile(fileUrl)
+    setFileType(type)
+    setFileOpen(true)
+  }
   function sendNotification(componentProps, options) {
     return toast(
       <Notification
@@ -112,7 +126,7 @@ export default function View(props) {
 
   function handleCopy(candidateId) {
 
-    
+
     axios({
       method: "post",
       url: `${process.env.REACT_APP_SERVER}recruiter/candiateCpvLink`,
@@ -210,13 +224,13 @@ export default function View(props) {
                     className={classes.drawerTitle}
                   >
                     {decode.companyType === "COMPANY" ? `View Candidate -  ${props.candidateView.firstName} ${props.candidateView.lastName}` :
-                    
-                    `View Candidate - ${props.candidateView.firstName +" " + props.candidateView.lastName}`
-                    (  
-                    <RemoveRedEye
-                      className={classes.toolIcon}
-                      onClick={handleOpen}
-                    /> ) 
+
+                      `View Candidate - ${props.candidateView.firstName + " " + props.candidateView.lastName}`
+                        (
+                          <RemoveRedEye
+                            className={classes.toolIcon}
+                            onClick={handleOpen}
+                          />)
                     }
                     {/* View Candidate -
                     
@@ -457,6 +471,28 @@ export default function View(props) {
                 </Grid>
 
                 <Grid item xs={12} sm={5} md={5} lg={5}>
+                  <Typography className={classes.boldtext}>Document:</Typography>
+                </Grid>
+                <Grid item xs={12} sm={7} md={7} lg={7}>
+                  <div className={classes.documentViewBtn}
+                  onClick={()=>handleFileOpen(props.candidateView.document, "document")}>
+                    <IoDocumentText style={{ width: "16px", height: "16px", color: "#fff" }} />
+                    <Typography> Document </Typography>
+                  </div>
+                </Grid>
+
+                <Grid item xs={12} sm={5} md={5} lg={5}>
+                  <Typography className={classes.boldtext}>Photo:</Typography>
+                </Grid>
+                <Grid item xs={12} sm={7} md={7} lg={7}>
+                  <div className={classes.photoViewbtn}
+                  onClick={()=>handleFileOpen(props.candidateView.photo, "photo")}>
+                    <IoMdPhotos style={{ width: "16px", height: "16px", color: "#fff" }} />
+                    <Typography> Photograph </Typography>
+                  </div>
+                </Grid>
+
+                <Grid item xs={12} sm={5} md={5} lg={5}>
                   <Typography className={classes.boldtext}>DOB:</Typography>
                 </Grid>
                 <Grid item xs={12} sm={7} md={7} lg={7}>
@@ -691,8 +727,8 @@ export default function View(props) {
                         item.statusCode === 309
                           ? props.candidatesEdit?.joinedDate
                           : item.statusCode === 312
-                          ? props.candidatesEdit?.invoicedDate
-                          : item.createdAt,
+                            ? props.candidatesEdit?.invoicedDate
+                            : item.createdAt,
                       ).format("DD-MM-YYYY"),
                     ];
                   })}
@@ -750,7 +786,7 @@ export default function View(props) {
             <Grid item xs={12}>
               <Slider {...settings}>
                 {props.candidateView?.resume !== null &&
-                props.candidateView?.resume !==
+                  props.candidateView?.resume !==
                   "https://liverefo.s3.amazonaws.com/" ? (
                   <div>
                     <div className={classes.center}>
@@ -794,7 +830,7 @@ export default function View(props) {
 
                 {props.candidateView?.candidateSkillExplanationRecording !==
                   null &&
-                props.candidateView?.candidateSkillExplanationRecording !==
+                  props.candidateView?.candidateSkillExplanationRecording !==
                   "" ? (
                   <div>
                     <div className={classes.center}>
@@ -849,16 +885,12 @@ export default function View(props) {
                         color="primary"
                         onClick={(e) => {
                           window.open(
-                            `https://api.whatsapp.com/send?phone=+${
-                              props.candidateView?.mobile
-                            }&text="Hi ${
-                              props.candidateView?.firstName +
-                              "" +
-                              props.candidateView?.lastName
-                            }, view link and confirm ${
-                              process.env.REACT_APP_SITE
-                            }v1/%23/candidateCPV?candidateId=${
-                              props.candidateView?.id
+                            `https://api.whatsapp.com/send?phone=+${props.candidateView?.mobile
+                            }&text="Hi ${props.candidateView?.firstName +
+                            "" +
+                            props.candidateView?.lastName
+                            }, view link and confirm ${process.env.REACT_APP_SITE
+                            }v1/%23/candidateCPV?candidateId=${props.candidateView?.id
                             }"`,
                           );
                         }}
@@ -1193,7 +1225,7 @@ export default function View(props) {
                 )}
 
                 {props.candidateView?.candidateMindsetAssessmentLink !== null &&
-                props.candidateView?.candidateMindsetAssessmentLink !==
+                  props.candidateView?.candidateMindsetAssessmentLink !==
                   "https://liverefo.s3.amazonaws.com/" ? (
                   <div>
                     <div className={classes.center}>
@@ -1230,7 +1262,7 @@ export default function View(props) {
 
                 {props.candidateView?.candidateRecruiterDiscussionRecording !==
                   null &&
-                props.candidateView?.candidateRecruiterDiscussionRecording !==
+                  props.candidateView?.candidateRecruiterDiscussionRecording !==
                   "" ? (
                   <div>
                     <div className={classes.center}>
@@ -1268,8 +1300,8 @@ export default function View(props) {
 
                 {props.candidateView
                   ?.candidateAndTechPannelDiscussionRecording !== null &&
-                props.candidateView
-                  ?.candidateAndTechPannelDiscussionRecording !== "" ? (
+                  props.candidateView
+                    ?.candidateAndTechPannelDiscussionRecording !== "" ? (
                   <div>
                     <div className={classes.center}>
                       <Typography
@@ -1307,6 +1339,12 @@ export default function View(props) {
           </Grid>
         </DialogContent>
       </Dialog>
+        <ViewFiles
+          docFile={docFile}
+          fileType={fileType}
+          fileOpen={fileOpen}
+          handleFileClose={handleFileClose}
+        />
     </>
   );
 }

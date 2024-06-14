@@ -257,6 +257,8 @@ export default function Candidates(props) {
     candidateUniqueId: "",
     location: "",
     experience: null,
+    document: "",
+    photo: "",
     resume: "",
     gender: "",
     differentlyAbled: "",
@@ -1065,9 +1067,13 @@ export default function Candidates(props) {
   function handleEdit(values) {
 
     return new Promise((resolve) => {
+      if (!values.day || !values.month || !values.year) {
+        handleNotificationCall("error", "Please select the date of birth properly.");
+        return;
+      }
+
       setLoader(true);
       var dob = values.day + "-" + values.month + "-" + values.year;
-
       axios({
         method: "post",
         url: `${process.env.REACT_APP_SERVER}admin/adminEditCandidate`,
@@ -1143,6 +1149,10 @@ export default function Candidates(props) {
   }
 
   function handleAddList(send) {
+    if (!addList.day || !addList.month || !addList.year) {
+      handleNotificationCall("error", "Please select the date of birth properly.");
+      return;
+    }
     setLoader(true);
     var url = "";
     var data = {};
@@ -1825,6 +1835,8 @@ export default function Candidates(props) {
               gender: response.data.data.candidateDetail?.gender,
               alternateMobile: response.data.data.candidateDetail?.alternateMobile,
               resume: response.data.data.candidateDetail?.resume,
+              document: response.data.data.candidateDetail?.document,
+              photo: response.data.data.candidateDetail?.photo,
               candidateRecruiterDiscussionRecording: response.data.data.candidateRecruiterDiscussionRecording,
               candidateSkillExplanationRecording: response.data.data.candidateSkillExplanationRecording,
               candidateMindsetAssessmentLink: response.data.data.candidateMindsetAssessmentLink,

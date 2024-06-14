@@ -155,7 +155,8 @@ export default function Search(props) {
     source: "",
     requiremenUniqueId: "",
     candidateUniqueId: "",
-
+    document: "",
+    photo: "",
     gender: "",
     differentlyAbled: "",
     candidateProcessed: "",
@@ -551,6 +552,8 @@ export default function Search(props) {
             candidateProcessed: response.data.data.candidateDetail?.candidateProcessed,
             differentlyAbled: response.data.data.candidateDetail?.differentlyAbled,
             educationalQualification: response.data.data.candidateDetail?.educationalQualification,
+            document: response.data.data.candidateDetail?.document,
+              photo: response.data.data.candidateDetail?.photo,
             gender: response.data.data.candidateDetail?.gender,
             alternateMobile: response.data.data.candidateDetail?.alternateMobile,
             resume: response.data.data.candidateDetail?.resume,
@@ -815,6 +818,10 @@ export default function Search(props) {
   }
 
   function handleAddList(send) {
+    if (!addList.day || !addList.month || !addList.year) {
+      handleNotificationCall("error", "Please select the date of birth properly.");
+      return;
+    }
     setLoader(true);
     var url = "";
     var data = {};

@@ -370,12 +370,8 @@ export default function Edit(props) {
                     </FormControl>
                   </Grid>
 
-
-
-
                   <Grid item xs={12} sm={6} md={3} lg={3}>
                     <InputLabel shrink htmlFor="gender">
-
                       Gender
                     </InputLabel>
                     <FormControl className={classes.margin}>
@@ -407,6 +403,64 @@ export default function Edit(props) {
                         {props.editErrors.gender?.message}
                       </Typography>
                     </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} md={3} lg={3}>
+                    <InputLabel shrink htmlFor="dob">
+                      DOB
+                    </InputLabel>
+                    <FormControl
+                      className={classes.dateSelect}
+                    >
+                      <select
+                        defaultValue={days}
+                        {...props.editCandidates("day")}
+                        onChange={(e) => { props.setDay(e.target.value); }}
+                        className={classes.selectDrop}
+                      >
+                        <option value="">DD</option>
+                        {props.days.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+
+                      <select
+                        defaultValue={months}
+                        {...props.editCandidates("month")}
+                        onChange={(e) => { props.setMonth(e.target.value); }}
+                        className={classes.selectDrop}
+                      >
+                        <option value="">MM</option>
+                        {props.months.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+
+                      <select
+                        defaultValue={years}
+                        {...props.editCandidates("year")}
+                        onChange={(e) => { props.setYear(e.target.value); }}
+                        className={classes.selectDrop}
+                      >
+                        <option value="">YYYY</option>
+                        {props.years.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+
+
+                    </FormControl>
+                    <Typography variant="inherit" color="error">
+                      {props.editErrors.date?.message &&
+                        props.editErrors.month?.message &&
+                        props.editErrors.year?.message}
+                    </Typography>
                   </Grid>
 
                   <Grid item xs={6} sm={6} md={3} lg={3}>
@@ -773,9 +827,6 @@ export default function Edit(props) {
                     ""
                   )}
 
-
-
-
                   <Grid item xs={12} className={classes.drawerClose}>
 
                     {display === false ? (
@@ -809,67 +860,6 @@ export default function Edit(props) {
 
                   {display === true ? (
                     <>
-                      <Grid item xs={12} sm={6} md={3} lg={3}>
-                        <InputLabel shrink htmlFor="dob">
-
-                          DOB
-                        </InputLabel>
-                        <FormControl
-                          className={classes.dateSelect}
-                        >
-                          <select
-                            defaultValue={days}
-                            {...props.editCandidates("day")}
-                            onChange={(e) => { props.setDay(e.target.value); }}
-                            className={classes.selectDrop}
-                          >
-                            <option value="">   </option>
-                            {props.days.map((option) => (
-                              <option key={option} value={option}>
-                                {option}
-                              </option>
-                            ))}
-                          </select>
-
-                          <select
-                            defaultValue={months}
-                            {...props.editCandidates("month")}
-                            onChange={(e) => { props.setMonth(e.target.value); }}
-                            className={classes.selectDrop}
-                          >
-                            <option value="">   </option>
-                            {props.months.map((option) => (
-                              <option key={option} value={option}>
-                                {option}
-                              </option>
-                            ))}
-                          </select>
-
-                          <select
-                            defaultValue={years}
-                            {...props.editCandidates("year")}
-                            onChange={(e) => { props.setYear(e.target.value); }}
-                            className={classes.selectDrop}
-                          >
-                            <option value="">   </option>
-                            {props.years.map((option) => (
-                              <option key={option} value={option}>
-                                {option}
-                              </option>
-                            ))}
-                          </select>
-
-
-                        </FormControl>
-                        <Typography variant="inherit" color="error">
-                          {props.editErrors.date?.message &&
-                            props.editErrors.month?.message &&
-                            props.editErrors.year?.message}
-                        </Typography>
-                      </Grid>
-
-
-
                       <Grid item xs={12} sm={6} md={3} lg={3}>
                         <InputLabel shrink htmlFor="currentCompanyName">
                           Current Company Name
