@@ -1219,6 +1219,7 @@ exports.viewCandidate = async (req, res) => {
               "currentCompanyName",
               'panNumber',
               'linkedInProfile',
+              'showAllDetails',
               [
                 fn(
                   "concat",
@@ -1358,6 +1359,7 @@ exports.myCandidates = async (req, res) => {
         "currentCompanyName",
         "linkedInProfile",
         "panNumber",
+        'showAllDetails',
                 [
                   fn(
                     "concat",
