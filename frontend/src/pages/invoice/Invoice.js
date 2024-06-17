@@ -36,14 +36,14 @@ import {
   Bar, 
   Cell,
 } from 'recharts';
-import jwt_decode from "jwt-decode"; 
+import {jwtDecode} from "jwt-decode"; 
 
 export default function Tables() {
   var theme = useTheme();
   const mobileQuery = useMediaQuery('(max-width:600px)'); 
   const classes = useStyles();
   const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
 
   const [count, setCount] = useState(0);
   const [loader, setLoader] = useState(false);
@@ -902,13 +902,14 @@ className={classes.flexCenter}
                   {" "}
                   Invoiced{" "}
                 </Button>,
-                <Grid container row spacing={2} >  
+                <Grid container row spacing={2} className={classes.externalIconContainer}>  
                   {item.candidateDetail?.isExternal === "YES"?
-                    <Tooltip title="SUBVENDOR/FREELANCER"  placement="bottom" aria-label="title"> 
+                    <Tooltip title="SUBVENDOR"  placement="bottom" aria-label="title"> 
                           <Avatar  alt="Profile"   src={external}   className={classes.externalIcon}  /> 
                     </Tooltip>   : "" }  
-                  {item.candidateDetail?.firstName + " " +  item.candidateDetail?.lastName } <br /> {" (" +  item.uniqueId +   ")"} 
-             
+                  <div>
+                    {item.candidateDetail?.firstName + " " +  item.candidateDetail?.lastName } <br /> {" (" +  item.uniqueId +   ")"} 
+                  </div>
                 </Grid>,
                 item.mainId === decode.mainId ? 
                 <>  { item.candidateDetail?.email + " /"} <br/>{"91 " + item.candidateDetail?.mobile.slice(2)}  </> 

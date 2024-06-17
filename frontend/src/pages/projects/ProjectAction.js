@@ -1,23 +1,14 @@
 import React, { useState } from "react";
 import { ClickAwayListener, MenuItem, Popper } from "@material-ui/core";
 import useStyles from "../../themes/style.js";
-import UndoIcon from "@material-ui/icons/Undo";
-import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
-import EventNoteIcon from "@material-ui/icons/EventNote";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import InsertCommentIcon from "@material-ui/icons/InsertComment";
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import Tooltip from "@material-ui/core/Tooltip";
 import ViewIcon from "@material-ui/icons/Visibility";
-import jwt_decode from "jwt-decode";
 
 const ProjectAction = (props) => {
   const classes = useStyles();
-
-  const [menu, setMenu] = useState(false);
-  const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
-
   const resetCollapse = () =>{
     if(props.viewProjOpen.orgRecList || props.viewProjOpen.hireLevelList){
         props.setViewProjOpen({
@@ -32,27 +23,31 @@ const ProjectAction = (props) => {
         })
     }
   }
+
+  const handleClick = (e) => {
+    e.stopPropagation();
+    props.handleMenuClick(props.index, e);
+  };
+
   return (
     <>
       <MoreVertIcon
         key={props.index}
         className={classes.actions}
-        onClick={(e) => {
-          e.stopPropagation();
-          setMenu(e.currentTarget);
-        }}
+        onClick={handleClick}
+        style={{cursor:"pointer"}}
       />
       <div className={classes.actionBtnPosition}>
-        <Popper open={menu} anchorEl={menu} className={classes.actionBtnZIndex}>
+        <Popper open={props.index === props.activeIndex} anchorEl={props.anchorEl} className={classes.actionBtnZIndex}>
           <ClickAwayListener
             onClickAway={(e) => {
-              setMenu(false);
+              props.handleMenuClick(props.index, null);
             }}
           >
             <div className={classes.actiondrop}>
               <MenuItem
                 onClick={(e) => {
-                    setMenu(false);
+                  props.handleMenuClick(props.index, null);
                     props.setDisplayAdd(false);
                     props.handleShow(props.item.id, "EDIT");
                 }}
@@ -68,22 +63,22 @@ const ProjectAction = (props) => {
 
               <MenuItem
                 onClick={(e) => {
-                  setMenu(false);
+                  props.handleMenuClick(props.index, null);
                   props.handleShow(props.item.id, "APPROVAL");
                   resetCollapse()
                 }}
               >
                 <Tooltip
-                  title="View Project"
+                  title="Project Approval"
                   placement="right"
                   aria-label="view"
                 >
-                  <EventNoteIcon className={classes.toolIcon} />
+                  <ThumbUpIcon className={classes.toolIcon} />
                 </Tooltip>
               </MenuItem>
               <MenuItem
                 onClick={(e) => {
-                  setMenu(false);
+                  props.handleMenuClick(props.index, null);
                   props.handleShow(props.item.id, "VIEW");
                   resetCollapse()
                 }}

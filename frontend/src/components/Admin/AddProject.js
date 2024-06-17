@@ -20,13 +20,12 @@ import CloseIcon from "@material-ui/icons/Close";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import RemoveCircle from "@material-ui/icons/RemoveCircle";
 import classNames from "classnames";
-import jwtDecode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 export default function AddProject(props) {
   const classes = useStyles();
   const token = localStorage.getItem("token");
   const decode = jwtDecode(token);
-  console.log(props.clientsName)
   return (
     <>
       <Box sx={{ width: "100%" }} role="presentation">
@@ -94,6 +93,34 @@ export default function AddProject(props) {
                     </Typography>
                   </FormControl>
                 </Grid>
+                {decode.role ==="CLIENTCOORDINATOR" ?
+                <>
+                <Grid item xs={12} sm={4} md={4} lg={4} style={{display:'none'}}>
+                  <InputLabel shrink htmlFor="clientIndustry">
+                    Hiring Manager
+                  </InputLabel>
+                  <TextField
+                    name="recruiterId"
+                    label={
+                      props?.clientsName === "" ? "Select Hiring Manager" : ""
+                    }
+                    classes={{ root: classes.customSelectTextField }}
+                    size="small"
+                    {...props.register("recruiterId")}
+                    InputLabelProps={{ shrink: false }}
+                    margin="normal"
+                    variant="outlined"
+                    hidden="true"
+                    value={decode.recruiterId}
+                  >
+
+                  </TextField>
+                  <Typography variant="inherit" color="error">
+                    {props.errors.recruiterId?.message}
+                  </Typography>
+                </Grid>
+                </>
+                :
                 <Grid item xs={12} sm={4} md={4} lg={4}>
                   <InputLabel shrink htmlFor="clientIndustry">
                     Hiring Manager
@@ -104,7 +131,7 @@ export default function AddProject(props) {
                     label={
                       props?.clientsName === "" ? "Select Hiring Manager" : ""
                     }
-                    classes={{ root: classes.customTextField }}
+                    classes={{ root: classes.customSelectTextField }}
                     size="small"
                     defaultValue=""
                     {...props.register("recruiterId")}
@@ -129,9 +156,10 @@ export default function AddProject(props) {
                     {props.errors.recruiterId?.message}
                   </Typography>
                 </Grid>
+                }
                 <Grid item xs={12} sm={4} md={4} lg={4}>
                   <InputLabel shrink htmlFor="hrbpCode">
-                    HR business Unit Code
+                    HR Business Unit Code
                   </InputLabel>
                   <FormControl className={classes.margin}>
                     <TextField
@@ -141,7 +169,7 @@ export default function AddProject(props) {
                       placeholder="Enter HRBU Code"
                       id="hrbpCode"
                       {...props.register("hrbpCode")}
-                      error={props.errors.clientIndustry ? true : false}
+                      error={props.errors.hrbpCode ? true : false}
                     />
 
                     <Typography variant="inherit" color="error">
@@ -315,7 +343,7 @@ export default function AddProject(props) {
                         className={classNames(classes.fieldsInput)}
                       >
                         <InputLabel shrink>
-                          Number of Hire for this Level
+                        Number to be hired
                         </InputLabel>
 
                         <FormControl className={classes.margin}>
@@ -323,7 +351,8 @@ export default function AddProject(props) {
                             InputProps={{ disableUnderline: true }}
                             classes={{ root: classes.customTextField }}
                             size="small"
-                            placeholder="Enter the Number of Hiring for Levels"
+                            type="number"
+                            placeholder="Enter Number to be hired"
                             id="noOfHires"
                             value={user.noOfHires}
                             name="noOfHires"
@@ -360,9 +389,10 @@ export default function AddProject(props) {
                       </Grid>
                     </div>
                   ))}
-                <div id="section-leve-of-hire"> </div>
+                <div id="section-level-of-hire"> </div>
                 <Grid item xs lg={3}></Grid>
-                  {props.recruiterFields.map((user, index) => (
+                  {props.recruiterFields.map((user, index) =>{
+                    return(
                     <div key={index} className={classNames(classes.fields)}>
                       <Grid
                         item
@@ -372,22 +402,16 @@ export default function AddProject(props) {
                         className={classNames(classes.fieldsInput)}
                       >
                         <InputLabel shrink>
-                          Project Point of Contact(POC) Name
+                          Recruiter Point of Contact(POC) Name
                         </InputLabel>
                         <TextField
                           select
-                          name="name"
-                          label={
-                            props?.recruiterName === "" ? "Select Recrutier Name" : ""
-                          }
-                          style={{textAlign: "left"}}
-                          classes={{ root: classes.customTextField }}
-                          value={user.recId}
-                          onChange={(e) => {
-                            props.recruiterChange(e, index);
-                            console.log(e.target.value);
-                          }}
-                          // {...props.register("name")}
+                          name={`recruiterId`}
+                          label={props?.recruiterName === "" ? "Select Recruiter Name" : ""}
+                          style={{ textAlign: "left" }}
+                          classes={{ root: classes.customSelectTextField }}
+                          value={user.recruiterId}
+                          onChange={(e) => props.recruiterChange(e, index)}
                           size="small"
                           InputLabelProps={{ shrink: false }}
                           margin="normal"
@@ -404,16 +428,10 @@ export default function AddProject(props) {
                               if (roleName === "SUBVENDOR") {
                                 label = label.replace("(SUBVENDOR)", "(Vendor)");
                               } else if (roleName === "CLIENTCOORDINATOR") {
-                                label = label.replace(
-                                  "(CLIENTCOORDINATOR)",
-                                  "(Hiring Manager)",
-                                );
+                                label = label.replace("(CLIENTCOORDINATOR)", "(Hiring Manager)");
                               }
                               return (
-                                <MenuItem
-                                  key={option.id}
-                                  value={option.id}
-                                >
+                                <MenuItem key={option.id} value={option.id}>
                                   {label}
                                 </MenuItem>
                               );
@@ -444,7 +462,7 @@ export default function AddProject(props) {
                         className={classNames(classes.fieldsInput)}
                       >
                         <InputLabel shrink>
-                          Project Point of Contact(POC) Email
+                          Recruiter Email-Id
                         </InputLabel>
 
                         <FormControl className={classes.margin}>
@@ -452,7 +470,7 @@ export default function AddProject(props) {
                             InputProps={{ disableUnderline: true }}
                             classes={{ root: classes.customTextField }}
                             size="small"
-                            placeholder="Project Point of Contact(POC) Email"
+                            placeholder="Recruiter Email-Id"
                             id="email"
                             value={user.email}
                             name="email"
@@ -471,7 +489,7 @@ export default function AddProject(props) {
                         className={classNames(classes.fieldsInput)}
                       >
                         <InputLabel shrink>
-                          Project Point of Contact(POC) Mobile No
+                          Recruiter Mobile No
                         </InputLabel>
 
                         <FormControl className={classes.margin}>
@@ -479,7 +497,7 @@ export default function AddProject(props) {
                             InputProps={{ disableUnderline: true }}
                             classes={{ root: classes.customTextField }}
                             size="small"
-                            placeholder="Project Point of Contact(POC) Mobile No"
+                            placeholder="Recruiter Mobile No"
                             id="mobile"
                             value={user.mobile}
                             name="mobile"
@@ -515,7 +533,7 @@ export default function AddProject(props) {
                         )}
                       </Grid>
                     </div>
-                  ))}
+                  )})}
                 <div id="section"> </div>
                 </Grid>
             </CardContent>

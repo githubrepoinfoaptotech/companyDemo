@@ -3,7 +3,7 @@ import { IconButton, InputBase,ClickAwayListener } from "@material-ui/core";
 import { Search as SearchIcon } from "@material-ui/icons";
 import useStyles from "../../themes/style.js";
 import { useHistory } from "react-router-dom";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import Notification from "../../components/Notification";
 import { toast } from "react-toastify";
 
@@ -15,7 +15,7 @@ export default function SearchBar(props) {
   const positions = [toast.POSITION.TOP_RIGHT];
 
   const token = localStorage.getItem("token");
-  var decode = jwt_decode(token);
+  var decode = jwtDecode(token);
 
   const handleSearchClick = () => {
     setExpanded(!expanded);

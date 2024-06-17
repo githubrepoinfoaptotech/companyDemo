@@ -18,7 +18,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import RemoveCircle from "@material-ui/icons/RemoveCircle";
 import classNames from "classnames";
-import jwtDecode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 
 export default function AddClient(props) {

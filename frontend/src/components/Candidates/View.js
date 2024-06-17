@@ -26,15 +26,16 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { RemoveRedEye } from "@material-ui/icons";
 import Slider from "react-slick";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
+import copy from 'copy-to-clipboard';
 
 import "react-toastify/dist/ReactToastify.css";
 
 export default function View(props) {
+
   const positions = [toast.POSITION.TOP_RIGHT];
-
   var [errorToastId, setErrorToastId] = useState(null);
-
+  
   function sendNotification(componentProps, options) {
     return toast(
       <Notification
@@ -44,9 +45,9 @@ export default function View(props) {
       options,
     );
   }
+
   function handleNotificationCall(notificationType, message) {
     var componentProps;
-
     if (errorToastId && notificationType === "error") return;
 
     switch (notificationType) {
@@ -89,7 +90,7 @@ export default function View(props) {
   const classes = useStyles();
   const mobileQuery = useMediaQuery("(max-width:600px)");
   const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
 
   const [open, setOpen] = React.useState(false);
   const handleClose = () => {
@@ -108,15 +109,10 @@ export default function View(props) {
     slidesToScroll: 1,
   };
 
-  async function copyTextToClipboard(text) {
-    if ("clipboard" in navigator) {
-      return await navigator.clipboard.writeText(text);
-    } else {
-      return document.execCommand("copy", true, text);
-    }
-  }
 
   function handleCopy(candidateId) {
+
+    
     axios({
       method: "post",
       url: `${process.env.REACT_APP_SERVER}recruiter/candiateCpvLink`,
@@ -130,9 +126,9 @@ export default function View(props) {
     })
       .then(function (response) {
         if (response.data.status === true) {
-          copyTextToClipboard(response.data.link).then(() => {
-            handleNotificationCall("success", "Copied successfully");
-          });
+
+          copy(response.data.link)
+          handleNotificationCall("success", "Copied successfully");
         } else {
           handleNotificationCall("error", response.data.message);
         }
@@ -602,6 +598,28 @@ export default function View(props) {
                   </Typography>
                 </Grid>
 
+                <Grid item xs={12} sm={5} md={5} lg={5}>
+                  <Typography className={classes.boldtext}>
+                    PAN Number:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={7} md={7} lg={7}>
+                  <Typography>
+                    {props.candidateView.panNumber}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} sm={5} md={5} lg={5}>
+                  <Typography className={classes.boldtext}>
+                    LinkedIn Profile URL:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={7} md={7} lg={7}>
+                  <Typography>
+                    {props.candidateView.linkedInProfile}
+                  </Typography>
+                </Grid>
+
                 {props.candidateView.candidateProcessed === "NO" ? (
                   <>
                     <Grid item xs={12} sm={5} md={5} lg={5}>
@@ -911,7 +929,7 @@ export default function View(props) {
                         </span>
                       </Grid>
 
-                      <Grid item xs={12} sm={6} md={6} lg={6}>
+                      {/* <Grid item xs={12} sm={6} md={6} lg={6}>
                         <Typography>
                           Interested for Job Role Responsibilities
                         </Typography>
@@ -919,13 +937,13 @@ export default function View(props) {
 
                       <Grid item xs={12} sm={3} md={3} lg={3}>
                         {cpvForm?.jobResponsibilities}
-                      </Grid>
+                      </Grid> 
 
                       <Grid item xs={12} sm={3} md={3} lg={3}>
                         <span className={classes.greenColor}>
                           {cpvForm?.jobResponsibilities !== null ? "Yes" : ""}
                         </span>
-                      </Grid>
+                      </Grid>*/}
 
                       <Grid item xs={12} sm={6} md={6} lg={6}>
                         <Typography>

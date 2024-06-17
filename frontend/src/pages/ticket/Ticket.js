@@ -34,7 +34,7 @@ import { useForm } from "react-hook-form";
 import Notification from "../../components/Notification/Notification";
 import ViewIcon from "@material-ui/icons/Visibility";
 import PersonPinIcon from "@material-ui/icons/PersonPin";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import useStyles from "../../themes/style.js";
 
@@ -133,7 +133,7 @@ export default function Tables() {
   });
 
   const token = localStorage.getItem("token");
-  var decode = jwt_decode(token);
+  var decode = jwtDecode(token);
 
 
   const [ticketData, setTicketData] = useState([]);
@@ -171,7 +171,7 @@ export default function Tables() {
 
   useEffect(() => {
     setLoader(true);
-    var decode = jwt_decode(token);
+    var decode = jwtDecode(token);
 
     var url = "";
     if (decode.role === "SUPERADMIN") {
@@ -203,7 +203,7 @@ export default function Tables() {
     setPage(newPage);
     setLoader(true);
     setCurrerntPage(newPage + 1);
-    var decode = jwt_decode(token);
+    var decode = jwtDecode(token);
 
     const form = filterRef.current;
 
@@ -335,7 +335,7 @@ export default function Tables() {
     setLoader(true);
     const fetchData = async () => {
       var url = "";
-      var decode = jwt_decode(token);
+      var decode = jwtDecode(token);
     if (decode.role === "SUPERADMIN") {
       url = `${process.env.REACT_APP_SERVER}superadmin/supportViewAllTickets`;
     } else {

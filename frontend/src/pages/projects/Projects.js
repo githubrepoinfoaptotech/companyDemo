@@ -22,24 +22,22 @@ import {
 } from "@material-ui/core";
 // components
 import PageTitle from "../../components/PageTitle";
-import Tooltip from "@material-ui/core/Tooltip";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardMedia";
 import CardActions from "@material-ui/core/CardActions";
 import { toast } from "react-toastify";
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import EditIcon from "@material-ui/icons/Edit";
 import CloseIcon from "@material-ui/icons/Close";
 import { Autocomplete } from "@material-ui/lab";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
-import ViewIcon from "@material-ui/icons/Visibility";
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import SignalCellularAltIcon from '@material-ui/icons/SignalCellularAlt';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
-import DoneIcon from '@material-ui/icons/Done';
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import ScheduleIcon from '@material-ui/icons/Schedule';
 // data
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
@@ -50,23 +48,23 @@ import Notification from "../../components/Notification";
 import AddProject from "../../components/Admin/AddProject.js";
 
 import CancelIcon from "@material-ui/icons/Cancel";
- import moment from "moment";
+import moment from "moment";
 // import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 // import XlsxPopulate from "xlsx-populate";
 // import { saveAs } from "file-saver";
 import useStyles from "../../themes/style.js";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import ProjectAction from "./ProjectAction.js";
 import ProjectView from "./ProjectView.js";
 import ProjectApproval from "./ProjectApproval.js";
- 
+import classNames from "classnames";
 
 const positions = [toast.POSITION.TOP_RIGHT];
 
 export default function Tables() {
-  const classes = useStyles(); 
-  const mobileQuery = useMediaQuery('(max-width:600px)');    
+  const classes = useStyles();
+  const mobileQuery = useMediaQuery('(max-width:600px)');
   const token = localStorage.getItem("token");
   const decode = jwtDecode(token);
   const [clientData, setClientData] = useState([]);
@@ -79,8 +77,9 @@ export default function Tables() {
     reasonForHiring: "",
     projectRegion: "",
     projectLocation: "",
-    recruiterId:"",
-    billable:"",
+    recruiterId: "",
+    handler: {},
+    billable: "",
     lohName: "",
     lohNoOfHires: "",
     aggStartDate: "",
@@ -95,12 +94,22 @@ export default function Tables() {
 
   const [loader, setLoader] = useState(false);
 
+  //Action Button Popper
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(null);
+  const handleMenuClick = (index, event) => {
+    if (activeIndex === index) {
+      setAnchorEl(null);
+      setActiveIndex(null);
+    } else {
+      setAnchorEl(event.currentTarget);
+      setActiveIndex(index);
+    }
+  };
+
   const [reducerValue, forceUpdate] = useReducer((x) => x + 1, 0);
   const [page, setPage] = useState(0);
   const [currerntPage, setCurrerntPage] = useState(1);
-  const [name, setName] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [email, setEmail] = useState("");
   const [count, setCount] = useState(0);
   const [dataList, setDataList] = useState("ADD");
   const [display, setDisplay] = useState(false);
@@ -110,6 +119,7 @@ export default function Tables() {
   var [notificationsPosition] = useState(2);
   var [errorToastId, setErrorToastId] = useState(null);
   const [displayAdd, setDisplayAdd] = useState(false);
+  const [displayOrgAdd, setDisplayOrgAdd] = useState(false);
   const [Id, setId] = useState(0);
   const [addLevelOfHireData, setAddLevelOfHireData] = useState({
     clientId: "",
@@ -122,6 +132,7 @@ export default function Tables() {
     orgRecList: false
   });
   const [viewProjOpen, setViewProjOpen] = useState({
+    viewAllList: false,
     hireLevelList: false,
     orgRecList: false
   });
@@ -173,7 +184,7 @@ export default function Tables() {
   };
 
   const handleSaveEditLevelOfHire = () => {
-    if (editLevelOfHireData.name==="" || editLevelOfHireData.noOfHires==="") {
+    if (editLevelOfHireData.name === "" || editLevelOfHireData.noOfHires === "") {
       handleNotificationCall('error', "Please Fill both fields");
       return
     }
@@ -283,7 +294,7 @@ export default function Tables() {
       .max(255)
       .required("Project Division is required"),
     recruiterId: Yup.string().required("Hiring Manager is required"),
-    hrbpCode: Yup.string().required("HRPB is reuired"),
+    hrbpCode: Yup.string().required("HRBU is reuired"),
     reasonForHiring: Yup.string().required("Reason For Hiring is reuired"),
     projectRegion: Yup.string().required("Project Region is reuired"),
     projectLocation: Yup.string().required("Project Location is reuired"),
@@ -355,14 +366,20 @@ export default function Tables() {
           setCount(response.data.count);
         }
       });
-      const dataset= await getRecruiterName();
+      const dataset = await getRecruiterName();
       setRecruiterName(dataset)
 
     };
     const getUserName = async () => {
+      let url = ""
+      if (decode.role === "ADMIN") {
+        url = `${process.env.REACT_APP_SERVER}admin/getAllClientList`
+      } else {
+        url = `${process.env.REACT_APP_SERVER}CC/getClientList`
+      }
       axios({
         method: "post",
-        url: `${process.env.REACT_APP_SERVER}admin/getAllClientList`,
+        url: url,
         data: {},
         headers: {
           "Content-Type": "application/json",
@@ -406,8 +423,8 @@ export default function Tables() {
     }
     fetchData();
     getUserName();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reducerValue, token]);
-  console.log(clientsName,'oppop')
   const getRecruiterName = async () => {
     axios({
       method: "post",
@@ -419,11 +436,10 @@ export default function Tables() {
       },
     })
       .then(function (response) {
-         
+
         if (response.data.status === true) {
           setLoader(false);
           setRecruiterName(response.data.data);
-          console.log(response.data.data)
         }
       })
 
@@ -488,6 +504,11 @@ export default function Tables() {
   }
 
   function handleAdd(values) {
+    if (values.aggStartDate >= values.aggEndDate) {
+      handleNotificationCall("error", "Select Hiring Dates Properly");
+      return
+    }
+    const filteredRecruiterFields = recruiterFields.filter(item => item.recruiterId !== "");
     return new Promise((resolve) => {
       setLoader(true);
 
@@ -501,12 +522,12 @@ export default function Tables() {
           clientWebsite: values.clientWebsite,
           aggStartDate: values.aggStartDate,
           aggEndDate: values.aggEndDate,
-          orgRec: recruiterFields,
+          orgRec: filteredRecruiterFields,
           hrbpCode: values.hrbpCode,
           reasonForHiring: values.reasonForHiring,
           projectRegion: values.projectRegion,
-          projectLocation:values.projectLocation,
-          billable:values.billable,
+          projectLocation: values.projectLocation,
+          billable: values.billable,
           levelOfHiring: levelOfHiringFields,
 
         },
@@ -542,12 +563,12 @@ export default function Tables() {
           clientWebsite: values.clientWebsite,
           aggStartDate: values.aggStartDate,
           aggEndDate: values.aggEndDate,
-          recruiterId: values.recruiterId,
+          handlerId: values.recruiterId,
           hrbpCode: values.hrbpCode,
           projectRegion: values.projectRegion,
-          projectLocation:values.projectLocation,
+          projectLocation: values.projectLocation,
           reasonForHiring: values.reasonForHiring,
-          billable:values.billable,
+          billable: values.billable,
         },
         headers: {
           "Content-Type": "application/json",
@@ -578,9 +599,10 @@ export default function Tables() {
       method: "post",
       url: `${process.env.REACT_APP_SERVER}admin/addOrgRecruiter`,
       data: {
-        name: editRecFields[0].name,
-        email: editRecFields[0].email,
-        mobile: editRecFields[0].mobile,
+        name: newPOCRecruiterAdd[0].name,
+        email: newPOCRecruiterAdd[0].email,
+        mobile: newPOCRecruiterAdd[0].mobile,
+        recruiterId: newPOCRecruiterAdd[0].recruiterId,
         clientId: clientEdit.id,
       },
       headers: {
@@ -591,8 +613,13 @@ export default function Tables() {
       .then(function (response) {
         if (response.data.status === true) {
           handleShow(clientEdit.id, "EDIT");
-
-          setDisplayAdd(false);
+          setNewPOCRecruiterAdd([{
+            name: "",
+            mobile: "",
+            email: "",
+            recruiterId: ""
+          }])
+          setDisplayOrgAdd(false);
           handleNotificationCall("success", response.data.message);
         } else {
           handleNotificationCall("error", response.data.message);
@@ -618,14 +645,14 @@ export default function Tables() {
     }).then(function (response) {
       if (response.data.status === true) {
         setLoader(false);
-         const switchState = clientData.map(item => {
+        const switchState = clientData.map(item => {
 
-          if (item.id === id) { 
+          if (item.id === id) {
             return { ...item, statusList: { ...item.statusList, statusName: value === true ? "ACTIVE" : "INACTIVE" } };
-            
+
           }
           return item;
-        }); 
+        });
         setClientData(switchState);
         handleNotificationCall("success", response.data.message);
       }
@@ -638,22 +665,13 @@ export default function Tables() {
 
       axios({
         method: "post",
-        url: `${process.env.REACT_APP_SERVER}admin/addClient`,
+        url: `${process.env.REACT_APP_SERVER}CC/sendApprovalMail`,
         data: {
-          clientName: values.clientName,
-          clientIndustry: values.clientIndustry,
-          handlerId: values.recruiterId,
-          clientWebsite: values.clientWebsite,
-          aggStartDate: values.aggStartDate,
-          aggEndDate: values.aggEndDate,
-          orgRec: recruiterFields,
-          hrbpCode: values.hrbpCode,
-          reasonForHiring: values.reasonForHiring,
-          projectRegion: values.projectRegion,
-          projectLocation:values.projectLocation,
-          billable:values.billable,
-          levelOfHiring: levelOfHiringFields,
-
+          id: clientEdit.id,
+          name: values.approverName,
+          email: values.approverEmail,
+          designation: values.approverDesignation,
+          content: values.approverContent,
         },
         headers: {
           "Content-Type": "application/json",
@@ -664,7 +682,7 @@ export default function Tables() {
         if (response.data.status === true) {
           handleNotificationCall("success", response.data.message);
           forceUpdate();
-          setState({ ...state, right: false });
+          // setState({ ...state, right: false });
         } else {
           handleNotificationCall("error", response.data.message);
         }
@@ -690,13 +708,13 @@ export default function Tables() {
         setLoader(false);
         const switchState = recruiterEditFields.map(item => {
 
-          if (item.id === id) { 
+          if (item.id === id) {
             return { ...item, isActive: value };
-            
+
           }
           return item;
-        }); 
-         
+        });
+
         setRecruiterEditFields(switchState);
         handleNotificationCall("success", response.data.message);
       }
@@ -709,7 +727,7 @@ export default function Tables() {
     editreset();
     if (name === "EDIT") {
       setDataList("EDIT");
-    } else if(name === "APPROVAL"){
+    } else if (name === "APPROVAL") {
       setDataList("APPROVAL")
     }
     else {
@@ -730,16 +748,18 @@ export default function Tables() {
       .then(function (response) {
         if (response.data.status === true) {
           setRecruiterEditFields(response.data.orgRecruiter);
+          setRecruiterFields(response.data.orgRecruiter);
+          setEditRecFields(response.data.orgRecruiter);
           setLevelOfHireEditFields(response.data.levelOfHiring)
-
           setClientEdit({
             ...clientEdit,
             id: response.data.data.id,
             clientName: response.data.data.clientName,
             clientIndustry: response.data.data.clientIndustry,
             clientWebsite: response.data.data.clientWebsite,
-            recruiterId:response.data.data?.handlerId,
+            recruiterId: response.data.data?.handlerId,
             hrbpCode: response.data.data?.hrbpCode,
+            handler: response.data.data?.handler,
             reasonForHiring: response.data.data?.reasonForHiring,
             projectRegion: response.data.data?.projectRegion,
             projectLocation: response.data.data?.projectLocation,
@@ -760,7 +780,7 @@ export default function Tables() {
           setEditValue('billable', response.data.data?.billable);
           setBillable(response.data.data?.billable);
           setLoader(false);
-        }  else{
+        } else {
           setLoader(false);
         }
       })
@@ -769,72 +789,122 @@ export default function Tables() {
       });
   }
 
-    const [recruiterFields, setRecruiterFields] = useState([{
-        name: "",
-        mobile: "",
-        email: "",
-        recId: ""
-      }]);
+  const [recruiterFields, setRecruiterFields] = useState([{
+    name: "",
+    mobile: "",
+    email: "",
+    recruiterId: ""
+  }]);
 
-    const [editRecFields, setEditRecFields] = useState([{
-      name: "",
-      mobile: "",
-      email: "",
-      recId: ""
-    }]);
+  const [newPOCRecruiterAdd, setNewPOCRecruiterAdd] = useState([{
+    name: "",
+    mobile: "",
+    email: "",
+    recruiterId: ""
+  }]);
+  const [editRecFields, setEditRecFields] = useState([{
+    name: "",
+    mobile: "",
+    email: "",
+    recruiterId: ""
+  }]);
 
-    const [levelOfHiringFields, setLevelOfHiringFields] = useState([{
-      name: "",
-      noOfHires: "",
-    }]);
+  const [levelOfHiringFields, setLevelOfHiringFields] = useState([{
+    name: "",
+    noOfHires: "",
+  }]);
 
-    const recruiterChange = (event, index) => {
-      const { name, value } = event.target;
-      if (name === "name") {
-        const nameAlreadyExists = recruiterEditFields.some((field, idx) => field.name === value && idx !== index);
-        if (nameAlreadyExists) {
-          handleNotificationCall("error", "This POC name already exists in the list.");
-          return;
-        }
+  const recruiterChange = (event, index) => {
+    const { value } = event.target;
+    const nameAlreadyExists = recruiterFields.some((field, idx) => field.recruiterId === value && idx !== index);
+    if (nameAlreadyExists) {
+      handleNotificationCall("error", "This POC name already exists in the list.");
+      return;
+    }
 
-        const selectedRecruiter = recruiterName.find((recruiter) => recruiter.id === value);
-        const newRecruiterFields = [...recruiterEditFields];
-        newRecruiterFields[index][name] = value;
-        
-        if (selectedRecruiter) {
-          newRecruiterFields[index].name = selectedRecruiter.firstName+" "+selectedRecruiter?.lastName  || "";
-          newRecruiterFields[index].email = selectedRecruiter.user?.email || "";
-          newRecruiterFields[index].mobile = selectedRecruiter.mobile || "";
-          newRecruiterFields[index].recId = value;
-        }
-        setRecruiterFields(newRecruiterFields);
-      }
-    };
+    const selectedRecruiter = recruiterName.find((recruiter) => recruiter.id === value);
+    if (selectedRecruiter) {
+      const newRecruiterFields = [...recruiterFields];
+      newRecruiterFields[index] = {
+        ...newRecruiterFields[index],
+        name: `${selectedRecruiter.firstName} ${selectedRecruiter?.lastName || ""}`,
+        email: selectedRecruiter.user?.email || "",
+        mobile: selectedRecruiter.mobile || "",
+        recruiterId: value
+      };
+      setRecruiterFields(newRecruiterFields);
 
-    const recruiterEditChange = (event, index) => {
-      const { name, value } = event.target;
-      if (name === "editname") {
-        const nameAlreadyExists = recruiterEditFields.some((field, idx) => field.name === value && idx !== index);
-        if (nameAlreadyExists) {
-          handleNotificationCall("error", "This POC name already exists in the list.");
-          return;
-        }
+    }
+  };
 
-        const selectedRecruiter = recruiterName.find((recruiter) => recruiter.id === value);
-        const newRecruiterFields = [...recruiterEditFields];
-        newRecruiterFields[index][name] = value;
-        
-        if (selectedRecruiter) {
-          newRecruiterFields[index].name = selectedRecruiter.firstName+" "+selectedRecruiter?.lastName  || "";
-          newRecruiterFields[index].email = selectedRecruiter.user?.email || "";
-          newRecruiterFields[index].mobile = selectedRecruiter.mobile || "";
-          newRecruiterFields[index].recId = value;
-        }
-        console.log(newRecruiterFields,'4545454545')
-        setEditRecFields(newRecruiterFields);
-      }
-    };
-    
+  const recruiterEditChange = (event, index) => {
+    const { value } = event.target;
+    const nameAlreadyExists = editRecFields.some((field, idx) => field.recruiterId === value && idx !== index);
+    if (nameAlreadyExists) {
+      handleNotificationCall("error", "This POC name already exists in the list.");
+      return;
+    }
+
+    const selectedRecruiter = recruiterName.find((recruiter) => recruiter.id === value);
+    if (selectedRecruiter) {
+      const newRecruiterFields = [...editRecFields];
+      newRecruiterFields[index] = {
+        ...newRecruiterFields[index],
+        name: `${selectedRecruiter.firstName} ${selectedRecruiter?.lastName || ""}`,
+        email: selectedRecruiter.user?.email || "",
+        mobile: selectedRecruiter.mobile || "",
+        recruiterId: value
+      };
+      setEditRecFields(newRecruiterFields);
+    }
+  };
+
+
+  const recruiterAddInEditPage = (event, index) => {
+    const { value } = event.target;
+    const nameAlreadyExists = newPOCRecruiterAdd.some((field, idx) => field.recruiterId === value && idx !== index);
+    if (nameAlreadyExists) {
+      handleNotificationCall("error", "This POC name already exists in the list.");
+      return;
+    }
+
+    const selectedRecruiter = recruiterName.find((recruiter) => recruiter.id === value);
+    if (selectedRecruiter) {
+      const newRecruiterFields = [...newPOCRecruiterAdd];
+      newRecruiterFields[index] = {
+        ...newRecruiterFields[index],
+        name: `${selectedRecruiter.firstName} ${selectedRecruiter?.lastName || ""}`,
+        email: selectedRecruiter.user?.email || "",
+        mobile: selectedRecruiter.mobile || "",
+        recruiterId: value
+      };
+      setNewPOCRecruiterAdd(newRecruiterFields);
+    }
+  };
+  // const recruiterEditChange = (event, index) => {
+  //   const { name, value } = event.target;
+  //   if (name === "editname") {
+  //     const nameAlreadyExists = recruiterEditFields.some((field, idx) => field.name === value && idx !== index);
+  //     if (nameAlreadyExists) {
+  //       handleNotificationCall("error", "This POC name already exists in the list.");
+  //       return;
+  //     }
+
+  //     const selectedRecruiter = recruiterName.find((recruiter) => recruiter.id === value);
+  //     const newRecruiterFields = [...recruiterEditFields];
+  //     newRecruiterFields[index][name] = value;
+
+  //     if (selectedRecruiter) {
+  //       newRecruiterFields[index].name = selectedRecruiter.firstName+" "+selectedRecruiter?.lastName  || "";
+  //       newRecruiterFields[index].email = selectedRecruiter.user?.email || "";
+  //       newRecruiterFields[index].mobile = selectedRecruiter.mobile || "";
+  //       newRecruiterFields[index].recruiterId = value;
+  //     }
+  //     console.log(newRecruiterFields,'4545454545')
+  //     setEditRecFields(newRecruiterFields);
+  //   }
+  // };
+
   // const recruiterChange = (event, index) => {
   //   // const values = [...recruiterFields];
   //   // values[index][event.target.name] = event.target.value;
@@ -854,6 +924,7 @@ export default function Tables() {
       name: "",
       mobile: "",
       email: "",
+      recruiterId: ""
     },
   ]);
   const [levelOfHireEditFields, setLevelOfHireEditFields] = useState([
@@ -871,8 +942,8 @@ export default function Tables() {
         name: "",
         mobile: "",
         email: "",
-        recId: ""
-      },
+        recruiterId: ""
+      }
     ]);
 
     const timeout = setTimeout(() => {
@@ -887,7 +958,7 @@ export default function Tables() {
   const recruiterRemove = (index) => {
     if (recruiterFields.length !== -1) {
       const values = [...recruiterFields];
-      values.splice(-1);
+      values.splice(index, 1);
       setRecruiterFields(values);
     }
   };
@@ -902,7 +973,7 @@ export default function Tables() {
     ]);
 
     const timeout = setTimeout(() => {
-      const element = document.getElementById("section-leve-of-hire");
+      const element = document.getElementById("section-level-of-hire");
 
       element.scrollIntoView({ behavior: "smooth" });
     }, 500);
@@ -935,7 +1006,7 @@ export default function Tables() {
     setState({ ...state, [anchor]: open });
   };
 
-  
+
   const list = (anchor) =>
     dataList === "EDIT" ? (
       <>
@@ -950,7 +1021,7 @@ export default function Tables() {
                   className={classes.drawerHeader}
                 >
                   <Grid item xs={10} md={6}>
-                    <Typography variant="subtitle1">Edit Client</Typography>
+                    <Typography variant="subtitle1">Edit Project</Typography>
                   </Grid>
 
                   <Grid item xs={2} lg={6} className={classes.drawerClose}>
@@ -964,11 +1035,11 @@ export default function Tables() {
               </CardHeader>
 
               <form onSubmit={editSubmit(handleEdit)}>
-                <CardContent>
+                <CardContent className={classes.drawerViewContent}>
                   <Grid container direction="row" spacing={2}>
                     <Grid item xs={12} sm={4} md={4} lg={4}>
                       <InputLabel shrink htmlFor="clientName">
-                      Project Name
+                        Project Name
                       </InputLabel>
                       <FormControl className={classes.margin}>
                         <TextField
@@ -989,7 +1060,7 @@ export default function Tables() {
                     </Grid>
                     <Grid item xs={12} sm={4} md={4} lg={4}>
                       <InputLabel shrink htmlFor="clientIndustry">
-                      Project Division
+                        Project Division
                       </InputLabel>
                       <FormControl className={classes.margin}>
                         <TextField
@@ -1008,44 +1079,71 @@ export default function Tables() {
                         </Typography>
                       </FormControl>
                     </Grid>
+                    {decode.role === "CLIENTCOORDINATOR" ?
+                      <>
+                        <Grid item xs={12} sm={4} md={4} lg={4} style={{ display: 'none' }}>
+                          <InputLabel shrink htmlFor="clientIndustry">
+                            Hiring Manager
+                          </InputLabel>
+                          <TextField
+                            name="recruiterId"
+                            label={clientEdit.recruiterId === '' ? 'Select Hiring Manager' : ''}
+                            classes={{ root: classes.customSelectTextField }}
+                            size="small"
+                            {...editClient("recruiterId")}
+                            InputLabelProps={{ shrink: false }}
+                            margin="normal"
+                            variant="outlined"
+                            hidden="true"
+                            value={decode.recruiterId}
+                          >
 
-                    <Grid item xs={12} sm={4} md={4} lg={4}>
-                    <InputLabel shrink htmlFor="recruiterId">
-                      Hiring Manager
-                    </InputLabel>
-                    <FormControl className={classes.margin}>
-                      <TextField
-                        select
-                        label={clientEdit.recruiterId === '' ? 'Select Hiring Manager' : ''}
-                        classes={{ root: classes.customTextField }}
-                        size="small"
-                        {...editClient('recruiterId')}
-                        defaultValue={clientEdit.recruiterId}
-                        onChange={(e) => setEditValue('recruiterId', e.target.value)}
-                        InputLabelProps={{ shrink: false }}
-                        margin="normal"
-                        variant="outlined"
-                      >
-                        {clientsName?.map((option) => {  
-                        return(
-                          <MenuItem key={option.user.id} value={option.id}>
-                            {decode.user_id === option.user.id
-                              ? `${option.firstName} ${option.lastName} (You)`
-                              : option.employeeId === '' || option.employeeId === null
-                              ? `${option.firstName} ${option.lastName}`
-                              : `${option.firstName} ${option.lastName} (${option?.employeeId})`}
-                          </MenuItem>
-                        )})
-                        }
-                      </TextField>
-                      <Typography variant="inherit" color="error">
-                        {editErrors.recruiterId?.message}
-                      </Typography>
-                    </FormControl>
-                    </Grid>
+                          </TextField>
+                          <Typography variant="inherit" color="error">
+                            {editErrors.recruiterId?.message}
+                          </Typography>
+                        </Grid>
+                      </>
+                      :
+                      <Grid item xs={12} sm={4} md={4} lg={4}>
+                        <InputLabel shrink htmlFor="recruiterId">
+                          Hiring Manager
+                        </InputLabel>
+                        <FormControl className={classes.margin}>
+                          <TextField
+                            select
+                            label={clientEdit.recruiterId === '' ? 'Select Hiring Manager' : ''}
+                            classes={{ root: classes.customSelectTextField }}
+                            size="small"
+                            {...editClient('recruiterId')}
+                            defaultValue={clientEdit.recruiterId}
+                            onChange={(e) => setEditValue('recruiterId', e.target.value)}
+                            InputLabelProps={{ shrink: false }}
+                            margin="normal"
+                            variant="outlined"
+                          >
+                            {clientsName?.map((option) => {
+                              return (
+                                <MenuItem key={option.user.id} value={option.id}>
+                                  {decode.user_id === option.user.id
+                                    ? `${option.firstName} ${option.lastName} (You)`
+                                    : option.employeeId === '' || option.employeeId === null
+                                      ? `${option.firstName} ${option.lastName}`
+                                      : `${option.firstName} ${option.lastName} (${option?.employeeId})`}
+                                </MenuItem>
+                              )
+                            })
+                            }
+                          </TextField>
+                          <Typography variant="inherit" color="error">
+                            {editErrors.recruiterId?.message}
+                          </Typography>
+                        </FormControl>
+                      </Grid>
+                    }
                     <Grid item xs={12} sm={4} md={4} lg={4}>
                       <InputLabel shrink htmlFor="hrbpCode">
-                        HR Business Uint Code
+                        HR Business Unit Code
                       </InputLabel>
                       <FormControl className={classes.margin}>
                         <TextField
@@ -1064,7 +1162,7 @@ export default function Tables() {
                         </Typography>
                       </FormControl>
                     </Grid>
-                
+
                     <Grid item xs={12} sm={4} md={4} lg={4}>
                       <InputLabel shrink htmlFor="projectRegion">
                         Project Region
@@ -1133,7 +1231,7 @@ export default function Tables() {
                     </Grid>
                     <Grid item xs={12} sm={4} md={4} lg={4}>
                       <InputLabel shrink htmlFor="billable">
-                      Billable
+                        Billable
                       </InputLabel>
                       <FormControl className={classes.margin}>
                         <Switch
@@ -1200,639 +1298,626 @@ export default function Tables() {
                         </Typography>
                       </FormControl>
                     </Grid>
+                    <Grid item xs={12}>
+                      <ListItem button onClick={() => handleCollapseClick('hireLevelList')}>
+                        <ListItemIcon>
+                          <SignalCellularAltIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Number to be hired" />
+                        {collapseopen.hireLevelList ? <ExpandLess /> : <ExpandMore />}
+                      </ListItem>
+                      <Collapse in={collapseopen.hireLevelList}>
+                        <List component="div" disablePadding>
+                          <Grid container direction="row" spacing={2}>
+                            <Grid item xs={12} lg={12}>
+                              <MUIDataTable
+                                title=""
+                                options={{
+                                  pagination: false,
+                                  sort: false,
+                                  selectableRows: "none",
+                                  search: false,
+                                  filter: false,
+                                  download: false,
+                                  print: false,
+                                  viewColumns: false,
+                                  responsive: mobileQuery === true ? 'vertical' : 'standard',
+                                  textLabels: {
+                                    body: {
+                                      noMatch: 'Oops! Matching record could not be found',
+                                    }
+                                  },
 
-                    <ListItem button onClick={() => handleCollapseClick('hireLevelList')}>
-                      <ListItemIcon>
-                        <SignalCellularAltIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="Level Hire Lists" />
-                      {collapseopen.hireLevelList ? <ExpandLess /> : <ExpandMore />}
-                    </ListItem>
-                    <Collapse in={collapseopen.hireLevelList}>
-                      <List component="div" disablePadding>
-                      <Grid container direction="row" spacing={2}>
-                        <Grid item xs={12} lg={12}>
-                          <MUIDataTable
-                            title=""
-                            options={{
-                              pagination: false,
-                              sort: false,
-                              selectableRows: "none",
-                              search: false,
-                              filter: false,
-                              download: false,
-                              print: false,
-                              viewColumns: false,
-                              responsive: mobileQuery===true? 'vertical' : 'standard', 
-                              textLabels: {
-                                body: {
-                                  noMatch: 'Oops! Matching record could not be found',
-                                }
-                              },
-                              
-                            }}
-                            columns={[
-                              {
-                                name: "S.No",
-                              },
-                              {
-                                name: "Level Name",
-                                flex: 1
-                              },
-                              {
-                                name: "Number of Hiring",
-                                width: 300 
-                              },
-                              {
-                                name: "Edit",
-                                width: 300 
-                              },
-                            ]}
-                            data={levelOfHireEditFields.map((item, index) => {
-                              return [
-                                index + 1,
-                                item.id === Id ? (
-                                  display === false ? (
-                                    item.name
-                                  ) : (
+                                }}
+                                columns={[
+                                  {
+                                    name: "S.No",
+                                  },
+                                  {
+                                    name: "Level Name",
+                                    flex: 1
+                                  },
+                                  {
+                                    name: "Number to be hired",
+                                    width: 300
+                                  },
+                                  {
+                                    name: "Edit",
+                                    width: 300
+                                  },
+                                ]}
+                                data={levelOfHireEditFields.map((item, index) => {
+                                  return [
+                                    index + 1,
+                                    item.id === Id ? (
+                                      display === false ? (
+                                        item.name
+                                      ) : (
+                                        <TextField
+                                          InputProps={{ disableUnderline: true }}
+                                          classes={{ root: classes.customTextField }}
+                                          size="small"
+                                          placeholder="Level Name"
+                                          defaultValue={item.name}
+                                          onChange={(e) => handleLevelOfHireChange(e, 'name')}
+                                        />
+                                      )
+                                    ) : (
+                                      item.name
+                                    ),
+                                    item.id === Id ? (
+                                      display === false ? (
+                                        item.noOfHires
+                                      ) : (
+                                        <TextField
+                                          InputProps={{ disableUnderline: true }}
+                                          classes={{ root: classes.customTextField }}
+                                          size="small"
+                                          placeholder="Number to be hired"
+                                          defaultValue={item.noOfHires}
+                                          onChange={(e) => handleLevelOfHireChange(e, 'noOfHires')}
+                                        />
+                                      )
+                                    ) : (
+                                      item.noOfHires
+                                    ),
+                                    display === false ? (
+                                      <EditRoundedIcon
+                                        onClick={() => { handleLevelOfHireEdit(item); setId(item.id); }}
+                                        size="small"
+                                        color="primary"
+                                        className={classes.closeBtn}
+                                      />
+                                    ) : item.id === Id ? (
+                                      <div className={classes.space}>
+                                        <CheckCircleIcon
+                                          size="14px"
+                                          color="primary"
+                                          className={classes.closeBtn}
+                                          onClick={handleSaveEditLevelOfHire}
+                                        />
+                                        <CancelIcon
+                                          size="14px"
+                                          color="primary"
+                                          className={classes.closeBtn}
+                                          onClick={() => {
+                                            setDisplay(false);
+                                          }}
+                                        />
+                                      </div>
+                                    ) : (
+                                      <EditRoundedIcon
+                                        onClick={() => { handleLevelOfHireEdit(item); setId(item.id); }}
+                                        size="small"
+                                        color="primary"
+                                        className={classes.closeBtn}
+                                      />
+                                    ),
+                                  ];
+                                })}
+                              />
+                            </Grid>
+
+                            {displayAdd === true ? (
+                              <>
+                                <Grid item xs={12} sm={6} md={6} lg={6}>
+                                  <InputLabel shrink>
+                                    Level Name
+                                  </InputLabel>
+
+                                  <FormControl className={classes.margin}>
                                     <TextField
                                       InputProps={{ disableUnderline: true }}
                                       classes={{ root: classes.customTextField }}
                                       size="small"
                                       placeholder="Level Name"
-                                      defaultValue={item.name}
-                                      onChange={(e) => handleLevelOfHireChange(e, 'name')}
+                                      defaultValue=""
+                                      name="name"
+                                      onChange={(e) => handleAddNewLevelOfHire(e, 'name')}
                                     />
-                                  )
-                                ) : (
-                                  item.name
-                                ),
-                                item.id === Id ? (
-                                  display === false ? (
-                                    item.noOfHires
-                                  ) : (
+                                  </FormControl>
+                                </Grid>
+
+                                <Grid item xs={12} sm={6} md={6} lg={6}>
+                                  <InputLabel shrink>
+                                    Number to be hired
+                                  </InputLabel>
+
+                                  <FormControl className={classes.margin}>
                                     <TextField
                                       InputProps={{ disableUnderline: true }}
                                       classes={{ root: classes.customTextField }}
                                       size="small"
-                                      placeholder="Number of Hiring"
-                                      defaultValue={item.noOfHires}
-                                      onChange={(e) => handleLevelOfHireChange(e, 'noOfHires')}
+                                      placeholder="Number to be hired"
+                                      name="noOfHires"
+                                      defaultValue=""
+                                      onChange={(e) => handleAddNewLevelOfHire(e, 'noOfHires')}
                                     />
-                                  )
-                                ) : (
-                                  item.noOfHires
-                                ),
-                                display === false ? (
-                                  <EditRoundedIcon
-                                    onClick={() => {handleLevelOfHireEdit(item);setId(item.id);}}
+                                  </FormControl>
+                                </Grid>
+                              </>
+                            ) : (
+                              ""
+                            )}
+
+                            <Grid
+                              item
+                              xs={12}
+                              lg={12}
+                              className={classes.drawerClose}
+                            >
+                              {displayAdd === true ? (
+                                <>
+                                  <Button
+                                    variant="contained"
                                     size="small"
                                     color="primary"
                                     className={classes.closeBtn}
-                                  />
-                                ) : item.id === Id ? (
-                                  <div className={classes.space}>
-                                    <CheckCircleIcon
-                                      size="14px"
-                                      color="primary"
-                                      className={classes.closeBtn}
-                                      onClick={handleSaveEditLevelOfHire}
-                                    />
-                                    <CancelIcon
-                                      size="14px"
-                                      color="primary"
-                                      className={classes.closeBtn}
-                                      onClick={() => {
-                                        setDisplay(false);
-                                      }}
-                                    />
-                                  </div>
-                                ) : (
-                                  <EditRoundedIcon
-                                    onClick={() => {handleLevelOfHireEdit(item);setId(item.id);}}
-                                    size="small"
-                                    color="primary"
-                                    className={classes.closeBtn}
-                                  />
-                                ),
-                              ];
-                            })}
-                          />
-                        </Grid>
-
-                        {displayAdd === true ? (
-                          <>
-                            <Grid item xs={12} sm={6} md={6} lg={6}>
-                              <InputLabel shrink>
-                                Level Name
-                              </InputLabel>
-
-                              <FormControl className={classes.margin}>
-                                <TextField
-                                  InputProps={{ disableUnderline: true }}
-                                  classes={{ root: classes.customTextField }}
-                                  size="small"
-                                  placeholder="Level Name"
-                                  defaultValue=""
-                                  name="name"
-                                  onChange={(e) => handleAddNewLevelOfHire(e, 'name')}
-                                />
-                              </FormControl>
-                            </Grid>
-
-                            <Grid item xs={12} sm={6} md={6} lg={6}>
-                              <InputLabel shrink>
-                                Number of Hiring
-                              </InputLabel>
-
-                              <FormControl className={classes.margin}>
-                                <TextField
-                                  InputProps={{ disableUnderline: true }}
-                                  classes={{ root: classes.customTextField }}
-                                  size="small"
-                                  placeholder="Number of Hiring"
-                                  name="noOfHires"
-                                  defaultValue=""
-                                  onChange={(e) => handleAddNewLevelOfHire(e, 'noOfHires')}
-                                />
-                              </FormControl>
-                            </Grid>
-                          </>
-                        ) : (
-                          ""
-                        )}
-
-                        <Grid
-                          item
-                          xs={12}
-                          lg={12}
-                          className={classes.drawerClose}
-                        >
-                          {displayAdd === true ? (
-                            <>
-                              <Button
-                                variant="contained"
-                                size="small"
-                                color="primary"
-                                className={classes.closeBtn}
-                                onClick={(e) => {
-                                  handleSaveAddLevelOfHire();
-                                }}
-                              >
-                                SAVE
-                              </Button>
-                              <Button
-                                variant="contained"
-                                size="small"
-                                color="secondary"
-                                className={classes.closeBtn }
-                                onClick={(e) => {
-                                  setDisplayAdd(false);
-                                }}
-                              >
-                                Close
-                              </Button>
-                            </>
-                          ) : (
-                            <>
-                              <div className={classes.lgButton}>
-                                <Button
-                                  variant="contained"
-                                  color="primary"
-                                  size="small"
-                                  onClick={()=>handleLevelOfHireAdd(clientEdit)}
-                                  className={classes.margin}
-                                  startIcon={<AddCircleIcon />}
-                                >
-                                  Add New Level Name
-                                </Button>
-                              </div>
-
-                              <div className={classes.smButton}>
-                                <Button
-                                  variant="contained"
-                                  size="small"
-                                  startIcon={<AddCircleIcon />}
-                                  className={classes.addUser}
-                                  color="primary"
-                                  onClick={()=>handleLevelOfHireAdd(clientEdit)}
-                                >
-                                  Add New Level Name
-                                </Button>
-                              </div>
-                            </>
-                          )}
-                        </Grid>
-                      </Grid>
-                      </List>
-                    </Collapse>
-                   
-                    <ListItem button onClick={() => handleCollapseClick('orgRecList')}>
-                      <ListItemIcon>
-                        <PeopleAltIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="Org Recruiter Lists" />
-                      {collapseopen.orgRecList ? <ExpandLess /> : <ExpandMore />}
-                    </ListItem>
-                    <Collapse in={collapseopen.orgRecList}>
-                    <List component="div" disablePadding>
-                      <Grid container direction="row" spacing={2}>
-                        <Grid item xs={12} lg={12}>
-                        <MUIDataTable
-                          title=""
-                          options={{
-                            pagination: false,
-                            sort: false,
-                            selectableRows: "none",
-                            search: false,
-                            filter: false,
-                            download: false,
-                            print: false,
-                            viewColumns: false,
-                            responsive: mobileQuery===true? 'vertical' : 'standard', 
-                            textLabels: {
-                              body: {
-                                noMatch: 'Oops! Matching record could not be found',
-                              }
-                            },
-                          }}
-                          columns={[
-                            {
-                              name: "S.No",
-                            },
-                            {
-                              name: "Org Point of Contact(POC) Name",
-                            },
-                            {
-                              name: "Org Point of Contact(POC) Email",
-                            },
-                            {
-                              name: "Org Point of Contact(POC) Mobile No",
-                            },
-                            {
-                              name: "Status",
-                            },
-                            {
-                              name: "Edit",
-                            },
-                          ]}
-                          data={recruiterEditFields.map((item, index) => {
-                            console.log(item)
-                            return [
-                              index + 1,
-                              item.id === Id ? (
-                                display === false ? (
-                                  item.name
-                                ) : (
-                                  <>
-                                   <TextField
-                                    select
-                                    name="editname"
-                                    label={
-                                      recruiterName === "" ? "Select Recrutier Name" : ""
-                                    }
-                                    style={{textAlign: "left"}}
-                                    classes={{ root: classes.customTextField }}
-                                    defaultValue={item.recId}
-                                    onChange={(e) => {
-                                      recruiterEditChange(e, index);
+                                    onClick={(e) => {
+                                      handleSaveAddLevelOfHire();
                                     }}
-                                    size="small"
-                                    InputLabelProps={{ shrink: false }}
-                                    margin="normal"
-                                    variant="outlined"
                                   >
-                                    {recruiterName?.map((option) => {
-                                      const roleName = option.user?.roleName;
-                                      const firstName = option.firstName;
-                                      const lastName = option.lastName;
-                                      let label = `${firstName} ${lastName}`;
-                                      if (roleName) {
-                                        label += ` (${roleName})`;
-
-                                        if (roleName === "SUBVENDOR") {
-                                          label = label.replace("(SUBVENDOR)", "(Vendor)");
-                                        } else if (roleName === "CLIENTCOORDINATOR") {
-                                          label = label.replace(
-                                            "(CLIENTCOORDINATOR)",
-                                            "(Hiring Manager)",
-                                          );
-                                        }
-                                        return (
-                                          <MenuItem
-                                            key={option.id}
-                                            value={option.id}
-                                          >
-                                            {label}
-                                          </MenuItem>
-                                        );
-                                      }
-                                    })}
-                                  </TextField>
+                                    SAVE
+                                  </Button>
+                                  <Button
+                                    variant="contained"
+                                    size="small"
+                                    color="secondary"
+                                    className={classes.closeBtn}
+                                    onClick={(e) => {
+                                      setDisplayAdd(false);
+                                    }}
+                                  >
+                                    Close
+                                  </Button>
                                 </>
-                                )
                               ) : (
-                                item.name
-                              ),
-                              item.id === Id ? (
-                                display === false ? (
-                                  item.email
-                                ) : (
-                                  <TextField
-                                    InputProps={{ disableUnderline: true, readOnly: true }}
-                                    classes={{ root: classes.customTextField }}
-                                    size="small"
-                                    placeholder="Email"
-                                    value={item.email}
-                                    name="email"
-                                  />
-                                ) 
-                              ) : (
-                                item.email
-                              ),
-                              item.id === Id ? (
-                                display === false ? (
-                                  item.mobile
-                                ) : (
-                                  <TextField
-                                    InputProps={{ disableUnderline: true, readOnly: true }}
-                                    classes={{ root: classes.customTextField }}
-                                    size="small"
-                                    placeholder="Mobile"
-                                    value={item.mobile}
-                                  />
-                                )
-                              ) : (
-                                item.mobile
-                              ),
-                              <Switch
-                                checked={item.isActive}
-                                onChange={(e) => {
-                                  handleStatus(item.id, e.target.checked);
-                                }}
-                                color="primary"
-                                inputProps={{ "aria-label": "primary checkbox" }}
-                              />,
-                              display === false ? (
-                                <EditRoundedIcon
-                                  onClick={(e) => {
-                                    setDisplay(true);
-                                    setId(item.id);
-                                    setName(item.name);
-                                    setEmail(item.email);
-                                    setMobile(item.mobile);
-                                  }}
-                                  size="small"
-                                  color="primary"
-                                  className={classes.closeBtn}
-                                />
-                              ) : item.id === Id ? (
-                                <div className={classes.space}>
-                                  <CheckCircleIcon
-                                    size="14px"
-                                    color="primary"
-                                    className={classes.closeBtn}
-                                    onClick={() => {
-                                      axios({
-                                        method: "post",
-                                        url: `${process.env.REACT_APP_SERVER}admin/editOrgRecruiter`,
-                                        data: {
-                                          id: item.id,
-                                          name: editRecFields[0].name,
-                                          email: editRecFields[0].email,
-                                          mobile: editRecFields[0].mobile,
-                                        },
-                                        headers: {
-                                          "Content-Type": "application/json",
-                                          Authorization: token,
-                                        },
-                                      })
-                                        .then(function (response) {
-                                          if (response.data.status === true) {
-                                            handleNotificationCall(
-                                              "success",
-                                              response.data.message,
-                                            );
+                                <>
+                                  <div className={classes.lgButton}>
+                                    <Button
+                                      variant="contained"
+                                      color="primary"
+                                      size="small"
+                                      onClick={() => handleLevelOfHireAdd(clientEdit)}
+                                      className={classes.margin}
+                                      startIcon={<AddCircleIcon />}
+                                    >
+                                      Add New Level Name
+                                    </Button>
+                                  </div>
 
-                                            setDisplay(false);
-
-                                            handleShow(clientEdit.id, "EDIT");
-                                          } else {
-                                            handleNotificationCall(
-                                              "error",
-                                              response.data.message,
-                                            );
-                                          }
-                                        })
-                                        .catch(function (error) {
-                                          console.log(error);
-                                        });
-                                    }}
-                                  />
-
-                                  <CancelIcon
-                                    size="14px"
-                                    color="primary"
-                                    className={classes.closeBtn}
-                                    onClick={() => {
-                                      setDisplay(false);
-                                    }}
-                                  />
-                                </div>
-                              ) : (
-                                <EditRoundedIcon
-                                  onClick={(e) => {
-                                    setDisplay(true);
-                                    setId(item.id);
-                                    setName(item.name);
-                                    setEmail(item.email);
-                                    setMobile(item.mobile);
-                                  }}
-                                  size="small"
-                                  color="primary"
-                                  className={classes.closeBtn}
-                                />
-                              ),
-                            ];
-                          })}
-                        />
-                        </Grid>
-
-                        {displayAdd === true ? (
-                          <>
-                          {editRecFields.map((user, index) =>{ 
-                            console.log(user,'8989898') 
-                            return(
-                          <Grid container direction="row" spacing={2}  key={index}>
-                            <Grid item xs={12} sm={4} md={4} lg={4}>
-                              <InputLabel shrink>
-                                Org Point of Contact(POC) Name
-                              </InputLabel>
-
-                              <FormControl className={classes.margin}>
-                                <TextField
-                                    select
-                                    name="editname"
-                                    label={
-                                      recruiterName === "" ? "Select Recrutier Name" : ""
+                                  <div className={classes.smButton}>
+                                    <Button
+                                      variant="contained"
+                                      size="small"
+                                      startIcon={<AddCircleIcon />}
+                                      className={classes.addUser}
+                                      color="primary"
+                                      onClick={() => handleLevelOfHireAdd(clientEdit)}
+                                    >
+                                      Add New Level Name
+                                    </Button>
+                                  </div>
+                                </>
+                              )}
+                            </Grid>
+                          </Grid>
+                        </List>
+                      </Collapse>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <ListItem button onClick={() => handleCollapseClick('orgRecList')}>
+                        <ListItemIcon>
+                          <PeopleAltIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Org Recruiter Lists" />
+                        {collapseopen.orgRecList ? <ExpandLess /> : <ExpandMore />}
+                      </ListItem>
+                      <Collapse in={collapseopen.orgRecList}>
+                        <List component="div" disablePadding>
+                          <Grid container direction="row" spacing={2}>
+                            <Grid item xs={12} lg={12}>
+                              <MUIDataTable
+                                title=""
+                                options={{
+                                  pagination: false,
+                                  sort: false,
+                                  selectableRows: "none",
+                                  search: false,
+                                  filter: false,
+                                  download: false,
+                                  print: false,
+                                  viewColumns: false,
+                                  responsive: mobileQuery === true ? 'vertical' : 'standard',
+                                  textLabels: {
+                                    body: {
+                                      noMatch: 'Oops! Matching record could not be found',
                                     }
-                                    style={{textAlign: "left"}}
-                                    classes={{ root: classes.customTextField }}
-                                    onChange={(e) => {
-                                      recruiterEditChange(e, index);
-                                    }}
-                                    size="small"
-                                    InputLabelProps={{ shrink: false }}
-                                    margin="normal"
-                                    variant="outlined"
-                                  >
-                                    {recruiterName?.map((option) => {
-                                      const roleName = option.user?.roleName;
-                                      const firstName = option.firstName;
-                                      const lastName = option.lastName;
-                                      let label = `${firstName} ${lastName}`;
-                                      if (roleName) {
-                                        label += ` (${roleName})`;
-
-                                        if (roleName === "SUBVENDOR") {
-                                          label = label.replace("(SUBVENDOR)", "(Vendor)");
-                                        } else if (roleName === "CLIENTCOORDINATOR") {
-                                          label = label.replace(
-                                            "(CLIENTCOORDINATOR)",
-                                            "(Hiring Manager)",
-                                          );
-                                        }
-                                        return (
-                                          <MenuItem
-                                            key={option.id}
-                                            value={option.id}
+                                  },
+                                }}
+                                columns={[
+                                  {
+                                    name: "S.No",
+                                  },
+                                  {
+                                    name: "Recruiter Point of Contact(POC) Name",
+                                  },
+                                  {
+                                    name: "Recruiter Email-Id",
+                                  },
+                                  {
+                                    name: "Recruiter Mobile No",
+                                  },
+                                  {
+                                    name: "Status",
+                                  },
+                                  {
+                                    name: "Edit",
+                                  },
+                                ]}
+                                data={recruiterEditFields.map((item, index) => {
+                                  return [
+                                    index + 1,
+                                    item.id === Id ? (
+                                      display === false ? (
+                                        item.name
+                                      ) : (
+                                        <>
+                                          <TextField
+                                            select
+                                            name="editname"
+                                            label={
+                                              recruiterName === "" ? "Select Recrutier Name" : ""
+                                            }
+                                            style={{ textAlign: "left" }}
+                                            classes={{ root: classes.customSelectTextField }}
+                                            defaultValue={item.recruiterId}
+                                            onChange={(e) => {
+                                              recruiterEditChange(e, index);
+                                            }}
+                                            size="small"
+                                            InputLabelProps={{ shrink: false }}
+                                            margin="normal"
+                                            variant="outlined"
                                           >
-                                            {label}
-                                          </MenuItem>
-                                        );
-                                      }
-                                    })}
-                                  </TextField>
-                              </FormControl>
-                            </Grid>
+                                            {recruiterName?.map((option) => {
+                                              const roleName = option.user?.roleName;
+                                              const firstName = option.firstName;
+                                              const lastName = option.lastName;
+                                              let label = `${firstName} ${lastName}`;
+                                              if (roleName) {
+                                                label += ` (${roleName})`;
 
-                            <Grid item xs={12} sm={4} md={4} lg={4}>
-                              <InputLabel shrink>
-                                Project Point of Contact(POC) Email
-                              </InputLabel>
+                                                if (roleName === "SUBVENDOR") {
+                                                  label = label.replace("(SUBVENDOR)", "(Vendor)");
+                                                } else if (roleName === "CLIENTCOORDINATOR") {
+                                                  label = label.replace(
+                                                    "(CLIENTCOORDINATOR)",
+                                                    "(Hiring Manager)",
+                                                  );
+                                                }
+                                              }
+                                              return (
+                                                <MenuItem
+                                                  key={option.id}
+                                                  value={option.id}
+                                                >
+                                                  {label}
+                                                </MenuItem>
+                                              );
+                                            })}
+                                          </TextField>
+                                        </>
+                                      )
+                                    ) : (
+                                      item.name
+                                    ),
+                                    item.id === Id ? (
+                                      display === false ? (
+                                        item.email
+                                      ) : (
+                                        <TextField
+                                          InputProps={{ disableUnderline: true, readOnly: true }}
+                                          classes={{ root: classes.customTextField }}
+                                          size="small"
+                                          placeholder="Email"
+                                          value={item.email}
+                                          name="email"
+                                        />
+                                      )
+                                    ) : (
+                                      item.email
+                                    ),
+                                    item.id === Id ? (
+                                      display === false ? (
+                                        item.mobile
+                                      ) : (
+                                        <TextField
+                                          InputProps={{ disableUnderline: true, readOnly: true }}
+                                          classes={{ root: classes.customTextField }}
+                                          size="small"
+                                          placeholder="Mobile"
+                                          value={item.mobile}
+                                        />
+                                      )
+                                    ) : (
+                                      item.mobile
+                                    ),
+                                    <Switch
+                                      checked={item.isActive}
+                                      onChange={(e) => {
+                                        handleStatus(item.id, e.target.checked);
+                                      }}
+                                      color="primary"
+                                      inputProps={{ "aria-label": "primary checkbox" }}
+                                    />,
+                                    display === false ? (
+                                      <EditRoundedIcon
+                                        onClick={(e) => {
+                                          setDisplay(true);
+                                          setId(item.id);
+                                        }}
+                                        size="small"
+                                        color="primary"
+                                        className={classes.closeBtn}
+                                      />
+                                    ) : item.id === Id ? (
+                                      <div className={classes.space}>
+                                        <CheckCircleIcon
+                                          size="14px"
+                                          color="primary"
+                                          className={classes.closeBtn}
+                                          onClick={() => {
+                                            axios({
+                                              method: "post",
+                                              url: `${process.env.REACT_APP_SERVER}admin/editOrgRecruiter`,
+                                              data: {
+                                                id: item.id,
+                                                name: editRecFields[0].name,
+                                                email: editRecFields[0].email,
+                                                mobile: editRecFields[0].mobile,
+                                                recruiterId: editRecFields[0].recruiterId,
+                                              },
+                                              headers: {
+                                                "Content-Type": "application/json",
+                                                Authorization: token,
+                                              },
+                                            })
+                                              .then(function (response) {
+                                                if (response.data.status === true) {
+                                                  handleNotificationCall(
+                                                    "success",
+                                                    response.data.message,
+                                                  );
 
-                              <FormControl className={classes.margin}>
-                                <TextField
-                                  InputProps={{ disableUnderline: true }}
-                                  classes={{ root: classes.customTextField }}
-                                  size="small"
-                                  placeholder="Project Point of Contact(POC) Email"
-                                  id="email"
-                                  value={user.email}
-                                  name="email"
-                                />
-                              </FormControl>
-                            </Grid>
-                            <Grid item xs={12} sm={4} md={4} lg={4}>
-                              <InputLabel shrink>
-                                Project Point of Contact(POC) Mobile No
-                              </InputLabel>
+                                                  setDisplay(false);
 
-                              <FormControl className={classes.margin}>
-                                <TextField
-                                  InputProps={{ disableUnderline: true }}
-                                  classes={{ root: classes.customTextField }}
-                                  size="small"
-                                  placeholder="Project Point of Contact(POC) Mobile No"
-                                  id="mobile"
-                                  value={user.mobile}
-                                  name="mobile"
-                                />
-                              </FormControl>
-                            </Grid>
-                            </Grid>
-                          )})}
-                          </>
-                        ) : (
-                          ""
-                        )}
-                        <Grid
-                          item
-                          xs={12}
-                          lg={12}
-                        
-                          className={classes.drawerClose}
-                        >
-                          {displayAdd === true ? (
-                            <>
-                            
-                              <Button
-                                variant="contained"
-                                size="small"
-                                color="primary"
-                                className={classes.closeBtn}
-                                onClick={(e) => {
-                                  handleRecAdd();
-                                }}
-                              >
-                                SAVE
-                              </Button>
-                              <Button
-                                variant="contained"
-                                size="small"
-                                color="secondary"
-                                className={classes.closeBtn }
-                                onClick={(e) => {
-                                  setDisplayAdd(false);
-                                }}
-                              >
-                                Close
-                              </Button>
-                            </>
-                          ) : (
-                            <>
-                              <div className={classes.lgButton}>
-                                <Button
-                                  variant="contained"
-                                  color="primary"
-                                  size="small"
-                                  onClick={(e) => {
-                                    setDisplay(false);
-                                    setDisplayAdd(true);
-                                    setName("");
-                                    setEmail("");
-                                    setMobile("");
-                                  }}
-                                  className={classes.margin}
-                                  startIcon={<AddCircleIcon />}
-                                >
-                                  Add New Org Point of Contact(POC)
-                                </Button>
-                              </div>
+                                                  handleShow(clientEdit.id, "EDIT");
+                                                } else {
+                                                  handleNotificationCall(
+                                                    "error",
+                                                    response.data.message,
+                                                  );
+                                                }
+                                              })
+                                              .catch(function (error) {
+                                                console.log(error);
+                                              });
+                                          }}
+                                        />
 
-                              <div className={classes.smButton}>
-                                <Button
-                                  variant="contained"
-                                  size="small"
-                                  startIcon={<AddCircleIcon />}
-                                  className={classes.addUser}
-                                  color="primary"
-                                  onClick={(e) => {
-                                    setDisplayAdd(true);
-                                    setName("");
-                                    setEmail("");
-                                    setMobile("");
-                                  }}
-                                >
-                                  Add New Org POC
-                                </Button>
-                              </div>
-                            </>
-                          )}
-                        </Grid>
-                      </Grid>
-                      </List>
-                    </Collapse>
+                                        <CancelIcon
+                                          size="14px"
+                                          color="primary"
+                                          className={classes.closeBtn}
+                                          onClick={() => {
+                                            setDisplay(false);
+                                          }}
+                                        />
+                                      </div>
+                                    ) : (
+                                      <EditRoundedIcon
+                                        onClick={(e) => {
+                                          setDisplay(true);
+                                          setId(item.id);
+                                        }}
+                                        size="small"
+                                        color="primary"
+                                        className={classes.closeBtn}
+                                      />
+                                    ),
+                                  ];
+                                })}
+                              />
+                            </Grid>
+                            <Grid item xs={12} lg={12} className="vijay">
+                              {displayOrgAdd === true &&
+                                newPOCRecruiterAdd.map((user, index) => {
+                                  return (
+                                    <div key={index} style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', gap: "20px" }}>
+                                      <Grid
+                                        item
+                                        xs={12}
+                                        className={classNames(classes.fieldsInput)}
+                                      >
+                                        <InputLabel shrink>
+                                          Recruiter Point of Contact(POC) Name
+                                        </InputLabel>
+                                        <TextField
+                                          select
+                                          name={`recruiterId`}
+                                          label={recruiterName === "" ? "Select Recruiter Name" : ""}
+                                          style={{ textAlign: "left" }}
+                                          classes={{ root: classes.customSelectTextField }}
+                                          value={user.recruiterId}
+                                          onChange={(e) => recruiterAddInEditPage(e, index)}
+                                          size="small"
+                                          InputLabelProps={{ shrink: false }}
+                                          margin="normal"
+                                          variant="outlined"
+                                        >
+                                          {recruiterName?.map((option) => {
+                                            const roleName = option.user?.roleName;
+                                            const firstName = option.firstName;
+                                            const lastName = option.lastName;
+                                            let label = `${firstName} ${lastName}`;
+                                            if (roleName) {
+                                              label += ` (${roleName})`;
+
+                                              if (roleName === "SUBVENDOR") {
+                                                label = label.replace("(SUBVENDOR)", "(Vendor)");
+                                              } else if (roleName === "CLIENTCOORDINATOR") {
+                                                label = label.replace("(CLIENTCOORDINATOR)", "(Hiring Manager)");
+                                              }
+                                              return (
+                                                <MenuItem key={option.id} value={option.id}>
+                                                  {label}
+                                                </MenuItem>
+                                              );
+                                            }
+                                          })}
+                                        </TextField>
+
+                                      </Grid>
+
+                                      <Grid
+                                        item
+                                        xs={12}
+                                      >
+                                        <InputLabel shrink>
+                                          Recruiter Email-Id
+                                        </InputLabel>
+
+                                        <FormControl className={classes.margin}>
+                                          <TextField
+                                            InputProps={{ disableUnderline: true }}
+                                            classes={{ root: classes.customTextField }}
+                                            size="small"
+                                            placeholder="Recruiter Email-Id"
+                                            id="email"
+                                            value={user.email}
+                                            name="email"
+                                          />
+                                        </FormControl>
+                                      </Grid>
+
+                                      <Grid
+                                        item
+                                        xs={12}
+                                      >
+                                        <InputLabel shrink>
+                                          Recruiter Mobile No
+                                        </InputLabel>
+
+                                        <FormControl className={classes.margin}>
+                                          <TextField
+                                            InputProps={{ disableUnderline: true }}
+                                            classes={{ root: classes.customTextField }}
+                                            size="small"
+                                            placeholder="Recruiter Mobile No"
+                                            id="mobile"
+                                            value={user.mobile}
+                                            name="mobile"
+                                          />
+                                        </FormControl>
+                                      </Grid>
+                                    </div>
+                                  )
+                                })
+                              }
+                            </Grid>
+                            <div id="section"> </div>
+                            <Grid
+                              item
+                              xs={12}
+                              lg={12}
+                              className={classes.drawerClose}
+                            >
+                              {displayOrgAdd === true ? (
+                                <>
+
+                                  <Button
+                                    variant="contained"
+                                    size="small"
+                                    color="primary"
+                                    className={classes.closeBtn}
+                                    onClick={(e) => {
+                                      handleRecAdd();
+                                    }}
+                                  >
+                                    SAVE
+                                  </Button>
+                                  <Button
+                                    variant="contained"
+                                    size="small"
+                                    color="secondary"
+                                    className={classes.closeBtn}
+                                    onClick={(e) => {
+                                      setDisplayOrgAdd(false);
+                                    }}
+                                  >
+                                    Close
+                                  </Button>
+                                </>
+                              ) : (
+                                <>
+                                  <div className={classes.lgButton}>
+                                    <Button
+                                      variant="contained"
+                                      color="primary"
+                                      size="small"
+                                      onClick={(e) => {
+                                        setDisplay(false);
+                                        setDisplayOrgAdd(true);
+                                      }}
+                                      className={classes.margin}
+                                      startIcon={<AddCircleIcon />}
+                                    >
+                                      Add New Recruiter Point of Contact(POC)
+                                    </Button>
+                                  </div>
+
+                                  <div className={classes.smButton}>
+                                    <Button
+                                      variant="contained"
+                                      size="small"
+                                      startIcon={<AddCircleIcon />}
+                                      className={classes.addUser}
+                                      color="primary"
+                                      onClick={(e) => {
+                                        setDisplayOrgAdd(true);
+                                      }}
+                                    >
+                                      Add New Recruiter POC
+                                    </Button>
+                                  </div>
+                                </>
+                              )}
+                            </Grid>
+                          </Grid>
+                        </List>
+                      </Collapse>
+                    </Grid>
                   </Grid>
                 </CardContent>
                 <CardActions  >
@@ -1841,13 +1926,12 @@ export default function Tables() {
                     direction="row"
                     className={classes.clientDrawerFooter}
                   >
-                 
                     <Button
                       variant="contained"
                       color="primary"
                       size="small"
-                       type="submit"
-                       disabled={editIsSubmitting}
+                      type="submit"
+                      disabled={editIsSubmitting}
                     >
                       Update
                     </Button>
@@ -1869,317 +1953,30 @@ export default function Tables() {
       </>
     ) : dataList === "ADD" ? (
       <>
-     <AddProject 
-      clientsName={clientsName}
-      recruiterName={recruiterName}
-      isSubmitting={isSubmitting}
-      setValue={setValue}
-      handleAdd={ handleAdd }
-      handleSubmit={handleSubmit}
-      toggleDrawer={toggleDrawer}
-      billable={billable}
-      setBillable={setBillable}
-      recruiterChange={recruiterChange}
-      levelOfHiringChange={levelOfHiringChange}
-      recruiterFields={recruiterFields}
-      levelOfHiringFields = {levelOfHiringFields}
-      errors={errors}
-      register={register}
-      recruiterAdd={recruiterAdd}
-      recruiterRemove={recruiterRemove}
-      LevelOfHireAdd={LevelOfHireAdd}
-      LevelOfHireRemove={LevelOfHireRemove}
-      />
+        <AddProject
+          clientsName={clientsName}
+          recruiterName={recruiterName}
+          isSubmitting={isSubmitting}
+          setValue={setValue}
+          handleAdd={handleAdd}
+          handleSubmit={handleSubmit}
+          toggleDrawer={toggleDrawer}
+          billable={billable}
+          setBillable={setBillable}
+          recruiterChange={recruiterChange}
+          levelOfHiringChange={levelOfHiringChange}
+          recruiterFields={recruiterFields}
+          levelOfHiringFields={levelOfHiringFields}
+          errors={errors}
+          register={register}
+          recruiterAdd={recruiterAdd}
+          recruiterRemove={recruiterRemove}
+          LevelOfHireAdd={LevelOfHireAdd}
+          LevelOfHireRemove={LevelOfHireRemove}
+        />
       </>
     ) : dataList === "VIEW" ? (
       <>
-        {/* <Box sx={{ width: "100%" }} role="presentation">
-          <List>
-            <Card className={classes.root}>
-              <CardHeader>
-                <Grid
-                  container
-                  direction="row"
-                  spacing={1}
-                  className={classes.drawerViewHeader}
-                >
-                  <Grid item xs={10} md={6}>
-                    <Typography variant="subtitle1">View Client - {clientEdit.clientName}</Typography>
-                  </Grid>
-
-                  <Grid item xs={2} lg={6} className={classes.drawerViewClose}>
-                    <CloseIcon
-                      className={classes.closeBtn}
-                      size="14px"
-                      onClick={toggleDrawer(anchor, false)}
-                    />
-                  </Grid>
-                </Grid>
-              </CardHeader>
-
-              <CardContent className={classes.drawerViewContent}>
-                <Grid container direction="row" spacing={2}>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography className={classes.boldtext}>
-                    Project Name:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    {clientEdit.clientName}
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography className={classes.boldtext}>
-                    Project Division:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    {clientEdit.clientIndustry}
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography className={classes.boldtext}>
-                    Hiring Manager:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                  {
-                    (() => {
-                        const hiringManager = clientsName.find(client => client.id === clientEdit.handlerId);
-                        return hiringManager ? `${hiringManager.firstName} ${hiringManager.lastName}` : "Hiring Manager not found";
-                    })()
-                  }
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography className={classes.boldtext}>
-                    HR Business Unit Code:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    {clientEdit.hrbpCode}
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography className={classes.boldtext}>
-                    Project Region:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    {clientEdit.projectRegion}
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography className={classes.boldtext}>
-                    Project Location:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    {clientEdit.projectLocation}
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography className={classes.boldtext}>
-                    Reason for Hiring:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    {clientEdit.reasonForHiring}
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography className={classes.boldtext}>
-                    Is Billed:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    {clientEdit.billable === true ? <DoneIcon style={{color:'#4caf50'}}/> : <CloseIcon style={{color:'#b71c1c'}}/> }
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography className={classes.boldtext}>
-                    Hiring Start Date:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    {clientEdit.aggStartDate}
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography className={classes.boldtext}>
-                    Hiring End Date:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    {clientEdit.aggEndDate}
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography className={classes.boldtext}>
-                      Status:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    {clientEdit.status ? (
-                      clientEdit.status.statusName === "ACTIVE" ? (
-                        <>
-                          <Button
-                            variant="contained"
-                            size="small"
-                            className={classes.green+" "+ classes.noPointer}
-                          >
-                            ACTIVE
-                          </Button>
-                        </>
-                      ) : clientEdit.status.statusName === "INACTIVE" ? (
-                        <>
-                          <Button
-                            variant="contained"
-                            size="small"
-                            className={classes.red+" "+ classes.noPointer}
-                          >
-                            INACTIVE
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button
-                            variant="contained"
-                            size="small"
-                            className={classes.blue}
-                          >
-                            NEW
-                          </Button>
-                        </>
-                      )
-                    ) : (
-                      ""
-                    )}
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography className={classes.boldtext}>
-                      Posted Date:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    {moment(clientEdit.createdAt).format("DD-MM-YYYY")}
-                  </Grid>
-                  <ListItem button onClick={() => handleViewProjClick('hireLevelList')}>
-                    <ListItemIcon>
-                      <SignalCellularAltIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Level Hire Lists" />
-                    {viewProjOpen.hireLevelList ? <ExpandLess /> : <ExpandMore />}
-                  </ListItem>
-                  <Collapse in={viewProjOpen.hireLevelList}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <MUIDataTable
-                        options={{
-                          pagination: false,
-                          sort: false,
-                          selectableRows: "none",
-                          search: false,
-                          filter: false,
-                          download: false,
-                          print: false,
-                          viewColumns: false,
-                          responsive: mobileQuery===true? 'vertical' : 'standard', 
-                          textLabels: {
-                            body: {
-                              noMatch: 'Oops! Matching record could not be found',
-                            }
-                          },
-                        }}
-                        columns={[
-                          {
-                            name: "S.No",
-                          },
-                          {
-                            name: "Level Name",
-                          },
-                          {
-                            name: "Number of Hirings",
-                          },
-                        ]}
-                        data={levelOfHireEditFields.map((item, index) => {
-                          return [index + 1, item.name, item.noOfHires];
-                        })}
-                      />
-                    </Grid>
-                  </Grid>
-                  </Collapse>
-                  <ListItem button onClick={() => handleViewProjClick('orgRecList')}>
-                    <ListItemIcon>
-                      <PeopleAltIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Org Recruiter Lists" />
-                    {viewProjOpen.orgRecList ? <ExpandLess /> : <ExpandMore />}
-                  </ListItem>      
-                  <Collapse in={viewProjOpen.orgRecList}>
-                    <List component="div" disablePadding>
-                      <Grid container direction="row" spacing={2}>
-                        <Grid item xs={12}  md={12} lg={12}>
-                          <Typography className={classes.boldtext}>
-                            Org Point of Contact(POC):
-                          </Typography>
-                          <br />
-                          <MUIDataTable
-                            options={{
-                              pagination: false,
-                              sort: false,
-                              selectableRows: "none",
-                              search: false,
-                              filter: false,
-                              download: false,
-                              print: false,
-                              viewColumns: false,
-                              responsive: mobileQuery===true? 'vertical' : 'standard', 
-                              textLabels: {
-                                body: {
-                                  noMatch: 'Oops! Matching record could not be found',
-                                }
-                              },
-                            }}
-                            columns={[
-                              {
-                                name: "S.No",
-                              },
-                              {
-                                name: "Name",
-                              },
-                              {
-                                name: "Email",
-                              },
-
-                              {
-                                name: "Mobile No",
-                              },
-                            ]}
-                            data={recruiterEditFields.map((item, index) => {
-                              return [index + 1, item.name, item.email, item.mobile];
-                            })}
-                          />
-                        </Grid>
-                      </Grid>
-                    </List>
-                  </Collapse>
-                </Grid>
-              </CardContent>
-              <CardActions>
-                <Grid
-                  container
-                  direction="row"
-                  spacing={2}
-                  className={classes.clientDrawerFooter}
-                >
-                  <Button
-                    variant="contained"
-                    size="small"
-                    color="secondary"
-                    onClick={toggleDrawer(anchor, false)}
-                  >
-                    Close
-                  </Button>
-                </Grid>
-              </CardActions>
-            </Card>
-          </List>
-        </Box> */}
         <ProjectView
           anchor={anchor}
           toggleDrawer={toggleDrawer}
@@ -2192,7 +1989,7 @@ export default function Tables() {
           handleViewProjClick={handleViewProjClick}
         />
       </>
-    ) : dataList === "APPROVAL"?(
+    ) : dataList === "APPROVAL" ? (
       <>
         <ProjectApproval
           anchor={anchor}
@@ -2215,9 +2012,9 @@ export default function Tables() {
         />
       </>
     )
-    :(
-      ""
-    );
+      : (
+        ""
+      );
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -2370,14 +2167,14 @@ export default function Tables() {
                   mobile: "",
                   email: "",
                   recruiterId: ""
-                }])  
+                }])
               }}
             >
               Add New Project
             </Button>
           </div>
           <div className={classes.smButton}>
-          <Button
+            <Button
               variant="contained"
               color="primary"
               size="small"
@@ -2390,7 +2187,7 @@ export default function Tables() {
                 setState({ ...state, right: true });
               }}
             >
-              Add 
+              Add
             </Button>
           </div>
           <SwipeableDrawer
@@ -2434,7 +2231,7 @@ export default function Tables() {
 
           <TextField
             name="fromDate"
-           label="From"
+            label="From"
             size="small"
             variant="standard"
             className={classes.filterWidth}
@@ -2442,12 +2239,12 @@ export default function Tables() {
             type="date"
             defaultValue={fromDate}
             onChange={handleFromDateChange}
-            
+
           />
 
           <TextField
             name="toDate"
-           label="To"
+            label="To"
             size="small"
             variant="standard"
             className={classes.filterWidth}
@@ -2455,14 +2252,14 @@ export default function Tables() {
             type="date"
             defaultValue={toDate}
             onChange={handleToDateChange}
-            
+
           />
 
           <div className={classes.buttons}>
             <Button
               variant="contained"
               size="small"
-              color="primary" 
+              color="primary"
               type="submit"
             >
               Search
@@ -2482,7 +2279,7 @@ export default function Tables() {
       <Grid container direction="row" spacing={2}>
         <Grid item xs={12}>
           <MUIDataTable
-             
+
             options={{
               textLabels: {
                 body: {
@@ -2496,7 +2293,7 @@ export default function Tables() {
               print: false,
               download: false,
               sort: false,
-              responsive: mobileQuery===true? 'vertical' : 'standard', 
+              responsive: mobileQuery === true ? 'vertical' : 'standard',
               customToolbar: () => <HeaderElements />,
             }}
             columns={[
@@ -2509,7 +2306,9 @@ export default function Tables() {
               {
                 name: "Project Name",
               },
-
+              {
+                name: "Approval Status",
+              },
               {
                 name: "Project Division",
               },
@@ -2538,17 +2337,21 @@ export default function Tables() {
                 <>
                   <Grid container className={classes.space}>
                     <Grid item xs className={classes.toolAlign}>
-                    <ProjectAction
-                      index={index}
-                      item={item}
-                      handleShow={handleShow}
-                      setDisplayAdd={setDisplayAdd}
-                      viewProjOpen={viewProjOpen}
-                      collapseopen={collapseopen}
-                      setCollapseopen={setCollapseopen}
-                      setViewProjOpen={setViewProjOpen}
-                      
-                    />
+                      <ProjectAction
+                        index={index}
+                        item={item}
+                        activeIndex={activeIndex}
+                        handleMenuClick={handleMenuClick}
+                        anchorEl={anchorEl}
+                        handleShow={handleShow}
+                        setDisplayAdd={setDisplayAdd}
+                        setDisplayOrgAdd={setDisplayOrgAdd}
+                        viewProjOpen={viewProjOpen}
+                        collapseopen={collapseopen}
+                        setCollapseopen={setCollapseopen}
+                        setViewProjOpen={setViewProjOpen}
+
+                      />
                       {/* <Tooltip
                         title="Edit Projects"
                         placement="bottom"
@@ -2577,10 +2380,12 @@ export default function Tables() {
                     </Grid>
                   </Grid>
                 </>,
-                <>
+                <div style={{ display: "flex", alignItems: 'center', gap: "5px" }}>
                   {item.clientName} {"(" + item.uniqueId + ")"}
-                </>,
-
+                </div>,
+                <div style={{ display: "flex", alignItems: 'center', gap: "5px" }}>
+                  {item.approved === "Approved" ? <> <CheckCircleIcon style={{ color: "#9BCF53" }} /> <span> Approved </span> </> : item.approved === "Disapproved" ? <> <HighlightOffIcon style={{ color: "#FF0000" }} /> <span>Not Approved </span> </> : item.approved === "Pending" ? <> <ScheduleIcon style={{ color: "#1679AB" }} /><span> Pending </span> </> : <></>}
+                </div>,
                 item.clientIndustry,
                 item.aggStartDate
                   ? moment(item.aggStartDate).format("DD-MM-YYYY")
@@ -2621,7 +2426,7 @@ export default function Tables() {
           </Grid>
         </Grid>
       </Grid>
-     
+
       <Backdrop className={classes.backdrop} open={loader}>
         <CircularProgress color="inherit" />
       </Backdrop>

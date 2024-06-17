@@ -1,5 +1,8 @@
 import { makeStyles } from "@material-ui/styles";
 
+const drawerWidth = 220;
+// const drawerWidth = 270;
+
 export default makeStyles(theme => ({
   root: {
     display: "flex",
@@ -38,7 +41,7 @@ export default makeStyles(theme => ({
     },
     [theme.breakpoints.between("sm", "md")]: { 
       width: "100%", 
-      paddingLeft:"300px", 
+      paddingLeft: `${drawerWidth+20}px`, 
     },
      
     transition: theme.transitions.create(["width", "margin"], {

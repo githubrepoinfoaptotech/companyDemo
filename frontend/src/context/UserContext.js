@@ -1,5 +1,5 @@
 import React from "react";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 var UserStateContext = React.createContext();
 var UserDispatchContext = React.createContext();
@@ -65,7 +65,7 @@ function authUser(authToken, dispatch, history){
  
     localStorage.setItem('token', authToken);
 
-    const decode = jwt_decode(authToken); 
+    const decode = jwtDecode(authToken); 
     localStorage.setItem('firstName', decode.firstName);
     localStorage.setItem('email', decode.email);
     localStorage.setItem('mobile', decode.mobile);  
