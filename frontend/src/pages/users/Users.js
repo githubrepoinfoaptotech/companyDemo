@@ -42,17 +42,19 @@ import AssignAdd from "../../components/Admin/AssignAdd.js";
 
 import useStyles from "../../themes/style.js";
 import AddUser from "../../components/Admin/AddUser";
-import jwt_decode from "jwt-decode"; 
+import { jwtDecode } from "jwt-decode";
 
 const positions = [toast.POSITION.TOP_RIGHT];
 
 export default function Tables() {
   const classes = useStyles();
   const [loader, setLoader] = useState(false);
-  const mobileQuery = useMediaQuery('(max-width:600px)'); 
+  const mobileQuery = useMediaQuery('(max-width:600px)');
 
   const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
+  const decode = jwtDecode(token);
+  const userRole = decode?.role
+  const companyType = decode?.companyType
   const [userData, setUserData] = useState([]);
   const [userEdit, setUserEdit] = useState({
     id: "",
@@ -63,6 +65,11 @@ export default function Tables() {
     companyName: "",
     isActive: "",
     employeeId: "",
+    companyAddress: "",
+    headOfficeLocation: "",
+    branchOfficeLocation: "",
+    capabilities: "",
+    recruiterCapacity: ""
   });
   const [page, setPage] = useState(0);
   const [currerntPage, setCurrerntPage] = useState(1);
@@ -70,7 +77,7 @@ export default function Tables() {
 
   const [assignPage, setAssignPage] = useState(0);
   const [assignCurrerntPage, setAssignCurrerntPage] = useState(1);
-  const [assigncount, setAssignCount] = useState(0); 
+  const [assigncount, setAssignCount] = useState(0);
 
   const [reducerValue, forceUpdate] = useReducer((x) => x + 1, 0);
 
@@ -116,7 +123,7 @@ export default function Tables() {
         Authorization: token,
       },
     }).then(function (response) {
-      
+
       if (response.data.status === true) {
         setUserData(response.data.data);
         setCount(response.data.count);
@@ -126,11 +133,11 @@ export default function Tables() {
     });
   };
 
-  
+
   const handlerequirementChangePage = (event, newPage) => {
     setAssignPage(newPage);
     setLoader(true);
-    setAssignCurrerntPage(newPage + 1);  
+    setAssignCurrerntPage(newPage + 1);
 
     axios({
       method: "post",
@@ -144,7 +151,7 @@ export default function Tables() {
         Authorization: token,
       },
     }).then(function (response) {
-      
+
       if (response.data.status === true) {
         setAssignData(response.data.data);
         setAssignCount(response.data.count);
@@ -154,7 +161,7 @@ export default function Tables() {
     });
   };
 
-  
+
   function sendNotification(componentProps, options) {
     return toast(
       <Notification
@@ -206,8 +213,7 @@ export default function Tables() {
     if (notificationType === "error") setErrorToastId(toastId);
   }
 
-
-  const [ roleName, setRoleName] = useState("");
+  const [roleName, setRoleName] = useState("");
 
   const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -234,7 +240,12 @@ export default function Tables() {
       .required("Password is required")
       .min(8, "Password must be at least 8 characters"),
     employeeId: Yup.string(),
-    companyName: roleName==="SUBVENDOR"?  Yup.string().required("company Name is required"): Yup.string(),
+    companyName: userRole === "SUBVENDOR" ? Yup.string().required("Company Name is required") : Yup.string(),
+    companyAddress: (companyType === "COMPANY" && userRole === "SUBVENDOR") ? Yup.string().required("Company Address is required") : Yup.string(),
+    headOfficeLocation: (companyType === "COMPANY" && userRole === "SUBVENDOR") ? Yup.string().required("Head Office Location is required") : Yup.string(),
+    branchOfficeLocation: (companyType === "COMPANY" && userRole === "SUBVENDOR") ? Yup.string().required("Branch office Location is required") : Yup.string(),
+    capabilities: (companyType === "COMPANY" && userRole === "SUBVENDOR") ? Yup.string().required("Hiring Support Capabilities is required") : Yup.string(),
+    recruiterCapacity: (companyType === "COMPANY" && userRole === "SUBVENDOR") ? Yup.string().required("Recruiter Capacity is required") : Yup.string(),
   });
 
   const editSchema = Yup.object().shape({
@@ -259,15 +270,20 @@ export default function Tables() {
       .max(10, "Must be exactly 10 digits"),
     roleName: Yup.string().required("User Category is required"),
     employeeId: Yup.string(),
-    companyName: userEdit.roleName==="SUBVENDOR"?  Yup.string().required("company Name is required"): Yup.string(),
+    companyName: userEdit.roleName === "SUBVENDOR" ? Yup.string().required("company Name is required") : Yup.string(),
+    companyAddress: (companyType === "COMPANY" && userEdit.roleName === "SUBVENDOR") ? Yup.string().required("Company Address is required") : Yup.string(),
+    headOfficeLocation: (companyType === "COMPANY" && userEdit.roleName === "SUBVENDOR") ? Yup.string().required("Head Office Location is required") : Yup.string(),
+    branchOfficeLocation: (companyType === "COMPANY" && userEdit.roleName === "SUBVENDOR") ? Yup.string().required("Branch office Location is required") : Yup.string(),
+    capabilities: (companyType === "COMPANY" && userEdit.roleName === "SUBVENDOR") ? Yup.string().required("Hiring Support Capabilities is required") : Yup.string(),
+    recruiterCapacity: (companyType === "COMPANY" && userEdit.roleName === "SUBVENDOR") ? Yup.string().required("Recruiter Capacity is required") : Yup.string(),
   });
 
-  const assignSchema = Yup.object().shape({ 
-     requirementId: Yup.string().required("Requirement Name is required"),
-   });
+  const assignSchema = Yup.object().shape({
+    requirementId: Yup.string().required("Requirement Name is required"),
+  });
 
 
-   const {
+  const {
     register: assignRequirement,
     formState: { errors: assignErrors, isSubmitting: assignIsSubmitting },
     handleSubmit: assignSubmit,
@@ -310,7 +326,7 @@ export default function Tables() {
           Authorization: token,
         },
       }).then(function (response) {
-       
+
         if (response.data.status === true) {
           setLoader(false);
           setUserData(response.data.data);
@@ -318,8 +334,8 @@ export default function Tables() {
         }
       });
 
-      const dataset= await getUserName();
-      setUserName(dataset)
+      getUserName();
+      // setUserName(dataset)
     };
 
 
@@ -346,10 +362,10 @@ export default function Tables() {
         });
     };
 
- 
-    fetchData(); 
+
+    fetchData();
     getRequirementName();
-     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reducerValue, token]);
 
   const getUserName = async () => {
@@ -363,7 +379,7 @@ export default function Tables() {
       },
     })
       .then(function (response) {
-         
+
         if (response.data.status === true) {
           setLoader(false);
           setUserName(response.data.data);
@@ -376,7 +392,7 @@ export default function Tables() {
   };
 
   function handleStatus(id, value) {
-  
+
     setLoader(true);
     axios({
       method: "post",
@@ -391,16 +407,16 @@ export default function Tables() {
     }).then(function (response) {
       if (response.data.status === true) {
         setLoader(false);
-        const switchState = userData.map(item => { 
+        const switchState = userData.map(item => {
           if (item.user.id === id) {
             return { ...item, user: { ...item.user, isActive: value } };
-             
+
           }
           return item;
-        }); 
+        });
         setUserData(switchState);
         handleNotificationCall("success", response.data.data);
-       }
+      }
     });
   }
 
@@ -431,12 +447,12 @@ export default function Tables() {
       .catch(function (error) {
         console.log(error);
       });
-  
-  } 
+
+  }
 
 
   function handleAssignStatus(id, value) {
-  
+
     setLoader(true);
     axios({
       method: "post",
@@ -449,33 +465,33 @@ export default function Tables() {
         "Authorization": token,
       },
     }).then(function (response) {
-     
+
       if (response.data.status === true) {
-       
-        const switchState = assignData.map(item => { 
+
+        const switchState = assignData.map(item => {
           if (item.id === id) {
             return { ...item, isActive: value };
-             
+
           }
           return item;
-        }); 
+        });
         setAssignData(switchState);
         setLoader(false);
         handleNotificationCall("success", response.data.message);
-       }
+      }
     });
   }
 
   function handleAssignRequirements(values) {
-    
+
     return new Promise((resolve) => {
-      setLoader(true); 
+      setLoader(true);
       axios({
         method: "post",
         url: `${process.env.REACT_APP_SERVER}admin/assignRequirements`,
         data: {
-          recruiterId:  recruiterId?.id,
-          requirementId: requirementId?.id, 
+          recruiterId: recruiterId?.id,
+          requirementId: requirementId?.id,
         },
 
         headers: {
@@ -486,10 +502,10 @@ export default function Tables() {
         resolve();
         if (response.data.status === true) {
           handleNotificationCall("success", response.data.message);
-           forceUpdate();
-        assignReset();
-        setRecruiterId(null);
-        setRequirementId(null);
+          forceUpdate();
+          assignReset();
+          setRecruiterId(null);
+          setRequirementId(null);
 
           setState({ ...state, right: false });
         } else {
@@ -515,8 +531,13 @@ export default function Tables() {
           password: values.password,
           mobile: values.mobile,
           roleName: values.roleName,
-          companyName: values.companyName,
           employeeId: values.employeeId,
+          companyName: values.companyName,
+          companyAddress: values.companyAddress,
+          headOfficeLocation: values.headOfficeLocation,
+          branchOfficeLocation: values.branchOfficeLocation,
+          capabilities: values.capabilities,
+          recruiterCapacity: values.recruiterCapacity,
         },
 
         headers: {
@@ -554,6 +575,11 @@ export default function Tables() {
           roleName: values.roleName,
           companyName: values.companyName,
           employeeId: values.employeeId,
+          companyAddress: values.companyAddress,
+          headOfficeLocation: values.headOfficeLocation,
+          branchOfficeLocation: values.branchOfficeLocation,
+          capabilities: values.capabilities,
+          recruiterCapacity: values.recruiterCapacity,
         },
         headers: {
           "Content-Type": "application/json",
@@ -593,7 +619,7 @@ export default function Tables() {
   const [recruiterId, setRecruiterId] = useState(null);
   const [requirementId, setRequirementId] = useState(null);
 
-  
+
   const filterRef = useRef(null);
 
   const handleFromDateChange = (event) => {
@@ -606,6 +632,7 @@ export default function Tables() {
 
   const resetForm = (e) => {
     filterRef.current.reset();
+    setRoleName('');
     setRecruiterId(null);
     forceUpdate();
   };
@@ -660,9 +687,9 @@ export default function Tables() {
                   className={classes.drawerHeader}
                 >
                   <Grid item xs={10} md={6}>
-                    
+
                     <Typography variant="subtitle1">
-                      
+
                       Edit User
                     </Typography>
                   </Grid>
@@ -681,7 +708,7 @@ export default function Tables() {
                 <CardContent>
                   <Grid container direction="row" spacing={2}>
 
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
+                    <Grid item xs={12} sm={6} md={6} lg={6}>
                       <FormControl className={classes.margin}>
                         <InputLabel shrink htmlFor="roleName">
                           Select User Category
@@ -697,54 +724,54 @@ export default function Tables() {
                             root: classes.customSelectField,
                             icon: classes.customSelectIcon,
                           }}
-                          disableUnderline 
-                          onChange={(e)=>{ 
+                          disableUnderline
+                          onChange={(e) => {
                             setUserEdit({
-                              ...userEdit, 
+                              ...userEdit,
                               roleName: e.target.value
                             });
                           }}
                         >
-                            <MenuItem value="RECRUITER">Recruiter</MenuItem>
-                          <MenuItem value="CLIENTCOORDINATOR">{decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator"}</MenuItem>
-                          <MenuItem value="SUBVENDOR"> {decode.companyType === "COMPANY" ? "Vendor" :"Sub Vendor"}</MenuItem>
-                          {decode.companyType === "COMPANY" ? 
-                          <></> 
-                          : 
-                          <MenuItem value="FREELANCER">  Freelancer </MenuItem>
+                          <MenuItem value="RECRUITER">Recruiter</MenuItem>
+                          <MenuItem value="CLIENTCOORDINATOR">{companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator"}</MenuItem>
+                          <MenuItem value="SUBVENDOR"> {companyType === "COMPANY" ? "Vendor" : "Sub Vendor"}</MenuItem>
+                          {companyType === "COMPANY" ?
+                            <></>
+                            :
+                            <MenuItem value="FREELANCER">  Freelancer </MenuItem>
                           }
                         </Select>
                       </FormControl>
                     </Grid>
 
-                    {userEdit.roleName==="SUBVENDOR"? 
-                    <Grid item xs={12} sm={6} md={6} lg={6}>
-                      <InputLabel shrink htmlFor="companyName">
-                        
-                      Company Name
-                      </InputLabel>
-                      <FormControl className={classes.margin}>
-                        <TextField
-                          size="small"
-                          classes={{ root: classes.customTextField }}
-                          InputProps={{ disableUnderline: true }}
-                          placeholder="Enter Company Name"
-                          id="companyName"
-                          defaultValue={userEdit.companyName}
-                          {...editUser("companyName")}
-                          error={editErrors.companyName ? true : false}
-                        />
+                    {userEdit.roleName === "SUBVENDOR" &&
+                      <Grid item xs={12} sm={6} md={6} lg={6}>
+                        <InputLabel shrink htmlFor="companyName">
 
-                        <Typography variant="inherit" color="error">
-                          {editErrors.companyName?.message}
-                        </Typography>
-                      </FormControl>
-                    </Grid>
-                    :""}
+                          Company Name
+                        </InputLabel>
+                        <FormControl className={classes.margin}>
+                          <TextField
+                            size="small"
+                            classes={{ root: classes.customTextField }}
+                            InputProps={{ disableUnderline: true }}
+                            placeholder="Enter Company Name"
+                            id="companyName"
+                            defaultValue={userEdit.companyName}
+                            {...editUser("companyName")}
+                            error={editErrors.companyName ? true : false}
+                          />
+
+                          <Typography variant="inherit" color="error">
+                            {editErrors.companyName?.message}
+                          </Typography>
+                        </FormControl>
+                      </Grid>
+                      }
 
                     <Grid item xs={12} sm={6} md={6} lg={6}>
                       <InputLabel shrink htmlFor="firstName">
-                        
+
                         First Name
                       </InputLabel>
                       <FormControl className={classes.margin}>
@@ -767,7 +794,7 @@ export default function Tables() {
 
                     <Grid item xs={12} sm={6} md={6} lg={6}>
                       <InputLabel shrink htmlFor="lastName">
-                        
+
                         Last Name
                       </InputLabel>
                       <FormControl className={classes.margin}>
@@ -833,7 +860,7 @@ export default function Tables() {
                       </FormControl>
                     </Grid>
 
-               
+
 
                     <Grid item xs={12} sm={6} md={6} lg={6}>
                       <InputLabel shrink htmlFor="employeeId">
@@ -857,6 +884,119 @@ export default function Tables() {
                         </Typography>
                       </FormControl>
                     </Grid>
+                    {(companyType === "COMPANY" && userEdit.roleName === "SUBVENDOR") ? (
+                      <>
+                        <Grid item xs={12} sm={6} md={6} lg={6}>
+                        <InputLabel shrink htmlFor="companyAddress">
+                          Company Address
+                        </InputLabel>
+                        <FormControl className={classes.margin}>
+                          <TextField
+                            size="small"
+                            classes={{ root: classes.customTextField }}
+                            InputProps={{ disableUnderline: true }}
+                            placeholder="Enter Company Address"
+                            id="companyAddress"
+                            defaultValue={userEdit.companyAddress}
+                            {...editUser("companyAddress")}
+                            error={editErrors.companyAddress ? true : false}
+                          />
+
+                          <Typography variant="inherit" color="error">
+                            {editErrors.companyAddress?.message}
+                          </Typography>
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item xs={12} sm={6} md={6} lg={6}>
+                        <InputLabel shrink htmlFor="headOfficeLocation">
+                          Head Office Location
+                        </InputLabel>
+                        <FormControl className={classes.margin}>
+                          <TextField
+                            size="small"
+                            classes={{ root: classes.customTextField }}
+                            InputProps={{ disableUnderline: true }}
+                            placeholder="Enter Head Office Location"
+                            id="headOfficeLocation"
+                            defaultValue={userEdit.headOfficeLocation}
+                            {...editUser("headOfficeLocation")}
+                            error={editErrors.headOfficeLocation ? true : false}
+                          />
+
+                          <Typography variant="inherit" color="error">
+                            {editErrors.headOfficeLocation?.message}
+                          </Typography>
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item xs={12} sm={6} md={6} lg={6}>
+                        <InputLabel shrink htmlFor="branchOfficeLocation">
+                          Branch Office Location
+                        </InputLabel>
+                        <FormControl className={classes.margin}>
+                          <TextField
+                            size="small"
+                            classes={{ root: classes.customTextField }}
+                            InputProps={{ disableUnderline: true }}
+                            placeholder="Enter Branch Office Location"
+                            id="branchOfficeLocation"
+                            defaultValue={userEdit.branchOfficeLocation}
+                            {...editUser("branchOfficeLocation")}
+                            error={editErrors.branchOfficeLocation ? true : false}
+                          />
+
+                          <Typography variant="inherit" color="error">
+                            {editErrors.branchOfficeLocation?.message}
+                          </Typography>
+                          </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={6} lg={6}>
+                        <InputLabel shrink htmlFor="capabilities">
+                         Hiring Support
+                        </InputLabel>
+                        <FormControl className={classes.margin}>
+                          <TextField
+                            size="small"
+                            classes={{ root: classes.customTextField }}
+                            InputProps={{ disableUnderline: true }}
+                            placeholder="IT/Non-IT/NICHE/SUPER NICHE/Leadership"
+                            id="capabilities"
+                            defaultValue={userEdit.capabilities}
+                            {...editUser("capabilities")}
+                            error={editErrors.capabilities ? true : false}
+                          />
+
+                          <Typography variant="inherit" color="error">
+                            {editErrors.capabilities?.message}
+                          </Typography>
+                          </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={6} lg={6}>
+                        <InputLabel shrink htmlFor="recruiterCapacity">
+                          Recruiter Capacity
+                        </InputLabel>
+                        <FormControl className={classes.margin}>
+                          <TextField
+                            size="small"
+                            classes={{ root: classes.customTextField }}
+                            InputProps={{ disableUnderline: true }}
+                            placeholder="Enter Recruiter Capacity"
+                            id="recruiterCapacity"
+                            defaultValue={userEdit.recruiterCapacity}
+                            {...editUser("recruiterCapacity")}
+                            error={editErrors.recruiterCapacity ? true : false}
+                          />
+
+                          <Typography variant="inherit" color="error">
+                            {editErrors.recruiterCapacity?.message}
+                          </Typography>
+                          </FormControl>
+                        </Grid>
+                      </>
+                    ):(
+                      <></>
+                    )}
                   </Grid>
                 </CardContent>
                 <CardActions>
@@ -866,12 +1006,12 @@ export default function Tables() {
                     spacing={2}
                     className={classes.drawerFooter}
                   >
-                  
+
 
                     <Button
                       variant="contained"
-                      color="primary" 
-                      size="small" 
+                      color="primary"
+                      size="small"
                       type="submit"
                       disabled={editIsSubmitting}
                     >
@@ -883,7 +1023,7 @@ export default function Tables() {
                       color="secondary"
                       onClick={toggleDrawer(anchor, false)}
                     >
-                      
+
                       Close
                     </Button>
                   </Grid>
@@ -895,7 +1035,7 @@ export default function Tables() {
       </>
     ) : dataList === "ADD" ? (
       <>
-        <AddUser 
+        <AddUser
           toggleDrawer={toggleDrawer}
           handleSubmit={handleSubmit}
           handleAdd={handleAdd}
@@ -1178,32 +1318,32 @@ export default function Tables() {
     ) : dataList === "ASSIGN" ? (
       <>
 
-<Box sx={{ width: "100%" }} role="presentation">
-      <List>
-      <>
-<AssignAdd 
-externalUser={""}
-toggleDrawer={toggleDrawer}
-handleAssignRequirements={handleAssignRequirements} 
-assignSubmit={assignSubmit}
-assignRequirement={assignRequirement}
-assignErrors={assignErrors}
-setRequirementId={setRequirementId}
-handlerequirementChangePage={handlerequirementChangePage}
-assigncount={assigncount}
-assignPage={assignPage}
-handleAssignStatus={handleAssignStatus}
-requirementName={requirementName}
-setRecruiterId={setRecruiterId}
-assignIsSubmitting={assignIsSubmitting}
-assignData={assignData}
-assignCurrerntPage={assignCurrerntPage}
-getAssigendRequirements={getAssigendRequirements}
-recruiter={"false"}
-/>
-      </>
-      </List>
-      </Box>
+        <Box sx={{ width: "100%" }} role="presentation">
+          <List>
+            <>
+              <AssignAdd
+                externalUser={""}
+                toggleDrawer={toggleDrawer}
+                handleAssignRequirements={handleAssignRequirements}
+                assignSubmit={assignSubmit}
+                assignRequirement={assignRequirement}
+                assignErrors={assignErrors}
+                setRequirementId={setRequirementId}
+                handlerequirementChangePage={handlerequirementChangePage}
+                assigncount={assigncount}
+                assignPage={assignPage}
+                handleAssignStatus={handleAssignStatus}
+                requirementName={requirementName}
+                setRecruiterId={setRecruiterId}
+                assignIsSubmitting={assignIsSubmitting}
+                assignData={assignData}
+                assignCurrerntPage={assignCurrerntPage}
+                getAssigendRequirements={getAssigendRequirements}
+                recruiter={"false"}
+              />
+            </>
+          </List>
+        </Box>
 
         {/* <Box sx={{ width: "100%" }} role="presentation">
           <List>
@@ -1374,11 +1514,11 @@ recruiter={"false"}
                 </form>
             </Card>
           </List>
-        </Box> */} 
+        </Box> */}
 
 
       </>
-    )   : (
+    ) : (
       <>
         <Box sx={{ width: "100%" }} role="presentation">
           <List>
@@ -1391,10 +1531,10 @@ recruiter={"false"}
                   className={classes.drawerViewHeader}
                 >
                   <Grid item xs={10} md={6}>
-                    
+
                     <Typography variant="subtitle1">
-                      
-                      View User - {userEdit.firstName +" "+ userEdit.lastName}
+
+                      View User - {userEdit.firstName + " " + userEdit.lastName}
                     </Typography>
                   </Grid>
 
@@ -1418,28 +1558,47 @@ recruiter={"false"}
 
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>     <Typography className={classes.boldtext}>  User Category:  </Typography> </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>   {userEdit.roleName === "RECRUITER"? "Recruiter": 
-                                                               userEdit.roleName === "CLIENTCOORDINATOR"?  "Hiring Manager" :
-                                                               userEdit.roleName === "SUBVENDOR"?  (decode.companyType === "COMPANY" ? "Vendor" :"Sub Vendor"):
-                                                               userEdit.roleName === "FREELANCER"?  "Freelancer":
-                                                               "" }   </Grid>
-                  
+                  <Grid item xs={12} sm={6} md={6} lg={6}>   {userEdit.roleName === "RECRUITER" ? "Recruiter" :
+                    userEdit.roleName === "CLIENTCOORDINATOR" ? "Hiring Manager" :
+                      userEdit.roleName === "SUBVENDOR" ? (companyType === "COMPANY" ? "Vendor" : "Sub Vendor") :
+                        userEdit.roleName === "FREELANCER" ? "Freelancer" :
+                          ""}   </Grid>
+
                   <Grid item xs={12} sm={6} md={6} lg={6}>  <Typography className={classes.boldtext}>Email:</Typography>   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>   {userEdit.email}  </Grid>
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>    <Typography className={classes.boldtext}>   Mobile:   </Typography>   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>   {userEdit.mobile} </Grid>
 
-                
-                  {userEdit.roleName==="SUBVENDOR"? <>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>  <Typography className={classes.boldtext}>  Company Name: </Typography>   </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}> {userEdit.companyName}  </Grid></>
- :""}
 
- 
-                <Grid item xs={12} sm={6} md={6} lg={6}>
+                  {userEdit.roleName === "SUBVENDOR" ? <>
+                    <Grid item xs={12} sm={6} md={6} lg={6}>  <Typography className={classes.boldtext}>  Company Name: </Typography>   </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}> {userEdit.companyName}  </Grid></>
+                    : ""}
+
+
+                  <Grid item xs={12} sm={6} md={6} lg={6}>
                     <Typography className={classes.boldtext}>  Employee Id:       </Typography> </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>    {userEdit.employeeId}     </Grid>
+
+                  {userEdit.roleName === "SUBVENDOR" && (
+                   <>
+                    <Grid item xs={12} sm={6} md={6} lg={6}>  <Typography className={classes.boldtext}>  Company Address: </Typography>   </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}> {userEdit.companyAddress}  </Grid>
+                    
+                    <Grid item xs={12} sm={6} md={6} lg={6}>  <Typography className={classes.boldtext}>  Head office Location: </Typography>   </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}> {userEdit.headOfficeLocation}  </Grid>
+
+                    <Grid item xs={12} sm={6} md={6} lg={6}>  <Typography className={classes.boldtext}>  Branch office Location: </Typography>   </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}> {userEdit.branchOfficeLocation}  </Grid>
+
+                    <Grid item xs={12} sm={6} md={6} lg={6}>  <Typography className={classes.boldtext}>  Hiring Support: </Typography>   </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}> {userEdit.capabilities}  </Grid>
+
+                    <Grid item xs={12} sm={6} md={6} lg={6}>  <Typography className={classes.boldtext}>  Recruiter Capacity: </Typography>   </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={6}> {userEdit.recruiterCapacity}  </Grid>
+                  </>
+                  )}
 
                   <Grid item xs={12} sm={6} md={6} lg={6}> <Typography className={classes.boldtext}>   Posted Date:   </Typography> </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}> {moment(userEdit.createdAt).format("DD-MM-YYYY")}  </Grid>
@@ -1458,7 +1617,7 @@ recruiter={"false"}
                     color="secondary"
                     onClick={toggleDrawer(anchor, false)}
                   >
-                    
+
                     Close
                   </Button>
                 </Grid>
@@ -1470,68 +1629,68 @@ recruiter={"false"}
     );
 
 
-    const table_options = {
-      textLabels: {
-        body: {
-          noMatch: 'Oops! Matching record could not be found',
-        }
-      },
-        sort: false,
-        selectableRows: "none",
-        search: false,
-        filter: false,
-        print: false,
-        download: false,
-        pagination: false,
-        customToolbar: () => <HeaderElements />, 
-        page: page,
-        responsive: mobileQuery===true? 'vertical' : 'standard',
-    };
+  const table_options = {
+    textLabels: {
+      body: {
+        noMatch: 'Oops! Matching record could not be found',
+      }
+    },
+    sort: false,
+    selectableRows: "none",
+    search: false,
+    filter: false,
+    print: false,
+    download: false,
+    pagination: false,
+    customToolbar: () => <HeaderElements />,
+    page: page,
+    responsive: mobileQuery === true ? 'vertical' : 'standard',
+  };
 
 
-  
-    
- 
 
-    const table_column = [
-      {
-        name: "S.No",
-      },
-      {
-        name: "Actions",
-      },
-      {
-        name: "Name",
-      },
-      {
-        name: "Email",
-      },
-      {
-        name: "Employee ID",
-      },
 
-      {
-        name: "Mobile",
-      },
 
-      {
-        name: "User Category",
-      },
 
-      {
-        name: "Status",
-      },
-      {
-        name: "Posted Date",
-      },
-    ]
+  const table_column = [
+    {
+      name: "S.No",
+    },
+    {
+      name: "Actions",
+    },
+    {
+      name: "Name",
+    },
+    {
+      name: "Email",
+    },
+    {
+      name: "Employee ID",
+    },
+
+    {
+      name: "Mobile",
+    },
+
+    {
+      name: "User Category",
+    },
+
+    {
+      name: "Status",
+    },
+    {
+      name: "Posted Date",
+    },
+  ]
 
 
   return (
     <>
       <Grid container direction="row" spacing={2}>
         <Grid item xs={6}>
-          
+
           <PageTitle title="Users" />
         </Grid>
 
@@ -1551,7 +1710,7 @@ recruiter={"false"}
               startIcon={<AddCircleIcon />}
             >
               Add New User
-              
+
             </Button>
           </div>
           <div className={classes.smButton}>
@@ -1591,31 +1750,29 @@ recruiter={"false"}
         }}
       >
         <Grid container spacing={2} className={classes.filterGap}>
-          <div  className={classes.filterFullWidth} >
-        <InputLabel shrink id="roleName"> User Category </InputLabel>
-       
-               <TextField  
-              name="roleName"  
-              variant="standard"  
+          <div className={classes.filterFullWidth} >
+            <InputLabel shrink id="roleName"> User Category </InputLabel>
+
+            <TextField
+              name="roleName"
+              variant="standard"
               defaultValue=""
-                          onChange={ (e) => {
-                            setRoleName(e.target.value); 
-                          }} 
-                          
-                          InputProps={{ className: classes.h34 }}
-                          disableunderline="true"
-                           select>
-                          
-                          <MenuItem value="RECRUITER">Recruiter</MenuItem>
-                          <MenuItem value="CLIENTCOORDINATOR"> {decode.companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator"} </MenuItem>
-                          <MenuItem value="SUBVENDOR"> Subvendor </MenuItem>
-                          {decode.companyType === "COMPANY" ? 
-                          <></> 
-                          : 
-                          <MenuItem value="FREELANCER">  Freelancer </MenuItem>
-                          }
-                        </TextField>
-                        </div>
+              onChange={(e) => setRoleName(e.target.value)}
+              value={roleName}
+              InputProps={{ className: classes.h34 }}
+              disableunderline="true"
+              select>
+
+              <MenuItem value="RECRUITER">Recruiter</MenuItem>
+              <MenuItem value="CLIENTCOORDINATOR"> {companyType === "COMPANY" ? "Hiring Manager" : "Client Coordinator"} </MenuItem>
+              <MenuItem value="SUBVENDOR">  {companyType === "COMPANY" ? "Vendor" : "Sub Vendor"} </MenuItem>
+              {companyType === "COMPANY" ?
+                <></>
+                :
+                <MenuItem value="FREELANCER">  Freelancer </MenuItem>
+              }
+            </TextField>
+          </div>
           <Autocomplete
             className={classes.filterFullWidth}
             options={userName}
@@ -1628,22 +1785,23 @@ recruiter={"false"}
                 label += ` (${roleName})`;
 
                 if (roleName === 'SUBVENDOR') {
-                  label = label.replace('(SUBVENDOR)', '(Vendor)');
+                  label = label.replace('(SUBVENDOR)', `(${option?.companyName})`);
                 } else if (roleName === 'CLIENTCOORDINATOR') {
                   label = label.replace('(CLIENTCOORDINATOR)', '(Hiring Manager)');
                 }
               }
 
               return label;
-            }}         
+            }}
             onChange={(event, value) => setRecruiterId(value)}
+            value={recruiterId}
             size="small"
             renderInput={(params) => (
               <TextField
                 {...params}
                 name="recruiterId"
                 variant="standard"
-                label={decode.companyType ==="COMPANY"? "User" :"Recruiter"}
+                label={companyType === "COMPANY" ? "User" : "Recruiter"}
                 InputLabelProps={{ shrink: true }}
                 type="text"
               />
@@ -1652,7 +1810,7 @@ recruiter={"false"}
 
           <TextField
             name="fromDate"
-           label="From"
+            label="From"
             size="small"
             type="date"
             variant="standard"
@@ -1661,13 +1819,13 @@ recruiter={"false"}
             className={classes.filterWidth}
             defaultValue={fromDate}
             onChange={handleFromDateChange}
-            
+
           />
-          
+
 
           <TextField
             name="toDate"
-           label="To"
+            label="To"
             size="small"
             type="date"
             format={'DD/MM/YYYY'}
@@ -1676,7 +1834,7 @@ recruiter={"false"}
             className={classes.filterWidth}
             defaultValue={toDate}
             onChange={handleToDateChange}
-            
+
           />
 
           <div className={classes.buttons}>
@@ -1702,72 +1860,82 @@ recruiter={"false"}
 
       <Grid container spacing={2}>
         <Grid item xs >
-          <MUIDataTable 
+          <MUIDataTable
             options={table_options}
             columns={table_column}
             data={userData.map((item, index) => {
-           
+
               return [
                 currerntPage !== 0
-                ? 10 * currerntPage - 10 + index + 1
-                : index + 1 ,
-                
-                  <Grid container className={classes.space}>
-                    <Grid item xs className={classes.toolAlign}>
-                      <Tooltip
-                        title="Edit User"
-                        placement="bottom"
-                        aria-label="edit"
-                      >
-                        <EditIcon
-                          className={classes.toolIcon}
-                          onClick={(e) => {
-                            setState({ ...state, right: true });
-                            editreset();
-                            setDataList("EDIT");
+                  ? 10 * currerntPage - 10 + index + 1
+                  : index + 1,
 
-                            setUserEdit({
-                              ...userEdit,
-                              id: item.user.id,
-                              email: item.user.email,
-                              firstName: item.firstName,
-                              lastName: item.lastName,
-                              mobile: item.mobile,
-                              roleName: item.user.roleName,
-                              companyName: item.companyName,
-                              employeeId: item.employeeId,
-                            });
-                          }}
-                        />
-                      </Tooltip>
+                <Grid container className={classes.space}>
+                  <Grid item xs className={classes.toolAlign}>
+                    <Tooltip
+                      title="Edit User"
+                      placement="bottom"
+                      aria-label="edit"
+                    >
+                      <EditIcon
+                        className={classes.toolIcon}
+                        onClick={(e) => {
+                          setState({ ...state, right: true });
+                          editreset();
+                          setDataList("EDIT");
 
-                      <Tooltip
-                        title="View User"
-                        placement="bottom"
-                        aria-label="view"
-                      >
-                        <ViewIcon
-                          className={classes.toolIcon}
-                          onClick={(e) => {
-                            setState({ ...state, right: true });
-                            editreset();
-                            setDataList("VIEW");
+                          setUserEdit({
+                            ...userEdit,
+                            id: item.user.id,
+                            email: item.user.email,
+                            firstName: item.firstName,
+                            lastName: item.lastName,
+                            mobile: item.mobile,
+                            roleName: item.user.roleName,
+                            companyName: item.companyName,
+                            employeeId: item.employeeId,
+                            companyAddress: item.companyAddress,
+                            headOfficeLocation: item.headOfficeLocation,
+                            branchOfficeLocation: item.branchOfficeLocation,
+                            capabilities: item.capabilities,
+                            recruiterCapacity: item.recruiterCapacity
+                          });
+                        }}
+                      />
+                    </Tooltip>
 
-                            setUserEdit({
-                              ...userEdit,
-                              id: item.user.id,
-                              email: item.user.email,
-                              firstName: item.firstName,
-                              lastName: item.lastName,
-                              mobile: item.mobile,
-                              roleName: item.user.roleName,
-                              employeeId: item.employeeId,
-                              companyName: item.companyName,
-                            });
-                          }}
-                        />
-                      </Tooltip>
- {item.user?.roleName === "SUBVENDOR" || item.user?.roleName === "FREELANCER" ?
+                    <Tooltip
+                      title="View User"
+                      placement="bottom"
+                      aria-label="view"
+                    >
+                      <ViewIcon
+                        className={classes.toolIcon}
+                        onClick={(e) => {
+                          setState({ ...state, right: true });
+                          editreset();
+                          setDataList("VIEW");
+
+                          setUserEdit({
+                            ...userEdit,
+                            id: item.user.id,
+                            email: item.user.email,
+                            firstName: item.firstName,
+                            lastName: item.lastName,
+                            mobile: item.mobile,
+                            roleName: item.user.roleName,
+                            employeeId: item.employeeId,
+                            companyName: item.companyName,
+                            companyAddress: item.companyAddress,
+                            headOfficeLocation: item.headOfficeLocation,
+                            branchOfficeLocation: item.branchOfficeLocation,
+                            capabilities: item.capabilities,
+                            recruiterCapacity: item.recruiterCapacity
+                          });
+                        }}
+                      />
+                    </Tooltip>
+                    {item.user?.roleName === "SUBVENDOR" || item.user?.roleName === "FREELANCER" ?
                       <Tooltip
                         title="Assign Requirements"
                         placement="bottom"
@@ -1777,26 +1945,33 @@ recruiter={"false"}
                           className={classes.toolIcon}
                           onClick={(e) => {
                             setDataList("ASSIGN");
-                            setRecruiterId(item); 
-                            getAssigendRequirements(item.id); 
-                            setState({ ...state, right: true }); 
+                            setRecruiterId(item);
+                            getAssigendRequirements(item.id);
+                            setState({ ...state, right: true });
                             assignReset();
                           }}
                         />
                       </Tooltip>
-                      :""}
-                    </Grid>
-                  </Grid>,
-                 
-                 item.firstName +" "+item.lastName,
+                      : ""}
+                  </Grid>
+                </Grid>,
+                <>
+                  {
+                    item.firstName + " " + item.lastName
+                  }
+                  {
+                    item.companyName &&` (${ item.companyName})` 
+                  }
+                </>
+                ,
                 item.user.email,
                 item.employeeId,
                 item.mobile,
-                item.user?.roleName === "RECRUITER"? "Recruiter": 
-                item.user?.roleName === "CLIENTCOORDINATOR"?  "Hiring Manager" :
-                item.user?.roleName === "SUBVENDOR"?  (decode.companyType === "COMPANY" ? "Vendor" :"Sub Vendor"):
-                item.user?.roleName === "FREELANCER"?  "Freelancer":
-                "" ,
+                item.user?.roleName === "RECRUITER" ? "Recruiter" :
+                  item.user?.roleName === "CLIENTCOORDINATOR" ? "Hiring Manager" :
+                    item.user?.roleName === "SUBVENDOR" ? (companyType === "COMPANY" ? "Vendor" : "Sub Vendor") :
+                      item.user?.roleName === "FREELANCER" ? "Freelancer" :
+                        "",
                 <Switch
                   checked={item.user.isActive}
                   onChange={(e) => {
@@ -1823,7 +1998,7 @@ recruiter={"false"}
         </Grid>
       </Grid>
 
-    
+
 
       <Backdrop className={classes.backdrop} open={loader}>
         <CircularProgress color="inherit" />

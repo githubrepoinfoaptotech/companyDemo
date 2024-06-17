@@ -4,7 +4,7 @@ import { Grid, Backdrop, CircularProgress, Fab   } from "@material-ui/core";
  import PageTitle from "../../components/PageTitle";
 import { Typography } from "../../components/Wrappers";
 import axios from 'axios';
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
  import { useHistory } from "react-router-dom";
 import {  signOut, useUserDispatch } from "../../context/UserContext";
  import EmailIcon from '@material-ui/icons/Email';
@@ -32,12 +32,12 @@ export default function Dashboard(props) {
   const [loader, setLoader] = useState(false); 
    var [count, setCount] = useState([]);
   const token = localStorage.getItem('token');
-  const decode = jwt_decode(token); 
+  const decode = jwtDecode(token); 
 
 
   useEffect(() => {
     setLoader(true);
-    var decode = jwt_decode(token); 
+    var decode = jwtDecode(token); 
 
     var url = ""; 
     if (decode.role === "SUPERADMIN") {

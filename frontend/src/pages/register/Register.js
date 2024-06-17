@@ -1417,7 +1417,9 @@ function Register() {
   );
 }
 
-export default Register;
 function CloseButton({ closeToast, className }) {
   return <CloseIcon className={className} onClick={closeToast} />;
 }
+
+export default Register;
+

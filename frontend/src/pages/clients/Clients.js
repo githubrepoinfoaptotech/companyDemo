@@ -1188,7 +1188,7 @@ export default function Tables() {
 
                   <Grid item xs={12}  md={12} lg={12}>
                     <Typography className={classes.boldtext}>
-                      Org Point of Contact(POC):
+                      Recruiter Point of Contact(POC):
                     </Typography>
                     <br />
                     <MUIDataTable

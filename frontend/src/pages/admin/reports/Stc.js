@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from "../../../components/Admin/ReportLayout"; 
-import jwtDecode from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 
 function Stc() {
   const token = localStorage.getItem("token")

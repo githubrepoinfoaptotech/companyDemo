@@ -17,6 +17,8 @@ import {
   MenuItem,
   Dialog,
   DialogContent,
+  Chip,
+  Avatar,
 } from "@material-ui/core";
 import moment from "moment";
 import MUIDataTable from "mui-datatables";
@@ -30,7 +32,7 @@ import ViewIcon from "@material-ui/icons/Visibility";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import RemoveRedEyeIcon from "@material-ui/icons/RemoveRedEye";
 import { useHistory } from "react-router-dom";
-
+import "../../css/view-resume.css"
 import { toast } from "react-toastify";
 import PageTitle from "../../components/PageTitle";
 // data
@@ -38,7 +40,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Tooltip from "@material-ui/core/Tooltip";
 import EditIcon from "@material-ui/icons/Edit";
 import axios from "axios";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { useForm } from "react-hook-form";
 import JoditEditor from "jodit-react";
 
@@ -56,22 +58,21 @@ import AddRequirements from "../../components/Candidates/AddRequirements";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import "react-toastify/dist/ReactToastify.css";
 import "jodit/build/jodit.min.css";
+import { getFileExtension } from "../../utils/getextension.js";
+import CustomPdfView from "../../components/pdfViewer/CustomPdfView.js";
 
 const positions = [toast.POSITION.TOP_RIGHT];
 
 export default function Tables() {
   const classes = useStyles();
   const history = useHistory();
-
   const mobileQuery = useMediaQuery("(max-width:600px)");
   const token = localStorage.getItem("token");
-  const decode = jwt_decode(token);
-
+  const decode = jwtDecode(token);
   const [count, setCount] = useState(0);
   const [file, setFile] = useState([]);
   const [loader, setLoader] = useState(false);
   const [Id, setId] = useState();
-  console.log(decode,"ioioi")
   const [requirementsData, setRequirementsData] = useState([]);
   const [requirementsEdit, setRequirementsEdit] = useState({
     id: "",
@@ -79,9 +80,7 @@ export default function Tables() {
     skills: "",
     clientId: "",
     clientName: "",
-    orgRecruiterId: "",
-    levelHrDataId:"",
-    orgRecruiterName: "",
+    levelHrDataId: "",
     levelofHiringName: "",
     jobLocation: "",
     experience: "",
@@ -92,14 +91,15 @@ export default function Tables() {
     hideFromInternal: "",
   });
 
+  const resumeUrl = requirementsEdit?.jd;
+  const fileExtension = resumeUrl ? getFileExtension(resumeUrl) : null;
+
   const [requirementsView, setRequirementsView] = useState({
     id: "",
     requirementName: "",
     clientId: "",
     skills: "",
-    orgRecruiterId: "",
-    levelHrDataId:"",
-    orgRecruiterName: "",
+    levelHrDataId: "",
     levelofHiringName: "",
     jobLocation: "",
     experience: "",
@@ -126,7 +126,10 @@ export default function Tables() {
 
   const [clientEditList, setClientEditList] = useState([]);
 
-  const [requirementsOrgId, setRequirementsOrgId] = useState("");
+  const [reqOrgRecId, setReqOrgRecId] = useState([]);
+  const [assignedRecruiters, setAssignedRecruiters] = useState([]);
+  const [recUser, setRecUser] = useState([]);
+  const [levelHrData, setLevelHrData] = useState([]);
   const [reqLevelHrDataId, setReqLevelHrDataId] = useState("");
   const [clientId, setClientId] = useState("");
 
@@ -201,16 +204,19 @@ export default function Tables() {
   const validationSchema = Yup.object().shape({
     requirementName: Yup.string().required("Requirement Name is required"),
     jobLocation: Yup.string().required("Job Location is required"),
-    clientId: Yup.string().required(decode.companyType === "COMPANY" ? "Project Name is required" :"Client Name is required"),
-    orgRecruiterId: Yup.string().required("Org Recruiter Name is required"),
+    clientId: Yup.string().required(decode.companyType === "COMPANY" ? "Project Name is required" : "Client Name is required"),
+    assignRecruitersList: Yup.array().of(Yup.string())
+      .required("You can't leave this blank.")
+      .nullable(true).transform(v => v === null ? [] : v),
     levelHrDataId: Yup.string().required("Level of Hire Name is required"),
     skills: Yup.string().required("Skill is required"),
-    gist: Yup.string(),
+    gist: Yup.string().required("Type your gist from requirement"),
     hideFromInternal: Yup.string(),
     work: Yup.string().required("Mode of work is required"),
     hiring: Yup.string(),
     experience: Yup.string().required("Experience is required"),
   });
+
 
   const {
     register: editRequirements,
@@ -226,13 +232,15 @@ export default function Tables() {
     register,
     handleSubmit,
     reset,
+    setValue,
+    trigger,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
 
   useEffect(() => {
-    var decode = jwt_decode(token);
+    var decode = jwtDecode(token);
 
     const fetchData = async () => {
       setLoader(true);
@@ -325,6 +333,7 @@ export default function Tables() {
     }
     fetchData();
     getRequirementName();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reducerValue, token]);
 
   const [fromDate, setFromDate] = useState("");
@@ -333,6 +342,82 @@ export default function Tables() {
   const [clientsName, setClientsName] = useState([]);
   const [requirementId, setRequirementId] = useState(null);
   const [recruiterId, setRecruiterId] = useState(null);
+
+  const transformRecruiterData = (recruiters) => {
+    return recruiters.map(recruiter => {
+      const [firstName, lastName] = recruiter.name.split(' ');
+      return {
+        id: recruiter.id,
+        recruiter: {
+          firstName: firstName || '',
+          lastName: lastName || '',
+        },
+        recruiterId: recruiter.recruiterId,
+      };
+    });
+  };
+
+  const handleAddRecruiter = async (recruiterId) => {
+    try {
+      setLoader(true);
+      const response = await axios.post(`${process.env.REACT_APP_SERVER}admin/assignRequirements`, {
+        recruiterId: recruiterId, requirementId: Id,
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        }
+      });
+      setLoader(false);
+      if (response.data.status === true) {
+        const newRecruiter = response.data.addedData;
+
+        const addNewData = recUser.filter(item => item.recruiterId === newRecruiter.recruiterId)
+        const transformedRecruiters = transformRecruiterData(addNewData);
+        setAssignedRecruiters(prevRecruiters => [...prevRecruiters, ...transformedRecruiters]);
+      } else {
+        handleNotificationCall("error", response.data.message);
+      }
+    } catch (error) {
+      setLoader(false);
+      console.error('Error adding recruiter:', error);
+    }
+  };
+
+  const handleRemoveRecruiter = async (recruiterId) => {
+    try {
+      setLoader(true);
+      const response = await axios.post(`${process.env.REACT_APP_SERVER}CC/removeAssignedRequirements`, {
+        id: recruiterId, requirementId: Id,
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        }
+      });
+      setLoader(false);
+      if (response.data.status === true) {
+        setAssignedRecruiters(prevRecruiters => prevRecruiters.filter(item => item.id !== recruiterId));
+      } else {
+        handleNotificationCall("error", response.data.message);
+      }
+    } catch (error) {
+      setLoader(false);
+      console.error('Error removing recruiter:', error);
+    }
+  };
+
+  // const handleChangeAssignedRecruiters = (event, value) => {
+  //   const newSelectedIds = value.map((option) =>  option.recruiterId);
+  //   const oldSelectedIds = selectedRecruiters.map((recruiter) => recruiter.recruiterId);
+
+  //   const addedIds = newSelectedIds.filter((id) => !oldSelectedIds.includes(id));
+
+  //   addedIds.forEach(handleAddRecruiter);
+
+  //   setSelectedRecruiters(value);
+  //   setEditValue('assignRecruitersList', newSelectedIds);
+  // };
 
   const filterRef = useRef(null);
 
@@ -469,7 +554,7 @@ export default function Tables() {
             requirementName: values.requirementName,
             skills: values.skills,
             clientId: clientId,
-            orgRecruiterId: requirementsOrgId,
+            assignRecruitersList: reqOrgRecId,
             levelOfHiringId: reqLevelHrDataId,
             jobLocation: values.jobLocation,
             experience: values.experience,
@@ -489,7 +574,8 @@ export default function Tables() {
               if (file?.name) {
                 uploadJD(file, response.data.requirementId);
               }
-
+              setPage(0)
+              setCurrerntPage(1);
               handleNotificationCall("success", response.data.message);
               forceUpdate();
               setState({ ...state, right: false });
@@ -529,7 +615,7 @@ export default function Tables() {
           requirementName: values.requirementName,
           skills: values.skills,
           clientId: clientId,
-          orgRecruiterId: requirementsOrgId,
+          orgRecruiterId: reqOrgRecId,
           levelHrDataId: reqLevelHrDataId,
           jobLocation: values.jobLocation,
           experience: values.experience,
@@ -550,6 +636,8 @@ export default function Tables() {
             if (file?.name) {
               uploadJD(file, Id);
             }
+            setPage(0)
+            setCurrerntPage(1);
             forceUpdate();
 
             setState({ ...state, right: false });
@@ -611,7 +699,8 @@ export default function Tables() {
         if (response.data.status === true) {
           handleChange(response.data.data.clientId);
           setId(response.data.data.id);
-          setRequirementsOrgId(response.data.data.orgRecruiterId);
+          setAssignedRecruiters(response.data.data.assignedRequirements)
+          setReqOrgRecId(response.data.data.orgRecruiterId);
           setReqLevelHrDataId(response.data.data.levelOfHiringId)
           editreset({
             id: response.data.data.id,
@@ -621,7 +710,6 @@ export default function Tables() {
             clientName: response.data.data.client.clientName,
             orgRecruiterId: response.data.data.orgRecruiterId,
             levelHrDataId: response.data.data.levelOfHiringId,
-            orgRecruiterName: response.data.data.orgRecruiter.name,
             levelofHiringName: response.data.data.levelOfHiring.name,
             jobLocation: response.data.data.jobLocation,
             experience: response.data.data.experience,
@@ -639,8 +727,6 @@ export default function Tables() {
             skills: response.data.data.skills,
             clientId: response.data.data.clientId,
             clientName: response.data.data.client.clientName,
-            orgRecruiterId: response.data.data.orgRecruiterId,
-            orgRecruiterName: response.data.data.orgRecruiter.name,
             levelofHiringName: response.data.data.levelOfHiring.name,
             levelHrDataId: response.data.data.levelOfHiringId,
             jobLocation: response.data.data.jobLocation,
@@ -658,8 +744,6 @@ export default function Tables() {
             requirementName: response.data.data.requirementName,
             clientId: response.data.data.clientId,
             skills: response.data.data.skills,
-            orgRecruiterId: response.data.data.orgRecruiter.id,
-            orgRecruiterName: response.data.data.orgRecruiter.name,
             levelofHiringName: response.data.data.levelOfHiring.name,
             levelHrDataId: response.data.data.levelOfHiring.id,
             jobLocation: response.data.data.jobLocation,
@@ -676,7 +760,6 @@ export default function Tables() {
             candidateCount: response.data.candidateCount,
             createdAt: response.data.data.createdAt,
           });
-
           setState({ ...state, right: true });
           setLoader(false);
         } else {
@@ -688,8 +771,6 @@ export default function Tables() {
       });
   }
 
-  const [recUser, setRecUser] = useState([]);
-  const [levelHrData, setLevelHrData] = useState([]);
   const [state, setState] = useState({
     right: false,
   });
@@ -770,8 +851,6 @@ export default function Tables() {
             ...requirementsEdit,
             clientId: value.id,
             clientName: value.clientName,
-            orgRecruiterId: response.data.data[0]?.id,
-            orgRecruiterName: response.data.data[0]?.name,
             levelHrDataId: response.data.data[0]?.id,
           });
         } else {
@@ -859,7 +938,7 @@ export default function Tables() {
                     <Grid item xs={12} sm={6} md={6} lg={6}>
                       <FormControl className={classes.margin}>
                         <InputLabel shrink htmlFor="clientId">
-                            {decode.companyType === "COMPANY" ? "Select Project Name" :"Select Client Name"}
+                          {decode.companyType === "COMPANY" ? "Select Project Name" : "Select Client Name"}
                         </InputLabel>
 
                         <Autocomplete
@@ -898,44 +977,6 @@ export default function Tables() {
 
                     <Grid item xs={12} sm={6} md={6} lg={6}>
                       <FormControl className={classes.margin}>
-                        <InputLabel shrink htmlFor="orgRecruiterId">
-                          Select Organization Recruiter
-                        </InputLabel>
-
-                        <Autocomplete
-                          options={recUser}
-                          disableClearable
-                          error={editErrors.orgRecruiterId ? true : false}
-                          defaultValue={{
-                            id: requirementsEdit.orgRecruiterId,
-                            name: requirementsEdit.orgRecruiterName,
-                          }}
-                          {...editRequirements("orgRecruiterId")}
-                          getOptionLabel={(option) => option.name}
-                          getOptionSelected={(option) =>
-                            option.name === requirementsEdit.orgRecruiterName
-                          }
-                          onChange={(event, value) => {
-                            setRequirementsOrgId(value.id);
-                            setRequirementsEdit({
-                              ...requirementsEdit,
-                              orgRecruiterId: value.id,
-                              orgRecruiterName: value.name,
-                            });
-                          }}
-                          renderInput={(params) => (
-                            <TextField {...params} variant="filled" />
-                          )}
-                        />
-
-                        <Typography variant="inherit" color="error">
-                          {editErrors.orgRecruiterId?.message}
-                        </Typography>
-                      </FormControl>
-                    </Grid>
-    
-                    <Grid item xs={12} sm={6} md={6} lg={6}>
-                      <FormControl className={classes.margin}>
                         <InputLabel shrink htmlFor="levelHrDataId">
                           Select Level Name
                         </InputLabel>
@@ -954,7 +995,7 @@ export default function Tables() {
                             option.name === requirementsEdit.levelofHiringName
                           }
                           onChange={(event, value) => {
-                            setRequirementsOrgId(value.id);
+                            setReqLevelHrDataId(value.id);
                             setRequirementsEdit({
                               ...requirementsEdit,
                               levelHrDataId: value.id,
@@ -970,6 +1011,73 @@ export default function Tables() {
                           {editErrors.levelHrDataId?.message}
                         </Typography>
                       </FormControl>
+                    </Grid>
+
+                    <Grid item xs={12} sm={12} md={12} lg={12}>
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        {assignedRecruiters.map((item, index) => {
+                          return (
+                            <div key={index}>
+                              <Chip
+                                avatar={<Avatar> {item.recruiter?.firstName.split("")[0]}</Avatar>}
+                                label={item.recruiter?.firstName + " " + item.recruiter?.lastName}
+                                className={classes.EditRecUserChip}
+                                clickable
+                                color="primary"
+                                onDelete={() => handleRemoveRecruiter(item.id)}
+                                variant="outlined"
+                              />
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={12} lg={12}>
+                      <FormControl className={classes.margin}>
+                        <InputLabel shrink htmlFor="assignRecruitersList">
+                          Select Recruiter
+                        </InputLabel>
+                        <Autocomplete
+                          options={recUser}
+                          disableClearable
+                          error={editErrors.assignRecruitersList ? true : false}
+                          {...editRequirements("assignRecruitersList")}
+                          getOptionLabel={(option) => option.name}
+                          onChange={(event, value) => {
+                            handleAddRecruiter(value.recruiterId)
+                          }}
+                          renderInput={(params) => (
+                            <TextField {...params} variant="filled" />
+                          )}
+                        />
+                      </FormControl>
+                      {/* <Autocomplete
+                        multiple
+                        options={EditRecOption}
+                        disableClearable
+                        filterSelectedOptions
+                        getOptionLabel={editRecOptionLabel}
+                        onChange={(event, value)=> {
+                          console.log(value)
+                          // handleAddRecruiter(value.recruiterId)
+                          }
+                          }
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            {...editRequirements("assignRecruitersList")}
+                            variant="outlined"
+                            name="assignRecruitersList"
+                            label="Org Recruiter"
+                            className={classes.MultiSelectRec}
+                            error={editErrors.assignRecruitersList ? true : false}
+                          />
+                        )}
+                      /> */}
+
+                      <Typography variant="inherit" color="error">
+                        {editErrors.assignRecruitersList?.message}
+                      </Typography>
                     </Grid>
 
                     <Grid item xs={12} sm={6} md={6} lg={6}>
@@ -1195,7 +1303,7 @@ export default function Tables() {
 
                           {requirementsEdit?.jd !==
                             "https://liverefo.s3.amazonaws.com/" &&
-                          requirementsEdit?.jd !== "" ? (
+                            requirementsEdit?.jd !== "" ? (
                             <>
                               <Tooltip
                                 title="View JD"
@@ -1330,6 +1438,8 @@ export default function Tables() {
           toggleDrawer={toggleDrawer}
           register={register}
           errors={errors}
+          trigger={trigger}
+          setValue={setValue}
           isSubmitting={isSubmitting}
           recUser={recUser}
           levelHrData={levelHrData}
@@ -1344,7 +1454,7 @@ export default function Tables() {
           setFile={setFile}
           ContentRef={ContentRef}
           setClientList={setClientList}
-          setRequirementsOrgId={setRequirementsOrgId }
+          setReqOrgRecId={setReqOrgRecId}
           setReqLevelHrDataId={setReqLevelHrDataId}
         />
       </>
@@ -1392,7 +1502,7 @@ export default function Tables() {
 
                   <Grid item xs={12} sm={6} md={6} lg={6}>
                     <Typography className={classes.boldtext}>
-                      {decode.companyType === "COMPANY" && decode.companyType === "COMPANY"  ? "Project Name:" :"Client Name:"}
+                      {decode.companyType === "COMPANY" ? "Project Name:" : "Client Name:"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={6} lg={6}>
@@ -1401,16 +1511,21 @@ export default function Tables() {
                       requirementsView.clientUniqueId +
                       ") "}
                   </Grid>
-          
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Typography className={classes.boldtext}>
-                      Organization Recruiter Name:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6} lg={6}>
-                    {requirementsView.orgRecruiterName}
-                  </Grid>
-     
+                  {decode.companyType !== "COMPANY" && (
+                    <>
+                      <Grid item xs={12} sm={6} md={6} lg={6}>
+                        <Typography className={classes.boldtext}>
+                          Organization Recruiter Name:
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={6} lg={6}>
+                        {/* {requirementsView.orgRecruiterName} */}
+                      </Grid>
+                    </>
+                  )}
+
+
+
                   <Grid item xs={12} sm={6} md={6} lg={6}>
                     <Typography className={classes.boldtext}>
                       Level of Hiring Name:
@@ -1482,7 +1597,7 @@ export default function Tables() {
                       className={classes.space + " " + classes.alignItemsEnd}
                     >
                       {requirementsView?.jd !==
-                      "https://liverefo.s3.amazonaws.com/" ? (
+                        "https://liverefo.s3.amazonaws.com/" ? (
                         <>
                           <Tooltip
                             title="View JD"
@@ -1646,10 +1761,10 @@ export default function Tables() {
       ...(decode.companyType === "COMPANY"
         ? []
         : [
-            {
-              name: "Organization Recruiter Name",
-            },
-          ]),
+          {
+            name: "Organization Recruiter Name",
+          },
+        ]),
       {
         name: "Experience",
       },
@@ -1703,7 +1818,7 @@ export default function Tables() {
                 />
               </Tooltip>
               <Tooltip
-                title={decode.companyType ==="COMPANY"? "Project Preview":"Client Preview"}
+                title={decode.companyType === "COMPANY" ? "Project Preview" : "Client Preview"}
                 placement="bottom"
                 aria-label="view"
               >
@@ -1722,12 +1837,12 @@ export default function Tables() {
         <>
           {item.requirementName} {"(" + item.uniqueId + ")"}
         </>,
-        <>{item.recruiter.firstName + " " + item.recruiter.lastName} </>,
+        <>{item.client.handler?.firstName + " (" + item.client.handler?.lastName + ")"}</>,
         <>{item.client.clientName + " (" + item.client.uniqueId + ")"} </>,
         ...(decode.companyType === "COMPANY"
-        ? []
-        : [
-          item.orgRecruiter.name
+          ? []
+          : [
+            item.orgRecruiter.name
           ]),
         item.experience,
         item.skills,
@@ -1765,10 +1880,10 @@ export default function Tables() {
       ...(decode.companyType === "COMPANY"
         ? []
         : [
-            {
-              name: "Organization Recruiter Name",
-            },
-          ]),
+          {
+            name: "Organization Recruiter Name",
+          },
+        ]),
       {
         name: "Experience",
       },
@@ -1785,7 +1900,7 @@ export default function Tables() {
     ];
 
     table_data = requirementsData.map((item, index) => {
-   
+
 
       return [
         <>
@@ -1826,9 +1941,9 @@ export default function Tables() {
         <>{item.requirementName + " (" + item.uniqueId + ")"}</>,
         <>{item.client.clientName + " (" + item.client.uniqueId + ")"} </>,
         ...(decode.companyType === "COMPANY"
-        ? []
-        : [
-          item.orgRecruiter.name
+          ? []
+          : [
+            item.orgRecruiter.name
           ]),
         item.experience,
 
@@ -1869,6 +1984,8 @@ export default function Tables() {
                 reset();
                 setDataList("ADD");
                 setFile([]);
+                setLevelHrData([])
+                setRecUser([])
                 setState({ ...state, right: true });
               }}
             >
@@ -1921,8 +2038,8 @@ export default function Tables() {
                 decode.user_id === option.user.id
                   ? option.firstName + " " + option.lastName + " (You)"
                   : option.employeeId === ""
-                  ? option.firstName + " " + option.lastName + " "
-                  : option.firstName +
+                    ? option.firstName + " " + option.lastName + " "
+                    : option.firstName +
                     " " +
                     option.lastName +
                     " (" +
@@ -2037,10 +2154,10 @@ export default function Tables() {
 
           <Grid container spacing={2} className={classes.pagination}>
             <TablePagination
-              rowsPerPageOptions={[50]}
+              rowsPerPageOptions={[10]}
               component="div"
               count={count}
-              rowsPerPage={50}
+              rowsPerPage={10}
               page={page}
               onPageChange={handleChangePage}
             />
@@ -2052,19 +2169,19 @@ export default function Tables() {
         aria-labelledby="dialog-title"
         onClose={handleModalClose}
         open={modalOpen}
-        width="lg"
-        maxWidth="lg"
+        fullWidth={true}
+        maxWidth="md"
         PaperProps={{
           style: {
             width: "100%",
           },
         }}
       >
-        <DialogContent className={classes.center}>
+        <DialogContent>
           <Grid container direction="row" spacing={2}>
-            <div className={classes.heading + " " + classes.inputRoot}>
+            <div className={classes.heading + " " + classes.inputRoot} style={{ position: "absolute", zIndex: 1, background: '#fff', top: 0, padding: "6px 30px" }}>
               <Typography variant="subtitle2" className={classes.inputRoot}>
-                JD
+                Job Description
               </Typography>
               <div className={classes.drawerClose}>
                 <CloseIcon
@@ -2073,20 +2190,24 @@ export default function Tables() {
                 />
               </div>
             </div>
-            <div className={classes.iframediv}>
-              <iframe
-                src={
-                  "https://docs.google.com/a/umd.edu/viewer?url=" +
-                  requirementsEdit?.jd +
-                  "&embedded=true"
-                }
-                title="File"
-                width="100%"
-                height="500"
-              ></iframe>
-
-              <div className={classes.iframeLogo}></div>
-            </div>
+            <Grid item xs={12}>
+              {fileExtension === "pdf" ?
+                <CustomPdfView resumeUrl={requirementsEdit?.jd} />
+                :
+                <div className={classes.iframediv} style={{ marginTop: "40px" }}>
+                  <iframe
+                    src={
+                      "https://docs.google.com/a/umd.edu/viewer?url=" +
+                      requirementsEdit?.jd +
+                      "&embedded=true"
+                    }
+                    title="File"
+                    width="100%" height="500" sandbox="allow-scripts allow-same-origin"
+                  ></iframe>
+                  <div className={classes.iframeLogo}></div>
+                </div>
+              }
+            </Grid>
 
             <div className={classes.sendWhatsapp + " " + classes.inputRoot}>
               <Button

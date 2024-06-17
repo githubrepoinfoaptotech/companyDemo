@@ -110,6 +110,11 @@ const io = socketio(server, {
   },
 }); 
 
+app.get("/",async(req,res)=>{
+  console.log("in");
+  res.send("helloworld");
+});
+
 io.on("connection", (socket) => {
   console.log("A user is connected");
 });
