@@ -86,8 +86,9 @@ const candidateCpv = sequelize.define("candidateCpv", {
         type:Sequelize.BOOLEAN,
         allowNull:true 
     },
+    
     candidateConformation:{
-        type: Sequelize.STRING,
+        type: Sequelize.BOOLEAN,
         allowNull: true,
     }
 });

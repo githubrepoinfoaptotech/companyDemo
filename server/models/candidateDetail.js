@@ -133,6 +133,10 @@ const candidateDetail=sequelize.define("candidateDetail",{
     linkedInProfile:{
         type:Sequelize.STRING,
         allowNull:true
+    },
+    showAllDetails:{
+        type:Sequelize.BOOLEAN,
+        allowNull:true
     }
 },
 {

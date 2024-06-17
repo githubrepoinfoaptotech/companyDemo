@@ -658,7 +658,8 @@ exports.editCandidate = async (req, res) => {
         gender: req.body.gender,
         currentCompanyName:req.body.currentCompanyName,
         panNumber:req.body.panNumber,
-        linkedInProfile:req.body.linkedInProfile
+        linkedInProfile:req.body.linkedInProfile,
+        showAllDetails:req.body.showAllDetails
       };
       if (req.body.candidateProcessed == "NO") {
         mycan.reason = req.body.reason;
@@ -757,7 +758,8 @@ exports.adminEditCandidate = async (req, res) => {
           gender: req.body.gender,
           currentCompanyName:req.body.currentCompanyName,
           panNumber:req.body.panNumber,
-          linkedInProfile:req.body.linkedInProfile
+          linkedInProfile:req.body.linkedInProfile,
+          showAllDetails:req.body.showAllDetails
         };
         if (req.body.candidateProcessed == "NO") {
           mycan.reason = req.body.reason;
@@ -1217,6 +1219,7 @@ exports.viewCandidate = async (req, res) => {
               "currentCompanyName",
               'panNumber',
               'linkedInProfile',
+              'showAllDetails',
               [
                 fn(
                   "concat",
@@ -1356,6 +1359,7 @@ exports.myCandidates = async (req, res) => {
         "currentCompanyName",
         "linkedInProfile",
         "panNumber",
+        'showAllDetails',
                 [
                   fn(
                     "concat",
