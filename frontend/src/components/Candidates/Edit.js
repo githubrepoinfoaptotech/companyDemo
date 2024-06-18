@@ -40,6 +40,7 @@ export default function Edit(props) {
   const classes = useStyles();
   const token = localStorage.getItem("token");
   const decode = jwtDecode(token);
+  console.log(decode.role,'-==-=')
   const [sourceEdit, setEditSource] = useState([]);
   const [display, setDisplay] = useState(false);
   const [fileName, setFileName] = useState();
@@ -314,6 +315,7 @@ export default function Edit(props) {
                         placeholder="Enter First Name"
                         id="firstName"
                         name="fisrtName"
+                        disabled={props.candidatesEdit?.showAllDetails ? false :true}
                         defaultValue={props.candidatesEdit.firstName}
                         {...props.editCandidates("firstName")}
                         error={props.editErrors.firstName ? true : false}
@@ -336,6 +338,7 @@ export default function Edit(props) {
                         placeholder="Enter Last Name"
                         id="lastName"
                         name="lastName"
+                        disabled={props.candidatesEdit?.showAllDetails ? false :true}
                         defaultValue={props.candidatesEdit.lastName}
                         {...props.editCandidates("lastName")}
                         error={props.editErrors.lastName ? true : false}
@@ -702,6 +705,33 @@ export default function Edit(props) {
                           </Typography>
                         </FormControl>
                       </Grid>
+                      {decode.role === "SUBVENDOR" && (
+                        <Grid item xs={12} sm={6} md={6} lg={6}>
+                          <InputLabel shrink htmlFor="showAllDetails">
+                            Show All Details
+                          </InputLabel>
+                          <FormControl className={classes.margin}>
+                            <Switch
+                              color="primary"
+                              id="showAllDetails"
+                              name="showAllDetails"
+                              checked={props.candidatesEdit?.showAllDetails}
+                              onChange={(e) => {
+                                props.setCandidatesEdit({
+                                  ...props.candidatesEdit,
+                                  showAllDetails: e.target.checked,
+                                });
+
+                              }}
+                              error={props.editErrors.showAllDetails ? true : false}
+                              inputProps={{ "aria-label": "primary checkbox" }}
+                            />
+                            <Typography variant="inherit" color="error">
+                              {props.editErrors.showAllDetails?.message}
+                            </Typography>
+                          </FormControl>
+                        </Grid>
+                      )}
                     </>
                     :
                     props.show === true ?

@@ -1811,6 +1811,7 @@ export default makeStyles(theme => ({
   externalIconContainer: {
     display: 'flex',
     flexDirection: 'row',
+    alignItems: "flex-end",
     flexWrap: 'nowrap',
     whiteSpace: 'nowrap',
     width: "160px",
