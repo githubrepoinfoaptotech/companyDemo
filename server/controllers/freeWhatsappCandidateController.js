@@ -310,7 +310,8 @@ exports.addFreeCandidate = async (req, res) => {
           createdBy:req.recruiterId,
           currentCompanyName:req.body.currentCompanyName,
           panNumber:request.body.panNumber,
-          linkedInProfile:req.body.linkedInProfile
+          linkedInProfile:req.body.linkedInProfile,
+          showAllDetails:req.body.showAllDetails
         };
 
         if (cnd_data) {
@@ -525,7 +526,8 @@ exports.addFreeCandidate = async (req, res) => {
             createdBy:req.recruiterId,
             isExternal:"NO",
             panNumber:req.body.panNumber,
-            linkedInProfile:req.body.linkedInProfile
+            linkedInProfile:req.body.linkedInProfile,
+            showAllDetails:req.body.showAllDetails
           };
 
           if (cnd_data) {

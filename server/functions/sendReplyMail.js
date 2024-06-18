@@ -487,7 +487,6 @@ email.transporter.sendMail(mailOptions, async function (error, info) {
 };
 
 exports.MsmeResgistrationConformation=async(req,password)=>{
-
 var supportMailOptions = {
   from: '<no-reply@refo.app>',
   to: "contact-support@refo.app",
@@ -565,6 +564,30 @@ exports.sendOtpForProjectApproval=async(data)=>{
        name:data.name,
        content:data.content,
        otp:otp
+    },
+};
+email.transporter.sendMail(clientMailOptions, async function (error, info) {
+  if (error) {
+      console.log(error);
+  } else {
+      console.log("Success");
+  }
+});
+};
+
+exports.sendcandidateShowDetails=async(data)=>{
+  console.log(data);
+  console.log(email);
+  var clientMailOptions = {
+    from: '<no-reply@refo.app>',
+    to: "vishallegend7775@gmail.com",
+    // to: "vishallegend7775@gmail.com",
+    template: "candidateShowDetails",
+    subject: "Candidate Suitability Confirmation - Need Further Details",
+    context: {
+      vendor_name:data.vendor_name,
+      candidate_unique_number:data.candidate_unique_number,
+      company_name:data.company_name
     },
 };
 email.transporter.sendMail(clientMailOptions, async function (error, info) {

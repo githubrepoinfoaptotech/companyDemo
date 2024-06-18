@@ -20,6 +20,7 @@ const recruiterCandidateActivity = require("../models/recruiterCandidateActivity
 const existingCandidate=require("../models/existingCandidate");
 const candidateCpv=require("../models/candidateCpv");
 const email = require("../config/email.js");
+const mailFunction=require("../functions/sendReplyMail");
 require("dotenv").config();
 
 //
@@ -321,7 +322,8 @@ exports.addCandidate = async (req, res) => {
           isExternal:"YES",
           currentCompanyName:req.body.currentCompanyName,
           panNumber:req.body.panNumber,
-          linkedInProfile:req.body.linkedInProfile
+          linkedInProfile:req.body.linkedInProfile,
+          showAllDetails:req.body.showAllDetails
         };
         if (req.body.candidateProcessed == "NO") {
           myCandidate.reason = req.body.reason;
@@ -491,6 +493,7 @@ exports.addCandidate = async (req, res) => {
             createdBy:req.recruiterId,
             panNumber:req.body.panNumber,
             linkedInProfile:req.body.linkedInProfile,
+            showAllDetails:req.body.showAllDetails,
             isExternal:"NO"
           };
           if (req.body.candidateProcessed == "NO") {
@@ -599,6 +602,48 @@ exports.addCandidate = async (req, res) => {
     res.status(500).json({ message: "ERROR", status: false });
   }
 };
+
+exports.sendRequestToVendor=async(req,res)=>{
+  try
+  {
+    var can_data=await candidate.findOne({where:{id:req.body.id},include:[candidateDetails,{model:recruiter,include:[user]}]});
+    if(can_data.recruiter.user.roleName=='SUBVENDOR')
+      {
+        if(can_data.candidateDetail.detailsHandler.isMailSent==false)
+          {
+            var user_data=await recruiter.findOne({where:{userId:can_data.mainId}});
+            //can_data.candidateDetail.detailsHandler.isMailSent=true;
+            var mailData={
+              company_name:user_data.firstName+" "+user_data.lastName,
+              candidate_unique_number:can_data.uniqueId,
+              vendor_name:can_data.recruiter.companyName
+            }
+            await mailFunction.sendcandidateShowDetails(mailData);
+            await candidateDetails.update(
+              { detailsHandler: { isMailSent: true, token: "" } },
+              { where: { id: can_data.candidateDetail.id } }
+          );
+            res.status(200).json({ message: "Mail Has Been Sent", status: true });
+          }
+          else
+          {
+            res.status(200).json({ message: "Mail Already Sent", status: false });
+          }
+      }
+      else
+      {
+          res.status(200).json({ message: "Invalid Action", status: false });
+      }
+    //res.send(can_data);
+  }
+  catch(error)
+  {
+    console.log(error);
+    res.status(500).json({ message: "ERROR", status: false });
+  }
+
+};
+
 exports.editCandidate = async (req, res) => {
   console.log(req.body);
   try {
@@ -1064,6 +1109,7 @@ exports.viewAllCanditates = async (req, res) => {
                 "reason",
                 "isExternal",
                 "currentCompanyName",
+                "showAllDetails",
                 [
                   fn(
                     "concat",
@@ -1072,22 +1118,6 @@ exports.viewAllCanditates = async (req, res) => {
                   ),
                   "resume",
                 ],
-                [
-                  fn(
-                    "concat",
-                    process.env.liveUrl,
-                    col("candidateDetail.document")
-                  ),
-                  "document",
-                ],
-                [
-                  fn(
-                    "concat",
-                    process.env.liveUrl,
-                    col("candidateDetail.photo")
-                  ),
-                  "photo",
-                ]
               ],
             },
             {model:Source,attributes:['name','status']},
@@ -1126,6 +1156,7 @@ exports.viewAllCanditates = async (req, res) => {
             {
               model: recruiter,
               attributes: ["firstName", "lastName", "mobile"],
+              include:[{model:user,attributes:["roleName"]}]
             },
           ],
           where: mywhere,
@@ -1133,8 +1164,23 @@ exports.viewAllCanditates = async (req, res) => {
           offset: page * limit - limit,
           order: [["createdAt", "DESC"]],
         })
-        .then((data) => {
+        .then(async (data) => {
           if (data) {
+      
+          console.log("in");
+              // Check if `candidateDetail` exists and `showAllDetails` is false
+              if(req.roleName!="SUBVENDOR")
+                {
+              data.rows.forEach(candidate => {
+            // Check if `candidateDetail` exists and `showAllDetails` is false
+            if (candidate.candidateDetail && candidate.recruiter.user.roleName=="SUBVENDOR" && (!candidate.candidateDetail.showAllDetails || candidate.candidateDetail.showAllDetails == null)) {
+              const attributesToRemove = ['firstName', 'lastName', 'mobile', 'email','alternateMobile'];
+              attributesToRemove.forEach(attr => {
+                candidate.candidateDetail[attr] = 'x'.repeat(candidate.candidateDetail[attr].length);;
+              });
+            }
+          });
+        }
             res
               .status(200)
               .json({ data: data.rows, count: data.count, status: true });
@@ -1269,8 +1315,15 @@ exports.viewCandidate = async (req, res) => {
               {
                 model: recruiter,
                 attributes: ["firstName", "lastName"],
+                include:[{model:user,attributes:["roleName"]}]
               },
             ],
+            
+          },
+          {
+            model: recruiter,
+            attributes: ["firstName", "lastName"],
+            include:[{model:user,attributes:["roleName"]}]
           },
         ],
       })
@@ -1282,6 +1335,15 @@ exports.viewCandidate = async (req, res) => {
               mainId: data.mainId,
             },
           });
+          if(req.roleName!="SUBVENDOR")
+              {
+          if (!data.candidateDetail.showAllDetails &&  data.recruiter.user.roleName=="SUBVENDOR") {
+            const attributesToRemove = ['firstName', 'lastName', 'mobile', 'email','alternateMobile'];
+            attributesToRemove.forEach(attr => {
+              candidate.candidateDetail[attr] = 'x'.repeat(candidate.candidateDetail[attr].length);
+            });
+            }
+          }
           res
             .status(200)
             .json({ data: data, status: true, chatUser: chatuserdata });
@@ -1359,7 +1421,7 @@ exports.myCandidates = async (req, res) => {
         "currentCompanyName",
         "linkedInProfile",
         "panNumber",
-        'showAllDetails',
+        "showAllDetails",
                 [
                   fn(
                     "concat",
@@ -1427,6 +1489,7 @@ exports.myCandidates = async (req, res) => {
           {
             model: recruiter,
             attributes: ["firstName", "lastName", "mobile"],
+            include:[{model:user,attributes:["roleName"]}]
           },
         ],
         order: [["createdAt", "DESC"]],
@@ -1434,8 +1497,20 @@ exports.myCandidates = async (req, res) => {
         limit: limit,
         offset: page * limit - limit,
       })
-      .then((data) => {
+      .then(async (data) => {
         if (data) {
+          if(req.roleName!="SUBVENDOR")
+              {
+         data.rows.forEach(candidate => {
+            // Check if `candidateDetail` exists and `showAllDetails` is false
+            if (candidate.candidateDetail && candidate.recruiter.user.roleName=="SUBVENDOR" && (!candidate.candidateDetail.showAllDetails || candidate.candidateDetail.showAllDetails == null)) {
+              const attributesToRemove = ['firstName', 'lastName', 'mobile', 'email','alternateMobile'];
+              attributesToRemove.forEach(attr => {
+                candidate.candidateDetail[attr] = 'x'.repeat(candidate.candidateDetail[attr].length);
+              });
+            }
+          });
+          }
           res
             .status(200)
             .json({ data: data.rows, count: data.count, status: true });

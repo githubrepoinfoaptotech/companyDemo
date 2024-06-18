@@ -136,7 +136,16 @@ const candidateDetail=sequelize.define("candidateDetail",{
     },
     showAllDetails:{
         type:Sequelize.BOOLEAN,
-        allowNull:true
+        allowNull:true,
+        defaultValue:false
+    },
+    detailsHandler: {
+        type: Sequelize.JSON,
+        allowNull: false,
+        defaultValue: {
+            isMailSent: false,
+            token: ""
+        }
     }
 },
 {
