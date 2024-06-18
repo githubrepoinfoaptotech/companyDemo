@@ -75,7 +75,8 @@ export default function Tables() {
     location:"",
     experience:null, 
     resume: "",
-
+    document: "",
+    photo: "",
     gender:"",
     differentlyAbled:"", 
     candidateProcessed:"",  
@@ -379,6 +380,8 @@ export default function Tables() {
               alternateMobile:
                 response.data.data.candidateDetail?.alternateMobile,
               resume: response.data.data.candidateDetail?.resume,
+              document: response.data.data.candidateDetail?.document,
+              photo: response.data.data.candidateDetail?.photo,
               candidateRecruiterDiscussionRecording:response.data.data.candidateRecruiterDiscussionRecording,
               candidateSkillExplanationRecording:response.data.data.candidateSkillExplanationRecording,
               candidateMindsetAssessmentLink:response.data.data.candidateMindsetAssessmentLink,

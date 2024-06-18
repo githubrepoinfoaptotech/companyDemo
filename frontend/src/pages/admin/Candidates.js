@@ -259,6 +259,8 @@ export default function Candidates(props) {
     location: "",
     experience: null,
     resume: "",
+    document: "",
+    photo: "",
     gender: "",
     differentlyAbled: "",
     candidateProcessed: "",
@@ -1332,6 +1334,12 @@ export default function Candidates(props) {
 
   function handleEdit(values) {
     return new Promise((resolve) => {
+
+      if (!values.day || !values.month || !values.year) {
+        handleNotificationCall("error", "Please select the date of birth properly.");
+        return;
+      }
+      
       setLoader(true);
       var dob = values.day + "-" + values.month + "-" + values.year;
 
@@ -1420,6 +1428,11 @@ export default function Candidates(props) {
   }
 
   function handleAddList(send) {
+    if (!addList.day || !addList.month || !addList.year) {
+      handleNotificationCall("error", "Please select the date of birth properly.");
+      return;
+    }
+      
     setLoader(true);
     var url = "";
     var data = {};
@@ -2251,6 +2264,8 @@ export default function Candidates(props) {
               alternateMobile:
                 response.data.data.candidateDetail?.alternateMobile,
               resume: response.data.data.candidateDetail?.resume,
+              document: response.data.data.candidateDetail?.document,
+              photo: response.data.data.candidateDetail?.photo,
               candidateRecruiterDiscussionRecording:
                 response.data.data.candidateRecruiterDiscussionRecording,
               candidateSkillExplanationRecording:

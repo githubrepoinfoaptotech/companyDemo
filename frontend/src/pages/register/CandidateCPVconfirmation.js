@@ -2,16 +2,13 @@ import React, { useState, useEffect } from "react";
 import {
   Grid,
   Typography,
-  Box,
   useTheme,
   useMediaQuery,
   Button,
   Backdrop,
   CircularProgress,
-  SwipeableDrawer,
   Dialog,
   DialogContent,
-  List,
   Divider,
 } from "@material-ui/core";
 import { createTheme, MuiThemeProvider } from "@material-ui/core/styles";
@@ -20,25 +17,14 @@ import {
   AppBar,
 } from "@material-ui/core";
 import { ToastContainer } from "react-toastify";
-import Tooltip from "@material-ui/core/Tooltip";
 import Lottie from 'lottie-react'
 import handshakelottie from '../../images/handshake.json'
-import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
-import CardContent from "@material-ui/core/CardContent";
-import CardHeader from "@material-ui/core/CardMedia";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import moment from "moment";
 import axios from "axios";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Notification from "../../components/Notification";
 import useStyles from "../../themes/style";
-import { useHistory, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import CloseIcon from "@material-ui/icons/Close";
-import RemoveRedEyeIcon from "@material-ui/icons/RemoveRedEye";
 import red from "@material-ui/core/colors/red";
 import "react-toastify/dist/ReactToastify.css";
 const positions = [toast.POSITION.TOP_RIGHT];
@@ -54,13 +40,6 @@ function CandidateCPVconfirmation() {
   };
   const handleModalOpen = () => {
     setModalOpen(true);
-  };
-  const [state, setState] = useState({
-    right: false,
-  });
-
-  const toggleDrawer = (anchor, open) => (event) => {
-    setState({ ...state, [anchor]: open });
   };
 
   const getMuiTheme = () =>
@@ -511,8 +490,6 @@ function CandidateCPVconfirmation() {
       });
   }
 
-  const history = useHistory();
-
   var [errorToastId, setErrorToastId] = useState(null);
   var [notificationsPosition] = useState(2);
 
@@ -571,62 +548,7 @@ function CandidateCPVconfirmation() {
     if (notificationType === "error") setErrorToastId(toastId);
   }
 
-  const validationSchema = Yup.object().shape({
-    companyName: Yup.string().nullable().required("Parent or Group Companies Name is required"),
-    webSiteUrl: Yup.string().nullable().required("WebSite Url is required"),
-    jobDescription: Yup.string().nullable(),
-    acknowledgement: Yup.bool().required('Read and agree the Job Description'),
-    companyNameConfirmation: Yup.bool().required('give the confirmation'),
-    jobTitle: Yup.string().nullable().required("Job Role Title is required"),
-    currentLocation: Yup.string().nullable().required("Residing Location is required"),
-    inProjectOrBench: Yup.string().required("In Project or Bench is required"),
-    jobLocation: Yup.string().nullable().required("Job Role Location is required"),
-    currentCompanyName: Yup.string().nullable().required("Current Company Name is required"),
-    shiftTimings: Yup.string().nullable().required("Acceptance for Shifts is required"),
-    noticePeriod: Yup.string().nullable().required("Can Join Within Days is required"),
-    payrollOrContract: Yup.string().nullable().required("Direct Payroll or Contract is required"),
-    currentCtcAndTakeHome: Yup.string().nullable().required("Your Current CTC is required"),
-    expectedCtcAndTakeHome: Yup.string().nullable().required("Expected CTC is required"),
-    currentTakeHome: Yup.string().nullable().required("Your Current Take Home is required"),
-    expectedTakeHome: Yup.string().nullable().required("Expected Take Home is required"),
-    modeOfWork: Yup.string().nullable().required("WFH/WFO/Hybrid is required"),
-    existingOfferDetails: Yup.string().nullable().required("Existing Offer Details is required"),
-    jobChangeReason: Yup.string().nullable().required("Reason for Job Change is required"),
-    documentsAvailabilty: Yup.string().nullable().required("Confirm that on selection for Offer that you have all relevant documents in-order to submit for Offer release and onboarding is required"),
-  });
-
-  const {
-    register,
-    reset,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm({
-    resolver: yupResolver(validationSchema),
-  });
-
-
   const [loader, setLoader] = useState(false);
-
-  const [requirementsView, setRequirementsView] = useState({
-    id: "",
-    requirementName: "",
-    clientId: "",
-    skills: "",
-    // orgRecruiterId: "",
-    // orgRecruiterName: "",
-    jobLocation: "",
-    experience: "",
-    uniqueId: "",
-    clientUniqueId: "",
-    clientName: "",
-    gist: "",
-    jd: "",
-    hideFromInternal: "",
-    modeOfWork: "",
-    specialHiring: "",
-    status: "",
-    createdAt: "",
-  });
 
   useEffect(() => {
     fetchCPVData();
@@ -649,26 +571,6 @@ function CandidateCPVconfirmation() {
         if (response.data.status === true) {
           setCandidateView(response.data.data);
           setLoader(false);
-          reset({
-            companyName: response.data?.companyName,
-            webSiteUrl: response.data?.companyWebsite,
-            //  jobDescription: response.data.data.requirement?.gist,
-            jobTitle: response.data.data.requirement?.requirementName,
-            currentLocation: response.data.data.candidateDetail?.currentLocation,
-            inProjectOrBench: "",
-            jobLocation: response.data.data.requirement?.jobLocation,
-            currentCompanyName: response.data.data.candidateDetail?.currentCompanyName,
-            shiftTimings: "",
-            noticePeriod: response.data.data.candidateDetail?.noticePeriod,
-            payrollOrContract: "",
-            currentCtcAndTakeHome: response.data.data.candidateDetail?.currentCtc,
-            expectedCtcAndTakeHome: response.data.data.candidateDetail?.expectedCtc,
-            modeOfWork: "",
-            existingOfferDetails: "",
-            jobChangeReason: response.data.data.candidateDetail?.reasonForJobChange,
-            documentsAvailabilty: "",
-          })
-
         }
       })
       .catch(function (error) {
@@ -677,235 +579,6 @@ function CandidateCPVconfirmation() {
     // eslint-disable-next-line react-hooks/exhaustive-deps  
   }, []);
 
-
-  const list = (anchor) =>
-  (
-    <>
-      <Box sx={{ width: "100%" }} role="presentation">
-        <List>
-          <Card className={classes.root}>
-            <CardHeader>
-              <Grid
-                container
-                direction="row"
-                spacing={1}
-                className={classes.drawerViewHeader}
-              >
-                <Grid item xs={10} md={6}>
-                  <Typography variant="subtitle1">
-                    View Requirement - {requirementsView.requirementName}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={2} lg={6} className={classes.drawerViewClose}>
-                  <CloseIcon
-                    className={classes.closeBtn}
-                    size="14px"
-                    onClick={toggleDrawer(anchor, false)}
-                  />
-                </Grid>
-              </Grid>
-            </CardHeader>
-
-            <CardContent className={classes.drawerViewContent}>
-              <Grid container direction="row" spacing={2}>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <Typography className={classes.boldtext}>
-                    Requirement Name:
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  {requirementsView.requirementName +
-                    " (" +
-                    requirementsView.uniqueId +
-                    ") "}
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <Typography className={classes.boldtext}>
-                    Parent or Group Companies Name:
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-
-                  {requirementsView.clientName +
-                    " (" +
-                    requirementsView.clientUniqueId +
-                    ") "}
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <Typography className={classes.boldtext}>
-                    Organization Recruiter Name:
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  {requirementsView.orgRecruiterName}
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <Typography className={classes.boldtext}>
-                    Experience:
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  {requirementsView.experience}
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <Typography className={classes.boldtext}>
-                    Skills:
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  {requirementsView.skills}
-                </Grid>
-
-
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <Typography className={classes.boldtext}>
-                    Location:
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={6} lg={6}>   {requirementsView.jobLocation} </Grid>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <Typography className={classes.boldtext}>
-                    Mode of work:
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={6} lg={6}>   {requirementsView.modeOfWork} </Grid>
-
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <Typography className={classes.boldtext}>
-                    Special hiring:
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6} md={6} lg={6}>   {requirementsView.specialHiring}
-                </Grid>
-
-
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <Typography className={classes.boldtext}>
-                    Hide to Internal Employees:
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  {requirementsView.hideFromInternal === true ? "YES" : "NO"}
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <Typography className={classes.boldtext}>
-                    JD :
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <div className={classes.space + " " + classes.alignItemsEnd}>
-                    {requirementsView?.jd !== "https://liverefo.s3.amazonaws.com/" && requirementsView?.jd !== null ? <>
-                      <Tooltip
-                        title="View JD"
-                        placement="bottom"
-                        aria-label="view"
-                      >
-                        <RemoveRedEyeIcon
-                          className={classes.toolIcon}
-                          onClick={handleModalOpen}
-                        />
-                      </Tooltip>
-
-                      <Tooltip
-                        title="Downlaod JD"
-                        placement="bottom"
-                        aria-label="downlaod"
-                      >
-                        <a className={classes.messageContent} href={requirementsView?.jd} download>
-                          <GetAppIcon className={classes.toolIcon} />
-                        </a>
-                      </Tooltip>
-                    </> : ""}
-                  </div>
-
-                </Grid>
-
-
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <Typography className={classes.boldtext}>
-                    Requirement Gist:
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <div dangerouslySetInnerHTML={{ __html: requirementsView.gist }} style={{ height: "100px", overflowY: "scroll" }}></div>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <Typography className={classes.boldtext}>
-                    Status:
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  {requirementsView.status ? (
-                    requirementsView.status.statusName === "ACTIVE" ? (
-                      <>
-                        <Button
-                          variant="contained"
-                          size="small"
-                          className={classes.green + " " + classes.noPointer}
-                        >
-                          ACTIVE
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Button
-                          variant="contained"
-                          size="small"
-                          className={classes.red + " " + classes.noPointer}
-                        >
-                          INACTIVE
-                        </Button>
-                      </>
-                    )
-                  ) : (
-                    ""
-                  )}
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  <Typography className={classes.boldtext}>
-                    Posted Date:
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                  {moment(requirementsView.createdAt).format(
-                    "DD-MM-YYYY",
-                  )}
-                </Grid>
-              </Grid>
-            </CardContent>
-            <CardActions>
-              <Grid
-                container
-                direction="row"
-                spacing={2}
-                className={classes.drawerFooter}
-              >
-                <Button
-                  variant="contained"
-                  size="small"
-                  color="secondary"
-                  onClick={toggleDrawer(anchor, false)}
-                >
-                  Close
-                </Button>
-              </Grid>
-            </CardActions>
-          </Card>
-        </List>
-      </Box>
-
-    </>
-  );
 
   return (
     <div className={classes.backgroundColor}>
@@ -946,7 +619,7 @@ function CandidateCPVconfirmation() {
                 {cpvForm?.candidateConformation === true ?
                   <div style={{ background: '#F6F7FF' }}>
                     <Lottie loop={false} animationData={handshakelottie} style={{ width: '270px', position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, margin: 'auto' }} />
-                    <p style={{ fontSize: "30px", textAlign: "center", fontFamily: '"IBM Plex Sans Condensed", sans-serif', fontWeight: '600', lineHeight: "36px", color: '#000', position: 'absolute', left: "50%", top: "65%", transform: 'translate(-50%, -50%)', color: '#10670e' }}>Thank you for your acceptance</p>
+                    <p style={{ fontSize: "30px", textAlign: "center", fontFamily: '"IBM Plex Sans Condensed", sans-serif', fontWeight: '600', lineHeight: "36px", position: 'absolute', left: "50%", top: "65%", transform: 'translate(-50%, -50%)', color: '#10670e' }}>Thank you for your acceptance</p>
                   </div>
                   :
                   <div style={{ padding: "0px 25px" }}>
@@ -1297,15 +970,6 @@ function CandidateCPVconfirmation() {
             </Grid>
           </Grid>
 
-          <SwipeableDrawer
-            anchor="right"
-            open={state["right"]}
-            onClose={toggleDrawer("right", false)}
-            onOpen={toggleDrawer("right", true)}
-            classes={{ paper: classes.drawer }}
-          >
-            {list("right")}
-          </SwipeableDrawer>
 
           <Dialog
             aria-labelledby="dialog-title"

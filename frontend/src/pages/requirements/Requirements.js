@@ -135,7 +135,7 @@ export default function Tables() {
 
   var [errorToastId, setErrorToastId] = useState(null);
 
-  const ContentRef = React.useRef();
+  const ContentRef = React.useRef(null);
   var [hideFromInternal, setHideFromInternal] = useState(false);
   const [modeofWork, setModeofWork] = React.useState("");
   const [specialHiring, setSpecialHiring] = React.useState("");
@@ -223,6 +223,8 @@ export default function Tables() {
     formState: { errors: editErrors, isSubmitting: editIsSubmitting },
     handleSubmit: editSubmit,
     reset: editreset,
+    setValue: setEditValue, 
+    trigger: editTrigger,
   } = useForm({
     mode: "onBlur",
     resolver: yupResolver(validationSchema)
@@ -808,6 +810,11 @@ export default function Tables() {
     });
   }, [token]);
 
+  useEffect(() => {
+    // Set the initial value for the gist field
+    setEditValue('gist', requirementsEdit?.gist || '');
+  }, [requirementsEdit, setEditValue]);
+
   function handleChange(value) {
     setClientId(value);
 
@@ -934,7 +941,7 @@ export default function Tables() {
 
               <form onSubmit={editSubmit(handleEdit)}>
                 <CardContent>
-                  <Grid container direction="row" spacing={2}>
+                  <Grid container direction="row" spacing={2} style={{height: "79vh",overflow: "scroll"}}>
                     <Grid item xs={12} sm={6} md={6} lg={6}>
                       <FormControl className={classes.margin}>
                         <InputLabel shrink htmlFor="clientId">
@@ -1388,6 +1395,14 @@ export default function Tables() {
                           value={requirementsEdit?.gist}
                           tabIndex={1} // tabIndex of textarea
                           ref={ContentRef}
+                          onBlur={() => {
+                            const newContent = ContentRef.current.value;
+                            setEditValue("gist", newContent);
+                            editTrigger("gist");
+                          }}
+                          onChange={newContent => {
+                            setEditValue("gist", newContent);
+                          }}
                         />
 
                         <Typography variant="inherit" color="error">

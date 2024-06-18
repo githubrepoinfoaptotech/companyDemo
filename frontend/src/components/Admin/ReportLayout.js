@@ -121,8 +121,9 @@ export default function Layout(props) {
     invoicedDate: "",
     joinedDate: "",
     invoiceValue: "",
-
     gender: "",
+    document: "",
+    photo: "",
     differentlyAbled: "",
     candidateProcessed: "",
     currentLocation: "",
@@ -473,6 +474,8 @@ export default function Layout(props) {
             gender: response.data.data.candidateDetail?.gender,
             alternateMobile: response.data.data.candidateDetail?.alternateMobile,
             resume: response.data.data.candidateDetail?.resume,
+            document: response.data.data.candidateDetail?.document,
+              photo: response.data.data.candidateDetail?.photo,
             candidateRecruiterDiscussionRecording: response.data.data.candidateRecruiterDiscussionRecording,
             candidateSkillExplanationRecording: response.data.data.candidateSkillExplanationRecording,
             candidateMindsetAssessmentLink: response.data.data.candidateMindsetAssessmentLink,
@@ -772,10 +775,6 @@ export default function Layout(props) {
       ];
     });
   }
-
-
-
-
 
   const list = (anchor) => (
     <Box sx={{ width: "100%" }} role="presentation">

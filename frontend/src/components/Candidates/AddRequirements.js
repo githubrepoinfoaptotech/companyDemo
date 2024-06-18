@@ -453,6 +453,10 @@ function AddRequirements(props) {
                     <JoditEditor
                       tabIndex={1} // tabIndex of textarea
                       ref={props.ContentRef}
+                      value={props.ContentRef.current ? props.ContentRef.current.value : ''}
+                      onChange={newContent => {
+                        props.setValue("gist", newContent); // For updating the value on every change
+                      }}
                     />
 
                     <Typography variant="inherit" color="error">

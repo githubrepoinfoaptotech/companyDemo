@@ -113,6 +113,8 @@ export default function Tables(props) {
     location: "",
     experience: null,
     resume: "",
+    document: "",
+    photo: "",
     clientName: "",
     requirementName: "",
     statusCode: "",
@@ -882,8 +884,11 @@ export default function Tables(props) {
   }
 
   function handleEdit(values) {
-
     return new Promise((resolve) => {
+      if (!values.day || !values.month || !values.year) {
+        handleNotificationCall("error", "Please select the date of birth properly.");
+        return;
+      }
       setLoader(true);
       var dob = values.day + "-" + values.month + "-" + values.year;
 
@@ -961,6 +966,10 @@ export default function Tables(props) {
   }
 
   function handleAddList(send, addList) {
+    if (!addList.day || !addList.month || !addList.year) {
+      handleNotificationCall("error", "Please select the date of birth properly.");
+      return;
+    }
     setLoader(true);
 
     var dob = addList.day + "-" + addList.month + "-" + addList.year;
@@ -1335,6 +1344,8 @@ export default function Tables(props) {
             educationalQualification: response.data.data.candidateDetail?.educationalQualification,
             gender: response.data.data.candidateDetail?.gender,
             resume: response.data.data.candidateDetail?.resume,
+            document: response.data.data.candidateDetail?.document,
+            photo: response.data.data.candidateDetail?.photo,
             alternateMobile: response.data.data.candidateDetail?.alternateMobile,
             candidateRecruiterDiscussionRecording: response.data.data.candidateRecruiterDiscussionRecording,
             candidateSkillExplanationRecording: response.data.data.candidateSkillExplanationRecording,
