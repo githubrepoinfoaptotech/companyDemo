@@ -130,6 +130,7 @@ const Layout = (props) => {
     mainId: "",
     recruiterId: "",
     hideContactDetails: false,
+    showAllDetails: false,
     panNumber: "",
     linkedInProfile: "",
   });
@@ -1217,6 +1218,7 @@ const Layout = (props) => {
               hideContactDetails: response.data.data.hideContactDetails,
               panNumber: response.data.data.candidateDetail?.panNumber,
               linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
+              showAllDetails: response.data.data.candidateDetail?.showAllDetails,
             });
 
             setState({ ...state, right: true });

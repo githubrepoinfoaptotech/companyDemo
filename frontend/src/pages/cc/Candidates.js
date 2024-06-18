@@ -123,6 +123,7 @@ export default function Tables(props) {
     recruiterId: "",
     currentCompanyName: "",
     hideContactDetails: false,
+    showAllDetails: false,
     panNumber: "",
     linkedInProfile: "",
   });
@@ -1977,6 +1978,7 @@ export default function Tables(props) {
               currentCompanyName: response.data.data.candidateDetail?.currentCompanyName,
               panNumber: response.data.data.candidateDetail?.panNumber,
               linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
+              showAllDetails: response.data.data.candidateDetail?.showAllDetails,
             });
 
             setState({ ...state, right: true });

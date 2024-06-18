@@ -100,6 +100,7 @@ export default function Tables(props) {
     hideContactDetails: false,
     panNumber: "",
     linkedInProfile: "",
+    showAllDetails: false,
   });
   const [listCanditate, setListCanditate] = useState([]);
   const [candidateView, setCandidateView] = useState({
@@ -145,6 +146,7 @@ export default function Tables(props) {
     currentCompanyName: "",
     panNumber: "",
     linkedInProfile: "",
+    showAllDetails: false,
   });
 
   const [page, setPage] = useState(0);
@@ -408,6 +410,7 @@ export default function Tables(props) {
     currentCompanyName: Yup.string().nullable().notRequired(),
     panNumber: Yup.string(),
     linkedInProfile: Yup.string(),
+    showAllDetails: Yup.bool().nullable().notRequired(),
   });
 
   const {
@@ -514,6 +517,7 @@ export default function Tables(props) {
             freeValue: "YES",
             panNumber: response.data.data?.panNumber,
             linkedInProfile: response.data.data?.linkedInProfile,
+            showAllDetails: response.data.data?.showAllDetails
           });
         }
       });
@@ -870,10 +874,7 @@ export default function Tables(props) {
     }).then(function (response) {
 
       if (response.data.status === true) {
-
-
         handleAddList(false, values);
-
       }
       // else{
       //   handleNotificationCall("error", response.data.message);
@@ -930,6 +931,7 @@ export default function Tables(props) {
           currentCompanyName: values.currentCompanyName,
           panNumber: values?.panNumber,
           linkedInProfile: values?.linkedInProfile,
+          showAllDetails: candidatesEdit.showAllDetails
         },
         headers: {
           "Content-Type": "application/json",
@@ -1010,6 +1012,7 @@ export default function Tables(props) {
       currentCompanyName: addList.currentCompanyName,
       panNumber: addList?.panNumber,
       linkedInProfile: addList?.linkedInProfile,
+      showAllDetails: candidate.showAllDetails,
     }
 
 
@@ -1356,6 +1359,7 @@ export default function Tables(props) {
             currentCompanyName: response.data.data.candidateDetail?.currentCompanyName,
             panNumber: response.data.data.candidateDetail?.panNumber,
             linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
+            showAllDetails: response.data.data.candidateDetail?.showAllDetails,
           });
 
           setCandidatesEdit({
@@ -1398,6 +1402,7 @@ export default function Tables(props) {
             currentCompanyName: response.data.data.candidateDetail?.currentCompanyName,
             panNumber: response.data.data.candidateDetail?.panNumber,
             linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
+            showAllDetails: response.data.data.candidateDetail?.showAllDetails,
           });
 
           setState({ ...state, right: true });
@@ -1553,6 +1558,7 @@ export default function Tables(props) {
     freeValue: "YES",
     panNumber: "",
     linkedInProfile: "",
+    showAllDetails: false,
   });
 
 
@@ -1715,6 +1721,7 @@ export default function Tables(props) {
                   freeValue: decode.isEnableFree === true ? "YES" : decode.isEnablePaid === true ? "NO" : "YES",
                   panNumber: "",
                   linkedInProfile: "",
+                  showAllDetails:false,
                 });
                 setState({ ...state, right: true });
                 setPhoneValidation(false);

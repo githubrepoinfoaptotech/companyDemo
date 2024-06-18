@@ -24,7 +24,6 @@ import external from "../../images/external.png";
 import { Autocomplete } from "@material-ui/lab";
 import ViewIcon from "@material-ui/icons/Visibility";
 import DescriptionIcon from "@material-ui/icons/Description";
-//import GetAppIcon from "@material-ui/icons/GetApp";
 import axios from "axios";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
@@ -52,6 +51,8 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import "react-toastify/dist/ReactToastify.css";
 import MatchJDDialog from "../../components/Candidates/MatchJDDialog.js";
 import { useResumeDataContext } from '../../context/CandidateDataContext.js'
+import Lottie from 'lottie-react'
+import lockanimation from '../../images/animation-lock.json'
 import ReactPdfDialog from "../../components/Candidates/ReactPdfDialog.js";
 import CPVFormView from "../../components/Candidates/CPVFormView.js";
 
@@ -128,6 +129,29 @@ export default function Candidates(props) {
 
   const [resumePercentage, setResumePercentage] = useState([])
   const [matchLoading, setMatchLoading] = useState(false)
+
+  const [lottieHovered, setLottieHovered] = useState(false);
+  const lottieRef = useRef(null);
+  const defaultLottieOptions = {
+    loop: false,
+    autoplay: false,
+    animationData: lockanimation,
+  };
+
+  const handleAnimationMouseHover = () => {
+    setLottieHovered(true);
+    if (lottieRef.current) {
+      lottieRef.current.play();
+    }
+  };
+
+  const handleAnimationMouseLeave = () => {
+    setLottieHovered(false);
+    if (lottieRef.current) {
+      lottieRef.current.stop();
+    }
+  }
+
   const [candidMatchId, setCandidMatchId] = useState("");
 
   function handleUse(mobile) {
@@ -236,6 +260,7 @@ export default function Candidates(props) {
     recruiterId: "",
     currentCompanyName: "",
     hideContactDetails: false,
+    showAllDetails: false,
     panNumber: "",
     linkedInProfile: "",
   });
@@ -1339,7 +1364,7 @@ export default function Candidates(props) {
         handleNotificationCall("error", "Please select the date of birth properly.");
         return;
       }
-      
+
       setLoader(true);
       var dob = values.day + "-" + values.month + "-" + values.year;
 
@@ -1432,7 +1457,7 @@ export default function Candidates(props) {
       handleNotificationCall("error", "Please select the date of birth properly.");
       return;
     }
-      
+
     setLoader(true);
     var url = "";
     var data = {};
@@ -2338,7 +2363,8 @@ export default function Candidates(props) {
                 response.data.data.candidateDetail?.currentCompanyName,
               hideContactDetails: response.data.data.hideContactDetails,
               panNumber: response.data.data.candidateDetail?.panNumber,
-              linkedInProfile: response.data.data.candidateDetail?.linkedInProfile
+              linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
+              showAllDetails: response.data.data.candidateDetail?.showAllDetails,
             });
 
             setState({ ...state, right: true });
@@ -3094,6 +3120,22 @@ export default function Candidates(props) {
                       item.candidateDetail?.lastName}
                     <br /> {" (" + item.uniqueId + ")"}
                   </div>
+                  {item.candidateDetail?.isExternal === "YES" ? (
+                    <div
+                      onMouseEnter={handleAnimationMouseHover}
+                      onMouseLeave={handleAnimationMouseLeave}
+                      style={{ width: 30, height: 30 }} // Adjust size as needed
+                    >
+                      <Lottie
+                        lottieRef={lottieRef}
+                        animationData={lockanimation}
+                        loop={false}
+                        autoplay={false}
+                      />
+                    </div>
+                  ) : (
+                    ""
+                  )}
                 </Grid>,
                 item.mainId === decode.mainId ? (
                   <>
