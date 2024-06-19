@@ -20,10 +20,13 @@ import useStyles from "../../themes/style.js";
 import ExpandButton from "../../components/Candidates/ExpandButton";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import external from "../../images/external.png";
+import mailSendImg from "../../images/mailSend.png";
 import ViewIcon from "@material-ui/icons/Visibility";
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
-
+import lockanimation from "../../images/animation-lock.json"
+import Lottie from 'lottie-react'
 import "react-toastify/dist/ReactToastify.css";
+import VendorCandidatesApproval from "../Admin/VendorCandidatesApproval.js";
 
 const positions = [toast.POSITION.TOP_RIGHT];
 
@@ -78,6 +81,28 @@ export default function Search(props) {
   const years = Array.from({ length: 60 }, (_, i) => moment(new Date()).format("YYYY") - i);
   const [recruitmentList, setRecruitmentList] = useState([]);
 
+  const lottieRef = useRef(null);
+  const handleAnimationMouseHover = () => {
+    if (lottieRef.current) {
+      lottieRef.current.play();
+    }
+  };
+
+  const handleAnimationMouseLeave = () => {
+    if (lottieRef.current) {
+      lottieRef.current.stop();
+    }
+  }
+  const [vcApproval, setVcApproval] = React.useState(false);
+  const [vcData, setVcData] = React.useState([]);
+  const handleVcApprovalClose = () => {
+    setVcApproval(false);
+  };
+
+  const handleVcApprovalOpen = (data) => {
+    setVcApproval(true);
+    setVcData(data)
+  };
 
   const toggleDrawer = (anchor, open) => (event) => {
     setState({ ...state, [anchor]: open });
@@ -553,7 +578,7 @@ export default function Search(props) {
             differentlyAbled: response.data.data.candidateDetail?.differentlyAbled,
             educationalQualification: response.data.data.candidateDetail?.educationalQualification,
             document: response.data.data.candidateDetail?.document,
-              photo: response.data.data.candidateDetail?.photo,
+            photo: response.data.data.candidateDetail?.photo,
             gender: response.data.data.candidateDetail?.gender,
             alternateMobile: response.data.data.candidateDetail?.alternateMobile,
             resume: response.data.data.candidateDetail?.resume,
@@ -1381,11 +1406,7 @@ export default function Search(props) {
           getFilterData();
         }}
       >
-        <Grid container spacing={2} className={classes.filterGap}>
-
-
-
-
+        <Grid container spacing={2} className={classes.filterGap} style={{paddingBottom: "10px"}}>
           <TagsInput value={skillSearch}
             onChange={handle}
             separators={["Enter", ","]}
@@ -1395,8 +1416,6 @@ export default function Search(props) {
             placeHolder="Press Enter or Comma to Add a New Skills"
             classes={{ root: classes.customTextField }}
           />
-
-
           <div className={classes.buttons}>
             <Button
               variant="contained"
@@ -1417,11 +1436,6 @@ export default function Search(props) {
           </div>
         </Grid>
       </form>
-
-
-
-
-
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -1493,16 +1507,12 @@ export default function Search(props) {
                   <>
                     <Status
                       list={item}
-
-
                     />
                   </>
                 ) : (
                   ""
                 ),
-
-                <Grid container row spacing={2} className={classes.externalIconContainer}>
-
+                <Grid container row spacing={2} className={classes.externalIconContainer} data-candidatename={item.candidateDetail?.firstName + " " + item.candidateDetail?.lastName}>
                   {item.candidateDetail?.isExternal === "YES" ?
                     <Tooltip title="SUBVENDOR" placement="bottom" aria-label="title">
                       <Avatar alt="Profile" src={external} className={classes.externalIcon} />
@@ -1510,7 +1520,32 @@ export default function Search(props) {
                   <div>
                     {item.candidateDetail?.firstName + " " + item.candidateDetail?.lastName}    <br />  {"(" + item.uniqueId + ")"}
                   </div>
-
+                  {item.candidateDetail?.isExternal === "YES" && item.candidateDetail?.showAllDetails === false ? (
+                    item.candidateDetail?.detailsHandler.isMailSent ===true ?
+                      <>
+                        <Avatar
+                          alt="mail-send-img"
+                          src={mailSendImg}
+                          className={classes.mailSendSuccessIcon}
+                        />
+                      </> 
+                      :
+                    <div
+                      onMouseEnter={handleAnimationMouseHover}
+                      onMouseLeave={handleAnimationMouseLeave}
+                      onClick={() => handleVcApprovalOpen(item)}
+                      style={{ width: 35, height: 35 }} // Adjust size as needed
+                    >
+                      <Lottie
+                        lottieRef={lottieRef}
+                        animationData={lockanimation}
+                        loop={true}
+                        autoplay={false}
+                      />
+                    </div>
+                  ) : (
+                    ""
+                  )}
                 </Grid>,
                 item.mainId === decode.mainId ?
                   <>  {item.candidateDetail?.email + " /"} <br />{"91 " + item.candidateDetail?.mobile.slice(2)}  </>
@@ -1537,7 +1572,14 @@ export default function Search(props) {
           </Grid>
         </Grid>
       </Grid>
-
+      <VendorCandidatesApproval
+        handleVcApprovalClose={handleVcApprovalClose}
+        handleNotificationCall={handleNotificationCall}
+        setLoader={setLoader}
+        vcData={vcData}
+        vcApproval={vcApproval}
+        updateData={getFilterData}
+      />
       <SwipeableDrawer
         anchor="right"
         open={state["right"]}
@@ -1547,7 +1589,6 @@ export default function Search(props) {
       >
         {list("right")}
       </SwipeableDrawer>
-
 
       <Backdrop className={classes.backdrop} open={loader}>
         <CircularProgress color="inherit" />

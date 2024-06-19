@@ -1847,6 +1847,13 @@ export default makeStyles(theme => ({
     mixBlendMode: "multiply",
     borderRadius: "unset !important"
   },
+  mailSendSuccessIcon: {
+    width: "36px !important",
+    height: "28px !important",
+    padding: "2px",
+    mixBlendMode: "multiply",
+    borderRadius: "unset !important"
+  },
   aLink: {
     fontSize: 16,
     "&:hover": {
