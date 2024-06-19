@@ -130,7 +130,8 @@ const Layout = (props) => {
     mainId: "",
     recruiterId: "",
     hideContactDetails: false,
-    showAllDetails: false,
+    showAllDetails: null,
+    detailsHandler: null,
     panNumber: "",
     linkedInProfile: "",
   });
@@ -276,15 +277,21 @@ const Layout = (props) => {
     email: candidatesEdit.recruiterId === decode.recruiterId ? Yup.string().email("Email must be a Valid Email Address").required('Email is required') : Yup.string().email("Email must be a Valid Email Address"),
     firstName: Yup.string()
       .max(255)
-      .required("First Name is required")
       .matches(/^[^!@#$%^&*+=<>:;|~]*$/, {
         message: "First Name be Alphanumeric",
+      }).when([], {
+        is: () => decode.role === "SUBVENDOR" || props.candidatesEdit?.showAllDetails === true,
+        then: Yup.string().required("First Name is required"),
+        otherwise: Yup.string(),
       }),
     lastName: Yup.string()
       .max(255)
-      .required("Last Name is required")
       .matches(/^[^!@#$%^&*+=<>:;|~]*$/, {
         message: "Last Name be Alphanumeric",
+      }).when([], {
+        is: () => decode.role === "SUBVENDOR" || props.candidatesEdit?.showAllDetails === true,
+        then: Yup.string().required("Last Name is required"),
+        otherwise: Yup.string(),
       }),
     skills: Yup.string().required("Skill is required"),
     source: Yup.string().required("Source is required"),
@@ -1219,6 +1226,7 @@ const Layout = (props) => {
               panNumber: response.data.data.candidateDetail?.panNumber,
               linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
               showAllDetails: response.data.data.candidateDetail?.showAllDetails,
+              detailsHandler: response.data.data.candidateDetail?.detailsHandler,
             });
 
             setState({ ...state, right: true });

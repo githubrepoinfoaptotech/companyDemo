@@ -9,11 +9,12 @@ import {
   Backdrop,
   CircularProgress,
   Avatar,
-  Typography
 } from "@material-ui/core";
+import lockanimation from "../../images/animation-lock.json"
 import PageTitle from "../PageTitle";
 import { Autocomplete } from "@material-ui/lab";
 import { toast } from "react-toastify";
+import Lottie from 'lottie-react'
 // import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import Tooltip from "@material-ui/core/Tooltip";
 import moment from "moment";
@@ -40,7 +41,9 @@ import Actions from "../Candidates/Actions";
 import ExpandButton from "../Candidates/ExpandButton";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import external from "../../images/external.png";
+import mailSendImg from "../../images/mailSend.png";
 import "react-toastify/dist/ReactToastify.css";
+import VendorCandidatesApproval from "./VendorCandidatesApproval.js";
 
 const positions = [toast.POSITION.TOP_RIGHT];
 
@@ -88,6 +91,29 @@ export default function Candidates(props) {
   const [count, setCount] = useState(0);
   const [loader, setLoader] = useState(false);
   const [user, setUserName] = useState([]);
+
+  const lottieRef = useRef(null);
+  const handleAnimationMouseHover = () => {
+    if (lottieRef.current) {
+      lottieRef.current.play();
+    }
+  };
+
+  const handleAnimationMouseLeave = () => {
+    if (lottieRef.current) {
+      lottieRef.current.stop();
+    }
+  }
+  const [vcApproval, setVcApproval] = React.useState(false);
+  const [vcData, setVcData] = React.useState([]);
+  const handleVcApprovalClose = () => {
+    setVcApproval(false);
+  };
+
+  const handleVcApprovalOpen = (data) => {
+    setVcApproval(true);
+    setVcData(data)
+  };
 
   const [candidateList, setCandidateList] = useState({
     id: "",
@@ -140,7 +166,8 @@ export default function Candidates(props) {
     mainId: "",
     recruiterId: "",
     hideContactDetails: false,
-    showAllDetails: false,
+    showAllDetails: null,
+    detailsHandler: null,
     panNumber: "",
     linkedInProfile: "",
   });
@@ -194,8 +221,7 @@ export default function Candidates(props) {
 
   const [page, setPage] = useState(0);
   const [currerntPage, setCurrerntPage] = useState(1);
-
-  const [rowsPerPage] = useState(50);
+  const [rowsPerPage] = useState(10);
 
   const [reducerValue, forceUpdate] = useReducer((x) => x + 1, 0);
   const joiningRef = useRef();
@@ -285,15 +311,21 @@ export default function Candidates(props) {
     email: candidatesEdit.recruiterId === decode.recruiterId ? Yup.string().email("Email must be a Valid Email Address").required('Email is required') : Yup.string().email("Email must be a Valid Email Address"),
     firstName: Yup.string()
       .max(255)
-      .required("First Name is required")
       .matches(/^[^!@#$%^&*+=<>:;|~]*$/, {
         message: "First Name be Alphanumeric",
+      }).when([], {
+        is: () => decode.role === "SUBVENDOR" || props.candidatesEdit?.showAllDetails === true,
+        then: Yup.string().required("First Name is required"),
+        otherwise: Yup.string(),
       }),
     lastName: Yup.string()
       .max(255)
-      .required("Last Name is required")
       .matches(/^[^!@#$%^&*+=<>:;|~]*$/, {
         message: "Last Name be Alphanumeric",
+      }).when([], {
+        is: () => decode.role === "SUBVENDOR" || props.candidatesEdit?.showAllDetails === true,
+        then: Yup.string().required("Last Name is required"),
+        otherwise: Yup.string(),
       }),
     skills: Yup.string().required("Skill is required"),
     source: Yup.string().required("Source is required"),
@@ -375,62 +407,60 @@ export default function Candidates(props) {
     resolver: yupResolver(editSchema),
   });
 
-
-
   useEffect(() => {
     setLoader(true);
-
-    const fetchData = async () => {
-      setCurrerntPage(1);
-      setPage(0);
-
-      axios({
-        method: "post",
-        url: props.candidateData,
-        data: {
-          page: "1",
-        },
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-      }).then(function (response) {
-        if (response.data.status === true) {
-          setLoader(false);
-
-          setCandidatesData(response.data.data);
-          setCount(response.data.count);
-        }
-      });
-
-    };
-    const getUserName = async () => {
-      axios({
-        method: "post",
-        url: props.userList,
-        data: {},
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-      })
-        .then(function (response) {
-          if (response.data.status === true) {
-            setLoader(false);
-            setUserName(response.data.data);
-          }
-        })
-
-        .catch(function (error) {
-          console.log(error);
-        });
-    };
     fetchData();
     getUserName();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reducerValue, token]);
 
+  const fetchData = async () => {
+    setCurrerntPage(1);
+    setPage(0);
 
+    try {
+      const response = await axios.post(
+        props.candidateData,
+        { page: 1 },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        }
+      );
+
+      if (response.data.status === true) {
+        setLoader(false);
+        setCandidatesData(response.data.data);
+        setCount(response.data.count);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getUserName = async () => {
+    try {
+      const response = await axios.post(
+        props.userList,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        }
+      );
+
+      if (response.data.status === true) {
+        setLoader(false);
+        setUserName(response.data.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   function updateData(id) {
     axios({
@@ -819,7 +849,7 @@ export default function Candidates(props) {
               { file: profile, uploadFunction: updateCandidatePhoto },
               { file: assessment, uploadFunction: uploadAssessment }
             ];
-  
+
             fileUploadTasks.forEach(({ file, uploadFunction }) => {
               if (file !== undefined && file.length !== 0) {
                 uploadFunction(file, response.data.candidateDetailsId);
@@ -1254,6 +1284,7 @@ export default function Candidates(props) {
               panNumber: response.data.data.candidateDetail?.panNumber,
               linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
               showAllDetails: response.data.data.candidateDetail?.showAllDetails,
+              detailsHandler: response.data.data.candidateDetail?.detailsHandler,
             });
 
             setState({ ...state, right: true });
@@ -1915,8 +1946,8 @@ export default function Candidates(props) {
                 ) : (
                   ""
                 ),
-                <Grid container row spacing={2} className={classes.externalIconContainer} data-candidatename={item.candidateDetail?.firstName +" " +item.candidateDetail?.lastName}>
-                  {item.candidateDetail?.isExternal === "YES" ? (
+                <Grid container row spacing={2} className={classes.externalIconContainer} data-candidatename={item.candidateDetail?.firstName + " " + item.candidateDetail?.lastName}>
+                  {item.candidateDetail?.isExternal === "YES" && (
                     <Tooltip
                       title="VENDOR"
                       placement="bottom"
@@ -1928,8 +1959,6 @@ export default function Candidates(props) {
                         className={classes.externalIcon}
                       />
                     </Tooltip>
-                  ) : (
-                    ""
                   )}
                   <div>
                     {item.candidateDetail?.firstName +
@@ -1937,6 +1966,32 @@ export default function Candidates(props) {
                       item.candidateDetail?.lastName}
                     <br /> {" (" + item.uniqueId + ")"}
                   </div>
+                  {item.candidateDetail?.isExternal === "YES" && item.candidateDetail?.showAllDetails === false ? (
+                    item.candidateDetail?.detailsHandler.isMailSent ===true ?
+                      <>
+                        <Avatar
+                          alt="mail-send-img"
+                          src={mailSendImg}
+                          className={classes.mailSendSuccessIcon}
+                        />
+                      </> 
+                      :
+                      <div
+                        onMouseEnter={handleAnimationMouseHover}
+                        onMouseLeave={handleAnimationMouseLeave}
+                        onClick={() => handleVcApprovalOpen(item)}
+                        style={{ width: 35, height: 35 }} // Adjust size as needed
+                      >
+                        <Lottie
+                          lottieRef={lottieRef}
+                          animationData={lockanimation}
+                          loop={true}
+                          autoplay={false}
+                        />
+                      </div>
+                  ) : (
+                    ""
+                  )}
                 </Grid>,
                 item.mainId === decode.mainId ?
                   <>  {item.candidateDetail?.email + " /"} <br />{"91 " + item.candidateDetail?.mobile.slice(2)}  </>
@@ -2040,6 +2095,14 @@ export default function Candidates(props) {
         candidateList={candidateList}
       />
 
+      <VendorCandidatesApproval
+        handleVcApprovalClose={handleVcApprovalClose}
+        handleNotificationCall={handleNotificationCall}
+        setLoader={setLoader}
+        vcData={vcData}
+        vcApproval={vcApproval}
+        updateData={fetchData}
+      />
 
       <Backdrop className={classes.backdrop} open={loader}>
         <CircularProgress color="inherit" />
