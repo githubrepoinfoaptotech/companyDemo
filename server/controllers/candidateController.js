@@ -925,7 +925,7 @@ exports.getAllCandidateStatus = async (req, res) => {
 exports.viewAllCanditates = async (req, res) => {
   try {
     var page = req.body.page;
-    var limit = 50;
+    var limit = 10;
     var mywhere = { mainId: req.mainId };
     reqWhere={};
     if (req.body.fromDate && req.body.toDate) {
@@ -953,6 +953,7 @@ exports.viewAllCanditates = async (req, res) => {
         { "$candidateDetail.mobile$": { [Op.iLike]: `%${req.body.search}%` } },
         { "$candidateDetail.email$": { [Op.iLike]: `%${req.body.search}%` } },
       ];
+      mywhere["candidateDetail.showAllDetails"]=true;
     } else if (req.body.year) {
       mywhere.createdAt = Sequelize.literal(
         `extract(year from "candidate"."createdAt") = ${req.body.year}`
@@ -1266,6 +1267,7 @@ exports.viewCandidate = async (req, res) => {
               'panNumber',
               'linkedInProfile',
               'showAllDetails',
+              'detailsHandler',
               [
                 fn(
                   "concat",
@@ -1361,8 +1363,9 @@ exports.viewCandidate = async (req, res) => {
 
 exports.myCandidates = async (req, res) => {
   try {
+    
     var page = req.body.page;
-    var limit = 50;
+    var limit = 10;
     mywhere = { mainId: req.mainId, recruiterId: req.recruiterId };
 
     if (req.body.fromDate && req.body.toDate) {
@@ -1384,6 +1387,7 @@ exports.myCandidates = async (req, res) => {
         { "$candidateDetail.mobile$": { [Op.iLike]: `%${req.body.search}%` } },
         { "$candidateDetail.email$": { [Op.iLike]: `%${req.body.search}%` } },
       ];
+      
     } else if (req.body.year) {
       mywhere.createdAt = Sequelize.literal(
         `extract(year from "candidate"."createdAt") = ${req.body.year}`
@@ -1422,6 +1426,7 @@ exports.myCandidates = async (req, res) => {
         "linkedInProfile",
         "panNumber",
         "showAllDetails",
+        'detailsHandler',
                 [
                   fn(
                     "concat",
@@ -1895,7 +1900,7 @@ exports.invoicedCandidates = async (req, res) => {
         res.status(200).json({ status: true, data: xldata });
       });
   } else {
-    var limit = 50;
+    var limit = 10;
     var page = req.body.page;
     var user_dat = await user.findOne({ where: { id: req.userId } });
 
@@ -2125,7 +2130,7 @@ exports.getMonthlyData = async (req, res) => {
 // https://prod.liveshare.vsengsaas.visualstudio.com/join?429BFE7419613878E48E87B9DC3F07A70EC0
 
 exports.candidateReports = async (req, res) => {
-  var limit = 50;
+  var limit = 10;
   var page = req.body.page;
   var dateObj = new Date();
   var month = dateObj.getUTCMonth() + 1; //months from 1-12
@@ -2523,7 +2528,7 @@ exports.getAllDropedCandidate = async (req, res) => {
       res.status(200).json({ data: xdata, status: true });
     } else {
       var page = req.body.page;
-      var limit = 50;
+      var limit = 10;
       var mywhere = { mainId: req.mainId, statusCode: 302 };
 
       if (req.body.fromDate && req.body.toDate) {
@@ -2986,7 +2991,7 @@ exports.getAllReportCount = async (req, res) => {
 
 exports.singleCandidateSearch = async (req, res) => {
   var page = req.body.page;
-  var limit = 50;
+  var limit = 10;
   myWhere = { mainId: req.mainId };
   if (req.body.skills && req.body.skills != "") {
     myWhere[Op.and] = [];
@@ -3004,7 +3009,7 @@ exports.singleCandidateSearch = async (req, res) => {
         include: [
           {
             model: candidateDetails,
-            attributes: ["firstName", "lastName", "email", "mobile", "skills",'isExternal'],
+            attributes: ["firstName", "lastName", "email", "mobile", "skills",'isExternal','alternateMobile','showAllDetails','detailsHandler'],
             required: true,
           },
           Source,
@@ -3040,6 +3045,7 @@ exports.singleCandidateSearch = async (req, res) => {
           {
             model: recruiter,
             attributes: ["firstName", "lastName", "mobile"],
+            include:[{model:user,attributes:["roleName"]}]
           },
         ],
         where: myWhere,
@@ -3048,6 +3054,15 @@ exports.singleCandidateSearch = async (req, res) => {
       })
       .then((data) => {
         if (data) {
+          data.rows.forEach(candidate => {
+            // Check if `candidateDetail` exists and `showAllDetails` is false
+            if (candidate.candidateDetail && candidate.recruiter.user.roleName=="SUBVENDOR" && (!candidate.candidateDetail.showAllDetails || candidate.candidateDetail.showAllDetails == null)) {
+              const attributesToRemove = ['firstName', 'lastName', 'mobile', 'email','alternateMobile'];
+              attributesToRemove.forEach(attr => {
+                candidate.candidateDetail[attr] = 'x'.repeat(candidate.candidateDetail[attr].length);
+              });
+            }
+          });
           res
             .status(200)
             .json({ data: data.rows, count: data.count, status: true });
@@ -3066,7 +3081,7 @@ exports.singleCandidateSearch = async (req, res) => {
 
 exports.singleMyCandidateSearch = async (req, res) => {
   var page = req.body.page;
-  var limit = 50;
+  var limit = 10;
   var myWhere = { mainId: req.mainId, recruiterId: req.recruiterId };
   if (req.body.skills && req.body.skills != "") {
     myWhere[Op.and] = [];
@@ -3084,7 +3099,7 @@ exports.singleMyCandidateSearch = async (req, res) => {
         include: [
           {
             model: candidateDetails,
-            attributes: ["firstName", "lastName", "email", "mobile", "skills"],
+            attributes: ["firstName", "lastName", "email", "mobile", "skills",'alternateMobile','showAllDetails','detailsHandler'],
             required: true,
           },
           Source,
@@ -3120,6 +3135,7 @@ exports.singleMyCandidateSearch = async (req, res) => {
           {
             model: recruiter,
             attributes: ["firstName", "lastName", "mobile"],
+            include:[{model:user,attributes:["roleName"]}]
           },
         ],
         where: myWhere,
@@ -3128,6 +3144,15 @@ exports.singleMyCandidateSearch = async (req, res) => {
       })
       .then((data) => {
         if (data) {
+          data.rows.forEach(candidate => {
+            // Check if `candidateDetail` exists and `showAllDetails` is false
+            if (candidate.candidateDetail && candidate.recruiter.user.roleName=="SUBVENDOR" && (!candidate.candidateDetail.showAllDetails || candidate.candidateDetail.showAllDetails == null)) {
+              const attributesToRemove = ['firstName', 'lastName', 'mobile', 'email','alternateMobile'];
+              attributesToRemove.forEach(attr => {
+                candidate.candidateDetail[attr] = 'x'.repeat(candidate.candidateDetail[attr].length);
+              });
+            }
+          });
           res
             .status(200)
             .json({ data: data.rows, count: data.count, status: true });
@@ -3146,7 +3171,7 @@ exports.singleMyCandidateSearch = async (req, res) => {
 
 exports.candidateActivity = async (req, res) => {
   const { page } = req.body;
-  const limit = 50;
+  const limit = 10;
   var myWhere = { mainId: req.mainId };
   if (req.body.fromDate && req.body.toDate) {
     const fromDate = moment(req.body.fromDate).startOf("day").toISOString();

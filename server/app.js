@@ -851,14 +851,14 @@ console.log(res);
 //   console.log("listening")
 // }
 
-// sequelize
-//   .sync({ alter: true })
-//   .then(() => {
-//     console.log("synced db.");
-// })  
-//   .catch((err) => {
-//     console.log(err);
-// });  
+sequelize
+  .sync({ alter: true })
+  .then(() => {
+    console.log("synced db.");
+})  
+  .catch((err) => {
+    console.log(err);
+});  
  
 
 // -----------------------------------------------------------------------------------------------------------------------------

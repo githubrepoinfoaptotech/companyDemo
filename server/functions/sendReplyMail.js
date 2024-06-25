@@ -13,6 +13,7 @@ const JWT = require("jsonwebtoken");
 const base64url=require("base64url");
 const crypto=require("crypto");
 const http = require("axios").default;
+const { format, parseISO,addMinutes  } = require('date-fns');
 //
 
 
@@ -576,8 +577,6 @@ email.transporter.sendMail(clientMailOptions, async function (error, info) {
 };
 
 exports.sendcandidateShowDetails=async(data)=>{
-  console.log(data);
-  console.log(email);
   var clientMailOptions = {
     from: '<no-reply@refo.app>',
     to: "vishallegend7775@gmail.com",
@@ -588,6 +587,62 @@ exports.sendcandidateShowDetails=async(data)=>{
       vendor_name:data.vendor_name,
       candidate_unique_number:data.candidate_unique_number,
       company_name:data.company_name
+    },
+};
+email.transporter.sendMail(clientMailOptions, async function (error, info) {
+  if (error) {
+      console.log(error);
+  } else {
+      console.log("Success");
+  }
+});
+};
+
+
+exports.sendFirstLoginMail=async(user_data,data)=>{
+  const now = new Date();
+  var theDateandtime =now.toISOString();
+  const date = parseISO(theDateandtime);
+  const istDate = addMinutes(date, 330);
+  theDateandtime=format(istDate, 'dd-MM-yyyy HH:mm:ss');
+  var clientMailOptions = {
+    from: '<no-reply@refo.app>',
+    //to: "",
+     to: "vishallegend7775@gmail.com",
+    template: "sendFirstLoginMail",
+    subject: "First Login Detected",
+    context: {
+      name:user_data.firstName+" "+user_data.lastName,
+      email:data.email,
+      time:theDateandtime
+    },
+};
+email.transporter.sendMail(clientMailOptions, async function (error, info) {
+  if (error) {
+      console.log(error);
+  } else {
+      console.log("Success");
+  }
+});
+};
+
+
+exports.sendFirst=async(user_data,data)=>{
+  const now = new Date();
+  var theDateandtime =now.toISOString();
+  const date = parseISO(theDateandtime);
+  const istDate = addMinutes(date, 330);
+  theDateandtime=format(istDate, 'dd-MM-yyyy HH:mm:ss');
+  var clientMailOptions = {
+    from: '<no-reply@refo.app>',
+    //to: "",
+     to: "vishallegend7775@gmail.com",
+    template: "sendFirstLoginMail",
+    subject: "First Login Detected",
+    context: {
+      name:user_data.firstName+" "+user_data.lastName,
+      email:data.email,
+      time:theDateandtime
     },
 };
 email.transporter.sendMail(clientMailOptions, async function (error, info) {

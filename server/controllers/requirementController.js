@@ -330,7 +330,7 @@ exports.viewRequirement = async (req, res) => {
       {
         model:assignedRequirements,
         attributes:["recruiterId","id"],
-        include:[{model:recruiter,attributes:["firstName","lastName","email"]}]
+        include:[{model:recruiter,attributes:["firstName","lastName"]}]
       }
     ],attributes:[
       'requirementName',
@@ -639,7 +639,7 @@ exports.viewAllAssigendRequirements=async(req,res)=>{
 
 exports.viewRequirementCandidates=async(req,res)=>{
   var page = req.body.page;
-    var limit = 50;
+    var limit = 10;
     var mywhere = {requirementId:req.body.requirementId};
 
     if (req.body.fromDate && req.body.toDate) {

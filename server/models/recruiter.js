@@ -64,7 +64,12 @@ const recruiter=sequelize.define("recruiter",{
     recruiterCapacity:{
         type: Sequelize.STRING,
         allowNull: true,
-      }
+    },
+    firstLogin:{
+        type:Sequelize.BOOLEAN,
+        allowNull:true,
+        defaultValue:true
+    }
 },
 {
     indexes: [

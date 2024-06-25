@@ -3,11 +3,13 @@ const candidate = require('../models/candidate');
 const requirement = require('../models/requirement');
 const statusCode = require('../models/statusList');
 const recruiter = require('../models/recruiter');
+const user = require('../models/user');
 const client = require("../models/client");
 const candidateStatus = require("../models/myCandidateStatus");
 const moment = require('moment');
 const Sequelize = require("../db/db");
-const { Op } = require("sequelize");
+const fn = Sequelize.fn;
+const { Op,col } = require("sequelize");
 const Source = require('../models/source');
 
 
@@ -52,29 +54,58 @@ exports.getData=async(req,code)=>{
             include: [{
                 model: candidateDetails,
                 attributes: [
-                    'firstName',
-                    'lastName',
-                    'email',
-                    'mobile',
-                    'skills',
-                    'currentLocation',
-                    'preferredLocation',
-                    'nativeLocation',
-                    'experience',
-                    'relevantExperience',
-                    'alternateMobile',
-                    'gender',
-                    'educationalQualification',
-                    'differentlyAbled',
-                    'currentCtc',
-                    'expectedCtc',
-                    'dob',
-                    'noticePeriod',
-                    'reasonForJobChange',
-                    'candidateProcessed',
-                    'reason',
-                    'isExternal'
-                  ]
+                    "firstName",
+                    "lastName",
+                    "email",
+                    "mobile",
+                    "skills",
+                    "currentLocation",
+                    "preferredLocation",
+                    "nativeLocation",
+                    "experience",
+                    "relevantExperience",
+                    "alternateMobile",
+                    "gender",
+                    "educationalQualification",
+                    "differentlyAbled",
+                    "currentCtc",
+                    "expectedCtc",
+                    "dob",
+                    "noticePeriod",
+                    "reasonForJobChange",
+                    "candidateProcessed",
+                    "reason",
+                    "isExternal",
+                    'currentCompanyName',
+                    "currentCompanyName",
+                    "linkedInProfile",
+                    "panNumber",
+                    "showAllDetails",
+                            [
+                              fn(
+                                "concat",
+                                process.env.liveUrl,
+                                col("candidateDetail.resume")
+                              ),
+                              "resume",
+                            ],
+                            [
+                              fn(
+                                "concat",
+                                process.env.liveUrl,
+                                col("candidateDetail.document")
+                              ),
+                              "document",
+                            ],
+                            [
+                              fn(
+                                "concat",
+                                process.env.liveUrl,
+                                col("candidateDetail.photo")
+                              ),
+                              "photo",
+                            ]
+                ],
             },
                 Source,
             { model: candidateStatus, include: [{ model: statusCode, attributes: ["statusName"] }] },
@@ -101,12 +132,22 @@ exports.getData=async(req,code)=>{
                 attributes: ['statusName'],
             }, {
                 model: recruiter,
-                attributes: ['firstName', 'lastName', 'mobile']
+                attributes: ['firstName', 'lastName', 'mobile'],
+                include:[{model:user,attributes:["roleName"]}]
             },
             ],
             limit: limit,
             offset: (page * limit) - limit,
             order: [['createdAt', 'DESC']]
         });
+        can_data.rows.forEach(candidate => {
+            // Check if `candidateDetail` exists and `showAllDetails` is false
+            if (candidate.candidateDetail && candidate.recruiter.user.roleName=="SUBVENDOR" && (!candidate.candidateDetail.showAllDetails || candidate.candidateDetail.showAllDetails == null)) {
+              const attributesToRemove = ['firstName', 'lastName', 'mobile', 'email','alternateMobile'];
+              attributesToRemove.forEach(attr => {
+                candidate.candidateDetail[attr] = 'x'.repeat(candidate.candidateDetail[attr].length);
+              });
+            }
+          });
         return can_data;
   };

@@ -315,7 +315,7 @@ exports.viewAdmin = async (req, res) => {
 
 exports.viewAllAdmin = async (req, res) => {
   try {
-    var limit = 50;
+    var limit = 10;
     var page = req.body.page;
     var mywhere={ roleName: "ADMIN" };
     if(req.body.adminId){
@@ -659,7 +659,7 @@ exports.changeMyPassword = async (req, res) => {
 exports.viewAllUsers = async (req, res) => {
   try {
     var page = req.body.page;
-    var limit = 50;
+    var limit = 10;
     // await user.findAndCountAll({where:{mainId:req.mainId,roleName:{[Op.ne]:"ADMIN"}},attributes:['id','email','roleName','isActive'],
     // include:[{
     //     model:recruiter

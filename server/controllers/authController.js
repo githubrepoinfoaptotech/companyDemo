@@ -44,6 +44,7 @@ console.log(req.body);
                     var valid = await bcrypt.compare(req.body.password, data.password);
                     if (valid) {
                         var user_data = await recruiter.findOne({ where: { userId: data.id } });
+                        
                         if (user_data) {
                             var settings_data = await recruitersSettings.findOne({ where: { mainId: user_data.mainId} });
                             if (settings_data) {
@@ -52,6 +53,11 @@ console.log(req.body);
                                     var admn=await user.findOne({ where: { id: user_data_company.userId} });
                                     var token = JWT.sign({ mainId:user_data.mainId,recruiterId:user_data.id,image:process.env.bucketUrl+settings_data.image,isCandidateResetEnable:settings_data.isCandidateResetEnable, isEnableEmail:settings_data.isEnableEmail,isEnableFree: settings_data.isEnableFree, isEnablePaid:settings_data.isEnablePaid,email: data.email, companyName: user_data_company.companyName, mobile: user_data.mobile, role: data.roleName, firstName: user_data.firstName, lastName: user_data.lastName, user_id: data.id,isMsme:data.isMsme,companyType: admn.companyType}, process.env.jwtKey,{expiresIn: '24h'});
                                 }else{
+                                    if(user_data.firstLogin==true)
+                                        {
+                                            await mailFunction.sendFirstLoginMail(user_data,data);
+                                            //await user_data.update({firstLogin:false});
+                                        }
                                     var token = JWT.sign({ mainId:user_data.mainId,recruiterId:user_data.id,image:process.env.bucketUrl+settings_data.image,isCandidateResetEnable:settings_data.isCandidateResetEnable, isEnableEmail:settings_data.isEnableEmail,isEnableFree: settings_data.isEnableFree, isEnablePaid:settings_data.isEnablePaid,email: data.email, companyName: user_data.companyName, mobile: user_data.mobile, role: data.roleName, firstName: user_data.firstName, lastName: user_data.lastName, user_id: data.id,companyType: data.companyType }, process.env.jwtKey,{expiresIn: '24h'});
                                 }
                                

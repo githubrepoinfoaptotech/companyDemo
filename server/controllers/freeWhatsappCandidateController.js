@@ -686,7 +686,7 @@ exports.uploadScreenShot=async(req,res)=>{
 }
 exports.freeMessageActivity = async (req, res) => {
   const { page } = req.body;
-  const limit = 50;
+  const limit = 10;
   var myWhere = { mainId: req.mainId };
   if (req.body.fromDate && req.body.toDate) {
     const fromDate = moment(req.body.fromDate).startOf("day").toISOString();

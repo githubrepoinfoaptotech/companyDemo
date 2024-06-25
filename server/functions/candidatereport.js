@@ -71,7 +71,8 @@ exports.reportData=async(req,Code)=>{
                     'reasonForJobChange',
                     'candidateProcessed',
                     'reason',
-                    'isExternal'
+                    'isExternal',
+                    'showAllDetails'
                   ]
             },
                 Source,
@@ -97,7 +98,7 @@ exports.reportData=async(req,Code)=>{
             }, {
                 model: recruiter,
                 attributes: ['firstName', 'lastName', 'mobile'],
-                
+                include:[{model:user,attributes:["roleName"]}]
             },
             ],
         }
@@ -111,5 +112,14 @@ exports.reportData=async(req,Code)=>{
         offset: (page * limit) - limit,
         order: [['createdAt', 'DESC']]
     });
+    mydata.rows.forEach(datas => {
+        // Check if `candidateDetail` exists and `showAllDetails` is false
+        if (datas.candidate.candidateDetail && datas.candidate.recruiter.user.roleName=="SUBVENDOR" && (!datas.candidate.candidateDetail.showAllDetails || datas.candidate.candidateDetail.showAllDetails == null)) {
+          const attributesToRemove = ['firstName', 'lastName', 'mobile', 'email','alternateMobile'];
+          attributesToRemove.forEach(attr => {
+            datas.candidate.candidateDetail[attr] = 'x'.repeat(datas.candidate.candidateDetail[attr].length);
+          });
+        }
+      });
     return mydata;
 }

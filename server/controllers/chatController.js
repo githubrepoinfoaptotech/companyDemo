@@ -2120,7 +2120,7 @@ exports.sendDocument = async (req, res) => {
 
 exports.viewAllChats=async(req,res)=>{
   var page = req.body.page;
-  var limit = 50;
+  var limit = 10;
   chatUserMessage.findAndCountAll({limit:limit,
     offset: (page * limit) - limit,
     order: [['createdAt', 'DESC']]

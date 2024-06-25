@@ -79,5 +79,5 @@ route.post('/viewCpv',candidateController.viewCpv);
 route.post('/candiateCpvLink',check_auth,candidateController.candiateCpvLink);
 route.post('/updateCandidateMindSetAssessment',check_auth,fileUploader.candidateMindsetAssessmentUpload,candidateController.updateCandidateMindSetAssessment);
 route.post('/extractInfo',check_auth,extracttext.textExtract);
-route.post('/sendRequestToVendor',candidateController.sendRequestToVendor);
+route.post('/sendRequestToVendor',check_auth,candidateController.sendRequestToVendor);
 module.exports=route; 
