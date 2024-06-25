@@ -19,12 +19,12 @@ import Tooltip from "@material-ui/core/Tooltip";
 //import classNames from "classnames";
 import { useHistory } from "react-router-dom";
 import external from "../../images/external.png";
+import mailSendImg from "../../images/mailSend.png";
 // import { saveAs } from "file-saver";
 // import XlsxPopulate from "xlsx-populate";
 import { Autocomplete } from "@material-ui/lab";
 import ViewIcon from "@material-ui/icons/Visibility";
 import DescriptionIcon from "@material-ui/icons/Description";
-//import GetAppIcon from "@material-ui/icons/GetApp";
 import axios from "axios";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
@@ -52,8 +52,11 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import "react-toastify/dist/ReactToastify.css";
 import MatchJDDialog from "../../components/Candidates/MatchJDDialog.js";
 import { useResumeDataContext } from '../../context/CandidateDataContext.js'
+import Lottie from 'lottie-react'
+import lockanimation from '../../images/animation-lock.json'
 import ReactPdfDialog from "../../components/Candidates/ReactPdfDialog.js";
 import CPVFormView from "../../components/Candidates/CPVFormView.js";
+import VendorCandidatesApproval from "../../components/Admin/VendorCandidatesApproval.js";
 
 const positions = [toast.POSITION.TOP_RIGHT];
 
@@ -128,6 +131,20 @@ export default function Candidates(props) {
 
   const [resumePercentage, setResumePercentage] = useState([])
   const [matchLoading, setMatchLoading] = useState(false)
+
+  const lottieRef = useRef(null);
+  const handleAnimationMouseHover = () => {
+    if (lottieRef.current) {
+      lottieRef.current.play();
+    }
+  };
+
+  const handleAnimationMouseLeave = () => {
+    if (lottieRef.current) {
+      lottieRef.current.stop();
+    }
+  }
+
   const [candidMatchId, setCandidMatchId] = useState("");
 
   function handleUse(mobile) {
@@ -236,6 +253,8 @@ export default function Candidates(props) {
     recruiterId: "",
     currentCompanyName: "",
     hideContactDetails: false,
+    showAllDetails: null,
+    detailsHandler: null,
     panNumber: "",
     linkedInProfile: "",
   });
@@ -470,15 +489,21 @@ export default function Candidates(props) {
         : Yup.string().email("Email must be a Valid Email Address"),
     firstName: Yup.string()
       .max(255)
-      .required("First Name is required")
       .matches(/^[^!@#$%^&*+=<>:;|~]*$/, {
         message: "First Name be Alphanumeric",
+      }).when([],{
+        is: ()=>decode.role === "SUBVENDOR" || props.candidatesEdit?.showAllDetails === true,
+        then: Yup.string().required("First Name is required"),
+        otherwise: Yup.string(),
       }),
     lastName: Yup.string()
       .max(255)
-      .required("Last Name is required")
       .matches(/^[^!@#$%^&*+=<>:;|~]*$/, {
         message: "Last Name be Alphanumeric",
+      }).when([],{
+        is: ()=>decode.role === "SUBVENDOR" || props.candidatesEdit?.showAllDetails === true,
+        then: Yup.string().required("Last Name is required"),
+        otherwise: Yup.string(),
       }),
     skills: Yup.string().required("Skill is required"),
     source: Yup.string().required("Source is required"),
@@ -622,180 +647,178 @@ export default function Candidates(props) {
       });
   }, [token]);
 
-  useEffect(() => {
-    var mobile = sessionStorage.getItem("use");
 
+  const mobile = sessionStorage.getItem("use");
+
+  const fetchCandidateDetails = async (mobile) => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_SERVER}recruiter/checkCandidateDetailExist`,
+        { mobile: mobile.substring(2) },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        }
+      );
+
+      if (response.data.status === true) {
+        sessionStorage.removeItem("use");
+
+        const candidateData = response.data.data;
+
+        reset({
+          requirementId: recruitmentId,
+          mobile: mobile.substring(2),
+          email: candidateData?.email,
+          firstName: candidateData?.firstName,
+          lastName: candidateData?.lastName,
+          skills: candidateData?.skills,
+          experience: candidateData?.experience,
+          location: candidateData?.currentLocation,
+          candidateProcessed: candidateData?.candidateProcessed,
+          native: candidateData?.nativeLocation,
+          preferredLocation: candidateData?.preferredLocation,
+          relevantExperience: candidateData?.relevantExperience,
+          educationalQualification: candidateData?.educationalQualification,
+          gender: candidateData?.gender,
+          differentlyAbled: candidateData?.differentlyAbled,
+          currentCtc: candidateData?.currentCtc,
+          expectedCtc: candidateData?.expectedCtc,
+          noticePeriod: candidateData?.noticePeriod,
+          reasonForJobChange: candidateData?.reasonForJobChange,
+          reason: candidateData?.reason,
+          currentCompanyName: candidateData?.currentCompanyName,
+        });
+
+        setCandidate({
+          mobile: mobile.substring(2),
+          email: candidateData?.email,
+          firstName: candidateData?.firstName,
+          lastName: candidateData?.lastName,
+          skills: candidateData?.skills,
+          experience: candidateData?.experience,
+          location: candidateData?.currentLocation,
+          dob: candidateData?.dob,
+          candidateProcessed: candidateData?.candidateProcessed,
+          native: candidateData?.nativeLocation,
+          preferredLocation: candidateData?.preferredLocation,
+          relevantExperience: candidateData?.relevantExperience,
+          educationalQualification: candidateData?.educationalQualification,
+          gender: candidateData?.gender,
+          differentlyAbled: candidateData?.differentlyAbled,
+          currentCtc: candidateData?.currentCtc,
+          expectedCtc: candidateData?.expectedCtc,
+          noticePeriod: candidateData?.noticePeriod,
+          reasonForJobChange: candidateData?.reasonForJobChange,
+          reason: candidateData?.reason,
+          candidateRecruiterDiscussionRecording: candidateData?.candidateRecruiterDiscussionRecording,
+          candidateSkillExplanationRecording: candidateData?.candidateSkillExplanationRecording,
+          candidateMindsetAssessmentLink: candidateData?.candidateMindsetAssessmentLink,
+          candidateAndTechPannelDiscussionRecording: candidateData?.candidateAndTechPannelDiscussionRecording,
+          currentCompanyName: candidateData?.currentCompanyName,
+          freeValue: decode.isEnableFree ? "YES" : decode.isEnablePaid ? "NO" : "YES",
+          panNumber: candidateData?.panNumber,
+          linkedInProfile: candidateData?.linkedInProfile,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchData = async () => {
+    setCurrerntPage(1);
+    setPage(0);
+
+    const form = filterRef.current;
+
+    if (new URLSearchParams(candidate_search).get("search")) {
+      form["search"].value = new URLSearchParams(candidate_search).get("search");
+    }
+
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_SERVER}admin/viewAllCanditates`,
+        {
+          page: "1",
+          search: `${form["search"].value}`,
+          requirementId: sessionStorage.getItem("recruitmentId") !== null
+            ? sessionStorage.getItem("recruitmentId")
+            : recruitmentId?.id,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        }
+      );
+
+      if (response.data.status === true) {
+        setLoader(false);
+        setCandidatesData(response.data.data);
+        setCount(response.data.count);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getRequirementName = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_SERVER}admin/getAllRequirementList`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        }
+      );
+
+      if (response.data.status === true) {
+        setLoader(false);
+        setRequirementName(response.data.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getClientName = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_SERVER}admin/getAllClientList`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        }
+      );
+
+      if (response.data.status === true) {
+        setLoader(false);
+        setClientName(response.data.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
     setLoader(true);
     setSearch(new URLSearchParams(candidate_search).get("search"));
 
     if (mobile !== "" && mobile !== null) {
       setState({ ...state, right: true });
       setDataList("ADD");
-
-      axios({
-        method: "post",
-        url: `${process.env.REACT_APP_SERVER}recruiter/checkCandidateDetailExist`,
-        data: {
-          mobile: mobile.substring(2),
-        },
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-      }).then(function (response) {
-        if (response.data.status === true) {
-          sessionStorage.removeItem("use");
-
-          reset({
-            requirementId: recruitmentId,
-            mobile: mobile.substring(2),
-            email: response.data.data?.email,
-            firstName: response.data.data?.firstName,
-            lastName: response.data.data?.lastName,
-            skills: response.data.data?.skills,
-            experience: response.data.data?.experience,
-            location: response.data.data?.currentLocation,
-            candidateProcessed: response.data.data?.candidateProcessed,
-            native: response.data.data?.nativeLocation,
-            preferredLocation: response.data.data?.preferredLocation,
-            relevantExperience: response.data.data?.relevantExperience,
-            educationalQualification:
-              response.data.data?.educationalQualification,
-            gender: response.data.data?.gender,
-            differentlyAbled: response.data.data?.differentlyAbled,
-            currentCtc: response.data.data?.currentCtc,
-            expectedCtc: response.data.data?.expectedCtc,
-            noticePeriod: response.data.data?.noticePeriod,
-            reasonForJobChange: response.data.data?.reasonForJobChange,
-            reason: response.data.data?.reason,
-            currentCompanyName: response.data.data?.currentCompanyName,
-          });
-
-          setCandidate({
-            ...candidate,
-            mobile: mobile.substring(2),
-            email: response.data.data?.email,
-            firstName: response.data.data?.firstName,
-            lastName: response.data.data?.lastName,
-            skills: response.data.data?.skills,
-            experience: response.data.data?.experience,
-            location: response.data.data?.currentLocation,
-            dob: response.data.data?.dob,
-            candidateProcessed: response.data.data?.candidateProcessed,
-            native: response.data.data?.nativeLocation,
-            preferredLocation: response.data.data?.preferredLocation,
-            relevantExperience: response.data.data?.relevantExperience,
-            educationalQualification:
-              response.data.data?.educationalQualification,
-            gender: response.data.data?.gender,
-            differentlyAbled: response.data.data?.differentlyAbled,
-            currentCtc: response.data.data?.currentCtc,
-            expectedCtc: response.data.data?.expectedCtc,
-            noticePeriod: response.data.data?.noticePeriod,
-            reasonForJobChange: response.data.data?.reasonForJobChange,
-            reason: response.data.data?.reason,
-            candidateRecruiterDiscussionRecording:
-              response.data.data?.candidateRecruiterDiscussionRecording,
-            candidateSkillExplanationRecording:
-              response.data.data?.candidateSkillExplanationRecording,
-            candidateMindsetAssessmentLink:
-              response.data.data?.candidateMindsetAssessmentLink,
-            candidateAndTechPannelDiscussionRecording:
-              response.data.data?.candidateAndTechPannelDiscussionRecording,
-            currentCompanyName: response.data.data?.currentCompanyName,
-            freeValue:
-              decode.isEnableFree === true
-                ? "YES"
-                : decode.isEnablePaid === true
-                  ? "NO"
-                  : "YES",
-            panNumber: response.data.data.panNumber,
-            linkedInProfile: response.data.data.linkedInProfile,
-          });
-        }
-      });
+      fetchCandidateDetails(mobile);
     }
-
-    const fetchData = async () => {
-      setCurrerntPage(1);
-      setPage(0);
-
-      const form = filterRef.current;
-
-      if (new URLSearchParams(candidate_search).get("search")) {
-        form["search"].value = new URLSearchParams(candidate_search).get(
-          "search",
-        );
-      }
-
-      axios({
-        method: "post",
-        url: `${process.env.REACT_APP_SERVER}admin/viewAllCanditates`,
-        data: {
-          page: "1",
-          search: `${form["search"].value}`,
-          requirementId:
-            sessionStorage.getItem("recruitmentId") !== null
-              ? sessionStorage.getItem("recruitmentId")
-              : requirementId?.id,
-        },
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-      }).then(function (response) {
-        if (response.data.status === true) {
-          setLoader(false);
-
-          setCandidatesData(response.data.data);
-          setCount(response.data.count);
-        }
-      });
-    };
-
-    const getRequirementName = async () => {
-      axios({
-        method: "post",
-        url: `${process.env.REACT_APP_SERVER}admin/getAllRequirementList`,
-        data: {},
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-      })
-        .then(function (response) {
-          if (response.data.status === true) {
-            setLoader(false);
-            setRequirementName(response.data.data);
-          }
-        })
-
-        .catch(function (error) {
-          console.log(error);
-        });
-    };
-
-    const getClientName = async () => {
-      axios({
-        method: "post",
-        url: `${process.env.REACT_APP_SERVER}admin/getAllClientList`,
-        data: {},
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-      })
-        .then(function (response) {
-          if (response.data.status === true) {
-            setLoader(false);
-            setClientName(response.data.data);
-          }
-        })
-
-        .catch(function (error) {
-          console.log(error);
-        });
-    };
 
     fetchData();
     getRequirementName();
@@ -1049,8 +1072,19 @@ export default function Candidates(props) {
 
   const [resumeOpen, setResumeOpen] = React.useState(false);
   const [cpvOpen, setCpvOpen] = React.useState(false);
+  const [vcApproval, setVcApproval] = React.useState(false);
+  const [vcData, setVcData] = React.useState([]);
   const [cpvData, setCpvData] = React.useState([]);
   const [matchJDOpen, setMatchJDOpen] = React.useState(false);
+
+  const handleVcApprovalClose = () => {
+    setVcApproval(false);
+  };
+
+  const handleVcApprovalOpen = (data) => {
+    setVcApproval(true);
+    setVcData(data)
+  };
 
   const handleResumeClose = () => {
     setResumeOpen(false);
@@ -1339,7 +1373,7 @@ export default function Candidates(props) {
         handleNotificationCall("error", "Please select the date of birth properly.");
         return;
       }
-      
+
       setLoader(true);
       var dob = values.day + "-" + values.month + "-" + values.year;
 
@@ -1432,7 +1466,7 @@ export default function Candidates(props) {
       handleNotificationCall("error", "Please select the date of birth properly.");
       return;
     }
-      
+
     setLoader(true);
     var url = "";
     var data = {};
@@ -2338,7 +2372,8 @@ export default function Candidates(props) {
                 response.data.data.candidateDetail?.currentCompanyName,
               hideContactDetails: response.data.data.hideContactDetails,
               panNumber: response.data.data.candidateDetail?.panNumber,
-              linkedInProfile: response.data.data.candidateDetail?.linkedInProfile
+              linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
+              showAllDetails: response.data.data.candidateDetail?.showAllDetails,
             });
 
             setState({ ...state, right: true });
@@ -3094,10 +3129,35 @@ export default function Candidates(props) {
                       item.candidateDetail?.lastName}
                     <br /> {" (" + item.uniqueId + ")"}
                   </div>
+                  {item.candidateDetail?.isExternal === "YES" && item.candidateDetail?.showAllDetails === false ? (
+                    item.candidateDetail?.detailsHandler.isMailSent ===true ?
+                      <>
+                        <Avatar
+                          alt="mail-send-img"
+                          src={mailSendImg}
+                          className={classes.mailSendSuccessIcon}
+                        />
+                      </> 
+                      :
+                    <div
+                      onMouseEnter={handleAnimationMouseHover}
+                      onMouseLeave={handleAnimationMouseLeave}
+                      onClick={() => handleVcApprovalOpen(item)}
+                      style={{ width: 35, height: 35 }} // Adjust size as needed
+                    >
+                      <Lottie
+                        lottieRef={lottieRef}
+                        animationData={lockanimation}
+                        loop={false}
+                        autoplay={false}
+                      />
+                    </div>
+                  ) : (
+                    ""
+                  )}
                 </Grid>,
                 item.mainId === decode.mainId ? (
                   <>
-
                     {item.candidateDetail?.email + " /"} <br />
                     {"91 " + item.candidateDetail?.mobile.slice(2)}
                   </>
@@ -3285,6 +3345,14 @@ export default function Candidates(props) {
         resume={file}
         resumeOpen={resumeOpen}
         handleResumeClose={handleResumeClose}
+      />
+      <VendorCandidatesApproval
+        handleVcApprovalClose={handleVcApprovalClose}
+        handleNotificationCall={handleNotificationCall}
+        setLoader={setLoader}
+        vcData={vcData}
+        vcApproval={vcApproval}
+        updateData={fetchData}
       />
       {/* <MatchJDDialog
         resumePercentage={resumePercentage}

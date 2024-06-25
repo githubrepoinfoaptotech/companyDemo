@@ -1811,6 +1811,7 @@ export default makeStyles(theme => ({
   externalIconContainer: {
     display: 'flex',
     flexDirection: 'row',
+    alignItems: "flex-end",
     flexWrap: 'nowrap',
     whiteSpace: 'nowrap',
     width: "160px",
@@ -1843,6 +1844,13 @@ export default makeStyles(theme => ({
     width: "30px !important",
     height: "30px !important",
     padding: "4px",
+    mixBlendMode: "multiply",
+    borderRadius: "unset !important"
+  },
+  mailSendSuccessIcon: {
+    width: "36px !important",
+    height: "28px !important",
+    padding: "2px",
     mixBlendMode: "multiply",
     borderRadius: "unset !important"
   },

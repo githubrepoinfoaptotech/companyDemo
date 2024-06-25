@@ -235,6 +235,8 @@ export default function Candidates(props) {
     recruiterId: "",
     currentCompanyName: "",
     hideContactDetails: false,
+    showAllDetails: null,
+    detailsHandler: null,
     panNumber: "",
     linkedInProfile: "",
   });
@@ -1889,6 +1891,8 @@ export default function Candidates(props) {
               currentCompanyName: response.data.data.candidateDetail?.currentCompanyName,
               panNumber: response.data.data.candidateDetail?.panNumber,
               linkedInProfile: response.data.data.candidateDetail?.linkedInProfile,
+              showAllDetails: response.data.data.candidateDetail?.showAllDetails,
+              detailsHandler: response.data.data.candidateDetail?.detailsHandler,
             });
 
             setState({ ...state, right: true });

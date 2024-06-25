@@ -976,6 +976,33 @@ export default function Add(props) {
                           </Typography>
                         </FormControl>
                       </Grid>
+                      {decode.role === "SUBVENDOR" && (
+                        <Grid item xs={12} sm={6} md={6} lg={6}>
+                          <InputLabel shrink htmlFor="showAllDetails">
+                            Show All Details
+                          </InputLabel>
+                          <FormControl className={classes.margin}>
+                            <Switch
+                              color="primary"
+                              id="showAllDetails"
+                              name="showAllDetails"
+                              checked={props.candidate?.showAllDetails}
+                              onChange={(e) => {
+                                props.setCandidate({
+                                  ...props.candidate,
+                                  showAllDetails: e.target.checked,
+                                });
+
+                              }}
+                              error={props.errors.showAllDetails ? true : false}
+                              inputProps={{ "aria-label": "primary checkbox" }}
+                            />
+                            <Typography variant="inherit" color="error">
+                              {props.errors.showAllDetails?.message}
+                            </Typography>
+                          </FormControl>
+                        </Grid>
+                      )}
                     </>
                     :
                     <Grid item xs={6} sm={5} md={2} lg={2}>

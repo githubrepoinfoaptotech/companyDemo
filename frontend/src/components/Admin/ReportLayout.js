@@ -11,7 +11,6 @@ import {
   CircularProgress,
   Avatar,
   Typography,
-
 } from "@material-ui/core";
 import ViewIcon from "@material-ui/icons/Visibility";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -475,7 +474,7 @@ export default function Layout(props) {
             alternateMobile: response.data.data.candidateDetail?.alternateMobile,
             resume: response.data.data.candidateDetail?.resume,
             document: response.data.data.candidateDetail?.document,
-              photo: response.data.data.candidateDetail?.photo,
+            photo: response.data.data.candidateDetail?.photo,
             candidateRecruiterDiscussionRecording: response.data.data.candidateRecruiterDiscussionRecording,
             candidateSkillExplanationRecording: response.data.data.candidateSkillExplanationRecording,
             candidateMindsetAssessmentLink: response.data.data.candidateMindsetAssessmentLink,
@@ -704,16 +703,20 @@ export default function Layout(props) {
             </Grid>
           </Grid>
         </>,
-        <div className={classes.externalIconContainer}>
-          {item.candidateDetail?.isExternal === "YES" ?
+        <Grid container row spacing={2} className={classes.externalIconContainer} data-candidatename={item.candidateDetail?.firstName + " " + item.candidateDetail?.lastName}>
+          {item.candidateDetail?.isExternal === "YES" ? (
             <Tooltip title="SUBVENDOR" placement="bottom" aria-label="title">
               <Avatar alt="Profile" src={external} className={classes.externalIcon} />
-            </Tooltip> : ""}
+            </Tooltip>) : (
+            ""
+          )}
           <div>
-            {item.candidateDetail?.firstName + " " + item.candidateDetail?.lastName} <br /> {" (" + item.uniqueId + ")"}
+            {item.candidateDetail?.firstName +
+              " " +
+              item.candidateDetail?.lastName}
+            <br /> {" (" + item.uniqueId + ")"}
           </div>
-
-        </div>,
+        </Grid>,
         item.mainId === decode.mainId ?
           <>  {item.candidateDetail?.email + " /"} <br />{"91 " + item.candidateDetail?.mobile.slice(2)}  </>
           : item.hideContactDetails !== true ?
@@ -748,7 +751,7 @@ export default function Layout(props) {
           </Tooltip>
         </Grid>,
         <Grid container row spacing={2} >
-          <div className={classes.externalIconContainer}>
+          <Grid container row spacing={2} className={classes.externalIconContainer} data-candidatename={item.candidate.candidateDetail?.firstName + " " + item.candidate.candidateDetail?.lastName}>
             {item.candidate.candidateDetail?.isExternal === "YES" ?
               <Tooltip title="SUBVENDOR" placement="bottom" aria-label="title">
                 <Avatar alt="Profile" src={external} className={classes.externalIcon} />
@@ -756,7 +759,7 @@ export default function Layout(props) {
             <div>
               {item.candidate.candidateDetail?.firstName + " " + item.candidate.candidateDetail?.lastName} <br />{" (" + item.candidate.uniqueId + ")"}
             </div>
-          </div>
+          </Grid>
         </Grid>,
 
         item.mainId === decode.mainId ?

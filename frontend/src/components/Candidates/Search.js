@@ -1,16 +1,16 @@
-import React, { useState, useRef, useEffect} from "react";
-import { IconButton, InputBase,ClickAwayListener } from "@material-ui/core";
+import React, { useState, useRef, useEffect } from "react";
+import { IconButton, InputBase, ClickAwayListener } from "@material-ui/core";
 import { Search as SearchIcon } from "@material-ui/icons";
 import useStyles from "../../themes/style.js";
 import { useHistory } from "react-router-dom";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import Notification from "../../components/Notification";
 import { toast } from "react-toastify";
 
 export default function SearchBar(props) {
 
 
- 
+
   const [expanded, setExpanded] = useState(false);
   const positions = [toast.POSITION.TOP_RIGHT];
 
@@ -20,22 +20,19 @@ export default function SearchBar(props) {
   const handleSearchClick = () => {
     setExpanded(!expanded);
   };
-  
-   
+
+
   const [search, setSearch] = useState(new URLSearchParams(props.search).get('search'));
- 
+
   useEffect(() => {
 
-   if(props.search !==""){
-    setSearch(new URLSearchParams(props.search).get('search'));
- 
-   } else{
-    setSearch("");
- 
-   } 
-     
+    if (props.search !== "") {
+      setSearch(new URLSearchParams(props.search).get('search'));
+    } else {
+      setSearch("");
+    }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps 
+    // eslint-disable-next-line react-hooks/exhaustive-deps 
   }, []);
 
 
@@ -93,22 +90,21 @@ export default function SearchBar(props) {
   }
 
 
-
   const handleSearch = () => {
 
-    if (searchRef.current.value !== "") { 
+    if (searchRef.current.value !== "") {
 
-        decode.role === "ADMIN"? 
-         history.push("/app/admin_candidates?search=" + searchRef.current.value)
-        :  decode.role === "RECRUITER"?
-        history.push("/app/recruiter_candidates?search=" + searchRef.current.value)
-        : decode.role === "CLIENTCOORDINATOR"?
-        history.push("/app/cc_candidates?search=" + searchRef.current.value)
-        :
-        history.push("/app/others_candidates?search=" + searchRef.current.value)
-      
-        setSearch("");
-      
+      decode.role === "ADMIN" ?
+        history.push("/app/admin_candidates?search=" + searchRef.current.value)
+        : decode.role === "RECRUITER" ?
+          history.push("/app/recruiter_candidates?search=" + searchRef.current.value)
+          : decode.role === "CLIENTCOORDINATOR" ?
+            history.push("/app/cc_candidates?search=" + searchRef.current.value)
+            :
+            history.push("/app/others_candidates?search=" + searchRef.current.value)
+
+      setSearch("");
+
     } else {
       handleNotificationCall("error", "Search keyword is required");
     }
@@ -122,20 +118,20 @@ export default function SearchBar(props) {
   return (
     <>
       <div className={classes.SlgButton}>
-        <ClickAwayListener onClickAway={()=>setExpanded(false)}>
-          <div className={expanded ? classes.searchBar : props.WalletValue<999? classes.searchBar1 : classes.searchBar2} 
-          style={{ padding: decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? "0px" : ""}}
+        <ClickAwayListener onClickAway={() => setExpanded(false)}>
+          <div className={expanded ? classes.searchBar : props.WalletValue < 999 ? classes.searchBar1 : classes.searchBar2}
+            style={{ padding: decode.role === "SUBVENDOR" || decode.role === "FREELANCER" ? "0px" : "" }}
           >
             {expanded && (
               <>
-                <InputBase   placeholder="Enter Candidate Unique ID/Name/Email/Mobile (eg: 91XXXXXXXXXX)" onChange={(e)=>{setSearch(e.target.value)}}  value={search!==null?search:""}    inputRef={searchRef}  />
-                <IconButton onClick={()=>{ if(search!=="") { handleSearch(); handleSearchClick(!expanded) } else{handleSearch();  }}}>
-                <SearchIcon   className={classes.closeBtn + " " + classes.mail_blue} /> </IconButton>
+                <InputBase placeholder="Enter Candidate Unique ID/Name/Email/Mobile (eg: 91XXXXXXXXXX)" onChange={(e) => { setSearch(e.target.value) }} value={search !== null ? search : ""} inputRef={searchRef} />
+                <IconButton onClick={() => { if (search !== "") { handleSearch(); handleSearchClick(!expanded) } else { handleSearch(); } }}>
+                  <SearchIcon className={classes.closeBtn + " " + classes.mail_blue} /> </IconButton>
               </>
             )}
-          
+
             {!expanded && (
-              <IconButton onClick={()=>{handleSearchClick(); setSearch("")}}>
+              <IconButton onClick={() => { handleSearchClick(); setSearch("") }}>
                 <SearchIcon color="primary" className={classes.searchIcon} />
               </IconButton>
             )}
@@ -144,11 +140,11 @@ export default function SearchBar(props) {
       </div>
 
       <div className={classes.SsmButton}>
-        <InputBase  placeholder="Enter Candidate Unique ID/Name/Email/Mobile (eg: 91XXXXXXXXXX)" onChange={(e)=>{setSearch(e.target.value)}} value={search!==null?search:"" }     inputRef={searchRef}     />
-         <IconButton onClick={()=>{ if(search!=="") { handleSearch();handleSearchClick(!expanded);setSearch("")} else{ handleSearch();  }}}>
-              <SearchIcon className={classes.closeBtn + " " + classes.mail_blue}  />
-            </IconButton>
-       
+        <InputBase placeholder="Enter Candidate Unique ID/Name/Email/Mobile (eg: 91XXXXXXXXXX)" onChange={(e) => { setSearch(e.target.value) }} value={search !== null ? search : ""} inputRef={searchRef} />
+        <IconButton onClick={() => { if (search !== "") { handleSearch(); handleSearchClick(!expanded); setSearch("") } else { handleSearch(); } }}>
+          <SearchIcon className={classes.closeBtn + " " + classes.mail_blue} />
+        </IconButton>
+
       </div>
     </>
   );

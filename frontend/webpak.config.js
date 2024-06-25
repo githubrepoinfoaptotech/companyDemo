@@ -42,6 +42,6 @@ module.exports = {
     contentBase: path.join(__dirname, 'dist'),
     historyApiFallback: true,  // Ensure the server fallback to index.html
     compress: true,
-    port: 3000
+    port: 1040
   }
 };
