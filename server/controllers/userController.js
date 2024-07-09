@@ -716,6 +716,10 @@ exports.viewUser = async (req, res) => {
     res.status(500).json({ message: 'Error', status: false });
   }
 };
+
+exports.getVendorCreds =async (req,res)=>{
+
+};
 exports.companySettings = async (req, res) => {
   console.log(req.body);
   const rec_data = await user.findOne({ where: { id: req.body.recruiterId }, include: [{ model: recruiter, attributes: ["id"] }] });
