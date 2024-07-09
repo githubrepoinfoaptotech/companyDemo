@@ -703,8 +703,7 @@ exports.editCandidate = async (req, res) => {
         gender: req.body.gender,
         currentCompanyName:req.body.currentCompanyName,
         panNumber:req.body.panNumber,
-        linkedInProfile:req.body.linkedInProfile,
-        showAllDetails:req.body.showAllDetails
+        linkedInProfile:req.body.linkedInProfile
       };
       if (req.body.candidateProcessed == "NO") {
         mycan.reason = req.body.reason;
@@ -741,6 +740,38 @@ exports.editCandidate = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "ERROR", status: false });
+  }
+};
+exports.changeCaididateVisibility=async (req,res)=>{
+  try
+  {
+  var can_data = await candidate.findOne({
+    where: { id: req.body.id },
+    include: [
+      {
+        model: candidateDetails,
+        attributes: ["id"],
+      },
+    ],
+  });
+  var can_detail= await candidateDetails.findOne({where:{id:can_data.candidateDetail.id}})
+  var rec_data=await recruiter.findOne({where:{id:can_data.recruiterId}});
+  if(can_detail.showAllDetails==true)
+    {
+      can_detail.showAllDetails=false;
+    }
+    else
+    {
+      rec_data.recCreds=rec_data.recCreds+1
+      can_detail.showAllDetails=true;
+    }
+    await can_detail.save();
+    res.status(200).json({ status: true, message: "Done" });
+  }
+  catch(e)
+  {
+    console.log(e);
+    res.status(200).json({ status: false, message: "Error" });
   }
 };
 exports.adminEditCandidate = async (req, res) => {

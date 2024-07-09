@@ -69,7 +69,12 @@ const recruiter=sequelize.define("recruiter",{
         type:Sequelize.BOOLEAN,
         allowNull:true,
         defaultValue:true
-    }
+    },
+    recCreds:{
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        defaultValue:0
+      }
 },
 {
     indexes: [
