@@ -116,6 +116,11 @@ const requirement=sequelize.define("requirement",{
             model: levelOfHiring, 
             key: 'id',
          }
+    },
+    hideForFrontDisplay:{
+        type:Sequelize.BOOLEAN,
+        allowNull:true,
+        defaultValue:false
     }
 },
 {

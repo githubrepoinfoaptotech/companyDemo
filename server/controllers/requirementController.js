@@ -347,6 +347,7 @@ exports.viewRequirement = async (req, res) => {
       'modeOfWork',
       'specialHiring',
       'levelOfHiringId',
+      'hideForFrontDisplay',
       [
         fn(
           "concat",
@@ -380,6 +381,19 @@ exports.viewRequirement = async (req, res) => {
 //     }); 
 // };
 
+exports.getAllRequirementsForDisplay=async(req,res)=>{
+  var page = req.body.page;
+  var limit = 10;
+  await requirements.findAll({where: {statusCode:201,hideForFrontDisplay:false},limit: limit,
+    offset: page * limit - limit,
+    order:[['createdAt','DESC']]}).then(data=>{
+    res.status(200).json({ status: true, data: data });
+  }).catch(e=>{
+    console.log(e);
+    res.status(500).json({ status: false, message: "Error" });
+  });
+};
+
 exports.editRequirement = async (req, res) => {
   console.log(req.body);
   const myreq = {
@@ -393,7 +407,8 @@ exports.editRequirement = async (req, res) => {
     updatedBy:req.userId,
     hideFromInternal:req.body.hideFromInternal,
     specialHiring:req.body.specialHiring,
-    modeOfWork:req.body.modeOfWork
+    modeOfWork:req.body.modeOfWork,
+    hideForFrontDisplay:req.body.hideForFrontDisplay
   };
   requirements
     .findOne({where:{id:req.body.id}})

@@ -681,6 +681,7 @@ exports.editCandidate = async (req, res) => {
       var can_email = false;
     }
     if (can_email == false) {
+      var rec_data=await recruiter.findOne({where:{id:can_data.recruiterId}});
       var mycan = {
         email: req.body.email,
         firstName: req.body.firstName,
@@ -703,8 +704,13 @@ exports.editCandidate = async (req, res) => {
         gender: req.body.gender,
         currentCompanyName:req.body.currentCompanyName,
         panNumber:req.body.panNumber,
-        linkedInProfile:req.body.linkedInProfile
+        linkedInProfile:req.body.linkedInProfile,
+        showAllDetails:req.body.showAllDetails
       };
+      if(req.body.showAllDetails==true)
+      {
+        rec_data.recCreds=rec_data.recCreds+1
+      }
       if (req.body.candidateProcessed == "NO") {
         mycan.reason = req.body.reason;
       }
