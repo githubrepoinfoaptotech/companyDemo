@@ -1249,7 +1249,7 @@ export default function Transaction(props) {
               rowsPerPageOptions={[50]}
               component="div"
               count={count}
-              rowsPerPage={50}
+              rowsPerPage={10}
               page={page}
               onPageChange={handleChangePage}
             />

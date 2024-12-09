@@ -590,7 +590,7 @@ export default function Layout(props) {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  const [rowsPerPage] = useState(50);
+  const [rowsPerPage] = useState(10);
 
   const Content = ({ name, value }) => {
     return (

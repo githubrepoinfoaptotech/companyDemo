@@ -719,10 +719,16 @@ export default function Add(props) {
                     >
                       <select
                         defaultValue={days}
-                        onChange={(e) => {
-                          props.setDay(e.target.value);
-                        }}
-                        {...props.register("day")}
+                        value={days}
+                        {...props.register("day", {
+                          onChange: (e) => {
+                            props.setDay(e.target.value);
+                            props.setCandidate({
+                              ...props.candidate,
+                              dob: `${e.target.value}-${months}-${years}`,
+                            });
+                          },
+                        })}
                         className={classes.selectDrop}
                         required
                       >
@@ -735,11 +741,17 @@ export default function Add(props) {
                       </select>
 
                       <select
-                        defaultValue={months}
-                        onChange={(e) => {
-                          props.setMonth(e.target.value);
-                        }}
-                        {...props.register("month")}
+                       defaultValue={months}
+                        value={months}
+                        {...props.register("month", {
+                          onChange: (e) => {
+                            props.setMonth(e.target.value);
+                            props.setCandidate({
+                              ...props.candidate,
+                              dob: `${days}-${e.target.value}-${years}`,
+                            });
+                          },
+                        })}
                         className={classes.selectDrop}
                         required
                       >
@@ -753,10 +765,16 @@ export default function Add(props) {
 
                       <select
                         defaultValue={years}
-                        onChange={(e) => {
-                          props.setYear(e.target.value);
-                        }}
-                        {...props.register("year")}
+                        value={years}
+                        {...props.register("year", {
+                          onChange: (e) => {
+                            props.setYear(e.target.value);
+                            props.setCandidate({
+                              ...props.candidate,
+                              dob: `${days}-${months}-${e.target.value}`,
+                            });
+                          },
+                        })}
                         className={classes.selectDrop}
                         required
                       >

@@ -46,6 +46,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import MatchJDDialog from "../../components/Candidates/MatchJDDialog.js";
 import { useResumeDataContext } from "../../context/CandidateDataContext.js";
 import CPVFormView from "../../components/Candidates/CPVFormView.js";
+import ReactPdfDialog from "../../components/Candidates/ReactPdfDialog.js";
 
 const positions = [toast.POSITION.TOP_RIGHT];
 
@@ -202,7 +203,7 @@ export default function Tables(props) {
   const [page, setPage] = useState(0);
   const [currerntPage, setCurrerntPage] = useState(1);
 
-  const [rowsPerPage] = useState(50);
+  const [rowsPerPage] = useState(10);
   const [setCandidatesChange] = useState([]);
   const [reducerValue, forceUpdate] = useReducer((x) => x + 1, 0);
   const [file, setFile] = useState([]);
@@ -245,7 +246,7 @@ export default function Tables(props) {
     "11",
     "12",
   ];
-  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+  const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0'));
   const years = Array.from({ length: 60 }, (_, i) => moment(new Date()).format("YYYY") - i);
 
   const [resumePercentage, setResumePercentage] = useState([])
@@ -2633,7 +2634,7 @@ export default function Tables(props) {
                 <> {item.requirement?.requirementName} <br />{"(" + item.requirement?.uniqueId + ")"}</>,
                 item.requirement?.recruiter?.firstName + " " + item.requirement?.recruiter?.lastName,
                 item.recruiter?.firstName + " " + item.recruiter?.lastName,
-                <>{item.candidateDetail?.resume !== "https://liverefo.s3.amazonaws.com/" ? (<>   <Grid container className={classes.space}>     <Grid item xs className={classes.toolAlign}>
+                <>{item.candidateDetail?.resume !== `${process.env.REACT_APP_AWS_BUCKET_URL}` ? (<>   <Grid container className={classes.space}>     <Grid item xs className={classes.toolAlign}>
                   <Tooltip title="View Resume" placement="bottom" aria-label="view"       >
                     <DescriptionIcon className={classes.toolIcon} onClick={() => {
                       handleResumeOpen(); setFile([
@@ -2775,12 +2776,16 @@ export default function Tables(props) {
         cpvData={cpvData}
         handleCPVClose={handleCPVClose}
       />
-      <ResumeDialog
+      {/* <ResumeDialog
+        resume={file}
+        resumeOpen={resumeOpen}
+        handleResumeClose={handleResumeClose}
+      /> */}
+      <ReactPdfDialog
         resume={file}
         resumeOpen={resumeOpen}
         handleResumeClose={handleResumeClose}
       />
-
       {/* <MatchJDDialog
         resumePercentage={resumePercentage}
         requirementName={requirementName}

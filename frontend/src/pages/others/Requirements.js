@@ -352,7 +352,7 @@ export default function Tables() {
                 <div className={classes.space + " " + classes.alignItemsEnd}  >
 
 
-                  {requirementsView?.jd !== "https://liverefo.s3.amazonaws.com/" ? <>
+                  {requirementsView?.jd !== `${process.env.REACT_APP_AWS_BUCKET_URL}` ? <>
                     <Tooltip
                       title="View JD"
                       placement="bottom"
@@ -654,7 +654,7 @@ export default function Tables() {
               rowsPerPageOptions={[50]}
               component="div"
               count={count}
-              rowsPerPage={50}
+              rowsPerPage={10}
               page={page}
               onPageChange={handleChangePage}
             />

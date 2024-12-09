@@ -452,7 +452,7 @@ export default function Tables() {
     "11",
     "12",
   ];
-  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+  const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0'));
   const years = Array.from({ length: 60 }, (_, i) => moment(new Date()).format("YYYY") - i);
 
 
@@ -1172,7 +1172,7 @@ export default function Tables() {
                   <div className={classes.space + " " + classes.alignItemsEnd}  >
 
 
-                    {requirementsView?.jd !== "https://liverefo.s3.amazonaws.com/" ? <>
+                    {requirementsView?.jd !== `${process.env.REACT_APP_AWS_BUCKET_URL}` ? <>
                       <Tooltip
                         title="View JD"
                         placement="bottom"
@@ -1618,7 +1618,7 @@ export default function Tables() {
               rowsPerPageOptions={[50]}
               component="div"
               count={count}
-              rowsPerPage={50}
+              rowsPerPage={10}
               page={page}
               onPageChange={handleChangePage}
             />

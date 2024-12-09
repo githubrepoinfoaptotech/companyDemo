@@ -142,7 +142,7 @@ export default function Tables(props) {
   const [page, setPage] = useState(0);
   const [currerntPage, setCurrerntPage] = useState(1);
 
-  const [rowsPerPage] = useState(50);
+  const [rowsPerPage] = useState(10);
   const [file, setFile] = useState([]);
   const [docFile, setDocFile] = useState([]);
   const [profile, setProfile] = useState([]);
@@ -166,7 +166,7 @@ export default function Tables(props) {
     "11",
     "12",
   ];
-  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+  const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0'));
   const years = Array.from(
     { length: 60 },
     (_, i) => moment(new Date()).format("YYYY") - i,

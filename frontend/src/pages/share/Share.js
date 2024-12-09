@@ -155,7 +155,7 @@ function Layouts(props) {
   const [page, setPage] = useState(0);
   const [currerntPage, setCurrerntPage] = useState(1);
 
-  const [rowsPerPage] = useState(50);
+  const [rowsPerPage] = useState(10);
    
  
   const [shortList] = useState({

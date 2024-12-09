@@ -213,7 +213,7 @@ export default function AddClient(props) {
               rowsPerPageOptions={[50]}
               component="div"
               count={props.assigncount}
-              rowsPerPage={50}
+              rowsPerPage={10}
               page={props.assignPage}
               onPageChange={props.handlerequirementChangePage}
             />
