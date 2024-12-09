@@ -103,7 +103,7 @@ export default function Tables() {
 
   const [page, setPage] = useState(0);
   const [currerntPage, setCurrerntPage] = useState(1);
-  const [rowsPerPage] = useState(50);
+  const [rowsPerPage] = useState(10);
   var currentYear = new Date().getFullYear();
   var startYear = 2023;
   var endYear = currentYear + 1;

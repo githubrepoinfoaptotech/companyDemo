@@ -245,19 +245,19 @@ export default function Header(props) {
   const monthDropdown = [
     {
       id: "1",
-      Month: "JAN",
+      Month: "JANUARY",
     },
     {
       id: "2",
-      Month: "FEB",
+      Month: "FEBRUARY",
     },
     {
       id: "3",
-      Month: "MAR",
+      Month: "MARCH",
     },
     {
       id: "4",
-      Month: "APR",
+      Month: "APRIL",
     },
 
     {
@@ -266,35 +266,35 @@ export default function Header(props) {
     },
     {
       id: "6",
-      Month: "JUN",
+      Month: "JUNE",
     },
     {
       id: "7",
-      Month: "JUL",
+      Month: "JULY",
     },
     {
       id: "8",
-      Month: "AUG",
+      Month: "AUGUST",
     },
 
     {
       id: "9",
-      Month: "SEP",
+      Month: "SEPTEMBER",
     },
 
     {
       id: "10",
-      Month: "OCT",
+      Month: "OCTOBER",
     },
 
     {
       id: "11",
-      Month: "NOV",
+      Month: "NOVEMBER",
     },
 
     {
       id: "12",
-      Month: "DEC",
+      Month: "DECEMBER",
     },
   ];
 
@@ -319,6 +319,34 @@ export default function Header(props) {
   const handleQAMobileClick = (event) => {
     setAnchorEl2(event.currentTarget);
     setQuickAccessMobileOpen((previousOpen) => !previousOpen);
+  };
+
+  const handleFromMonthChange = (e) => {
+    const selectedFromMonth = e.target.value;
+    const selectedFromMonthIndex = monthDropdown.findIndex(month => month.id === selectedFromMonth);
+
+    if (selectedFromMonthIndex !== -1) {
+      const endMonthIndex = (selectedFromMonthIndex + 11) % 12;
+      const endMonth = monthDropdown[endMonthIndex].id;
+
+      setMonthValue({
+        fromMonth: selectedFromMonth,
+        toMonth: endMonth,
+      });
+    } else {
+      console.error('Invalid fromMonth selected:', selectedFromMonth);
+    }
+  };
+
+    const getFinancialYearLabel = (fromMonth, toMonth) => {
+    const fromMonthObject = monthDropdown.find(month => month.id === fromMonth);
+    const toMonthObject = monthDropdown.find(month => month.id === toMonth);
+
+    if (fromMonthObject && toMonthObject) {
+      return `${fromMonthObject.Month}-${toMonthObject.Month}`;
+    } else {
+      return 'Invalid month selection';
+    }
   };
 
   const qaOpen = quickAccessOpen && Boolean(anchorEl2);
@@ -361,7 +389,7 @@ export default function Header(props) {
     "11",
     "12",
   ];
-  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+  const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0'));
   const years = Array.from(
     { length: 60 },
     (_, i) => moment(new Date()).format("YYYY") - i,
@@ -1381,8 +1409,8 @@ export default function Header(props) {
   }
 
   const [Month, setMonthValue] = useState({
-    toMonth: "",
-    fromMonth: "",
+    fromMonth: "4",
+    toMonth: "3",
   });
 
 
@@ -1649,20 +1677,18 @@ export default function Header(props) {
   }
 
   function handleCompanySettings(values) {
-    if (fromRef.current.value !== "" && toRef.current.value !== "") {
-      handleNotificationCall("error", "Check Financial Year Properly");
-      return
-    }
+
+    const dataToSend = {
+      fromMonth: Month.fromMonth,
+      toMonth: Month.toMonth,
+    };
 
     return new Promise((resolve) => {
       setLoader(true);
       axios({
         method: "post",
         url: `${process.env.REACT_APP_SERVER}admin/editMyCompanySettings`,
-        data: {
-          fromMonth: fromRef.current.value,
-          toMonth: toRef.current.value,
-        },
+        data: dataToSend,
         headers: {
           "Content-Type": "application/json",
           Authorization: token,
@@ -1677,9 +1703,12 @@ export default function Header(props) {
             handleNotificationCall("error", response.data.message);
           }
           setLoader(false);
+          resolve();
         })
         .catch(function (error) {
-          console.log(error);
+          console.error(error);
+          handleNotificationCall("error", "An error occurred while updating settings.");
+          setLoader(false);
         });
     });
   }
@@ -1967,9 +1996,13 @@ export default function Header(props) {
       },
     }).then(function (response) {
       if (response.data.status === true) {
+
+        const toMonthVal = response.data.data.toMonth
+        const fromMonthVal = response.data.data.fromMonth
+
         setMonthValue({
-          toMonth: response.data.data.toMonth,
-          fromMonth: response.data.data.fromMonth,
+          toMonth: toMonthVal.toString(),
+          fromMonth: fromMonthVal.toString(),
         });
       }
     });
@@ -2256,6 +2289,7 @@ export default function Header(props) {
                           <Select
                             labelId="toMonth"
                             name="toMonth"
+                            style={{ display: 'none' }}
                             defaultValue={Month.toMonth}
                             onChange={(e) => {
                               setMonthValue({
@@ -2281,6 +2315,9 @@ export default function Header(props) {
                           </Select>
                         </div>
                       </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                      {getFinancialYearLabel(Month.fromMonth, Month.toMonth)}
                     </Grid>
                   </Grid>
                 </CardContent>

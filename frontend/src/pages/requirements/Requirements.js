@@ -223,7 +223,7 @@ export default function Tables() {
     formState: { errors: editErrors, isSubmitting: editIsSubmitting },
     handleSubmit: editSubmit,
     reset: editreset,
-    setValue: setEditValue, 
+    setValue: setEditValue,
     trigger: editTrigger,
   } = useForm({
     mode: "onBlur",
@@ -941,7 +941,7 @@ export default function Tables() {
 
               <form onSubmit={editSubmit(handleEdit)}>
                 <CardContent>
-                  <Grid container direction="row" spacing={2} style={{height: "79vh",overflow: "scroll"}}>
+                  <Grid container direction="row" spacing={2} style={{ height: "79vh", overflow: "scroll" }}>
                     <Grid item xs={12} sm={6} md={6} lg={6}>
                       <FormControl className={classes.margin}>
                         <InputLabel shrink htmlFor="clientId">
@@ -1309,7 +1309,7 @@ export default function Tables() {
                           </div>
 
                           {requirementsEdit?.jd !==
-                            "https://liverefo.s3.amazonaws.com/" &&
+                            `${process.env.REACT_APP_AWS_BUCKET_URL}` &&
                             requirementsEdit?.jd !== "" ? (
                             <>
                               <Tooltip
@@ -1612,7 +1612,7 @@ export default function Tables() {
                       className={classes.space + " " + classes.alignItemsEnd}
                     >
                       {requirementsView?.jd !==
-                        "https://liverefo.s3.amazonaws.com/" ? (
+                        `${process.env.REACT_APP_AWS_BUCKET_URL}` ? (
                         <>
                           <Tooltip
                             title="View JD"

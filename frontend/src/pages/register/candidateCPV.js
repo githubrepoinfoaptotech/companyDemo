@@ -866,7 +866,7 @@ function CompanyRegister(props) {
                   <div className={classes.space + " " + classes.alignItemsEnd}  >
 
 
-                    {requirementsView?.jd !== "https://liverefo.s3.amazonaws.com/" && requirementsView?.jd !== null ? <>
+                    {requirementsView?.jd !== `${process.env.REACT_APP_AWS_BUCKET_URL}` && requirementsView?.jd !== null ? <>
                       <Tooltip
                         title="View JD"
                         placement="bottom"
@@ -1105,7 +1105,7 @@ function CompanyRegister(props) {
                     </Grid>
 
                     <Grid item xs={12} sm={6} md={6} lg={6}>
-                      <Typography> Confirmation on reading Job Discription fully</Typography>
+                      <Typography> Confirmation on reading Job Description  fully</Typography>
                     </Grid>
 
                     <Grid item xs={12} sm={6} md={6} lg={6}>
